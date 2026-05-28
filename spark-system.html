@@ -508,6 +508,24 @@ button{font-family:inherit;cursor:pointer}
   .toast { font-size: 12.5px; padding: 11px 16px; max-width: calc(100vw - 32px); }
 }
 /* <<< MOBILE-CSS <<< */
+
+/* >>> DR-CSS >>> */
+.dr-mask{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:9999;display:none;align-items:center;justify-content:center;padding:18px}
+.dr-mask.show{display:flex;animation:fade .18s ease-out}
+.dr-modal{width:min(420px,100%);background:var(--surface);border:1px solid var(--border-2);border-radius:22px;padding:26px;position:relative;box-shadow:0 24px 80px rgba(0,0,0,.7)}
+.dr-x{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);font-size:16px;cursor:pointer}
+.dr-head{text-align:center;margin-bottom:18px}
+.dr-eyebrow{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--primary);font-weight:700}
+.dr-title{font-size:20px;font-weight:700;margin-top:6px}
+.dr-sub{font-size:12.5px;color:var(--dim);margin-top:6px;line-height:1.5}
+.dr-fields{display:grid;gap:12px;margin-bottom:16px}
+.dr-fields label{display:flex;flex-direction:column;gap:4px;font-family:'JetBrains Mono';font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
+.dr-fields input{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:#fff;font-family:'JetBrains Mono';font-size:14px;color-scheme:dark}
+.dr-foot{display:flex;gap:10px}
+.dr-cancel,.dr-apply{flex:1;padding:11px;border-radius:10px;font-weight:700;font-size:13.5px;border:none;cursor:pointer}
+.dr-cancel{background:var(--surface-2);border:1px solid var(--border);color:#fff}
+.dr-apply{background:var(--grad);color:#160a00}
+/* <<< DR-CSS <<< */
 </style>
 </head>
 <body>
@@ -2318,7 +2336,178 @@ seedTickets();renderCheck();updateKdsBadge();setupReportsSidebar();renderReports
   });
 })();
 /* <<< SIDEBAR-DRAWER-JS <<< */
+
+/* >>> DATERANGE-JS >>> */
+(function(){
+  if (typeof document === 'undefined') return;
+  if (typeof state === 'undefined' || !state.rep) return;
+  if (typeof renderReports !== 'function') return;
+
+  // Snapshot of today so we can restore it after switching ranges
+  var TODAY = JSON.parse(JSON.stringify(state.rep));
+
+  // Per-range overlays. Only the metrics that meaningfully change with the
+  // window are overridden — session data (gift cards / audit log / loyalty
+  // pool / inventory) stay shared across ranges.
+  var RANGES = {
+    today: {},  // identity overlay
+    yesterday: {
+      netSales: 7825.30, covers: 198, checks: 65,
+      voids: 2, voidAmt: 28.5, comps: 1, compAmt: 18.0, discounts: 4, discAmt: 62.0,
+      laborCost: 2010, laborHours: 91,
+      hourly:   [185,310,490,580,820,510,340,440,650,855,790,540,295],
+      hourlyLW: [160,280,440,520,770,480,310,410,610,805,755,495,265],
+      grossSales: 8138.0, refunds: 24.0, tips: 962.0,
+      payMix: {Card:6420, Cash:580, Mobile:680, 'Gift card':145.3},
+      svcMix: {'Dine-in':5520,'Takeout':1340,'Delivery':650,'Bar':315.3},
+      catSales: {'Burgers':1810,'Mains':2960,'Starters':1010,'Bar':1880,'Dessert':620.3},
+      daypart: {'Lunch (11–4)':2890,'Happy Hr (4–6)':1090,'Dinner (6–9)':3180,'Late (9–close)':665.3},
+      taxable: 7350.0, exempt: 475.3, taxCollected: 606.4
+    },
+    wtd: {
+      netSales: 41880.0, covers: 1062, checks: 332,
+      voids: 14, voidAmt: 215.0, comps: 9, compAmt: 148.0, discounts: 23, discAmt: 412.0,
+      laborCost: 10485, laborHours: 478.5,
+      hourly:   [1080,1640,2580,3010,4310,2840,1820,2410,3520,4640,4310,2810,1610],
+      hourlyLW: [ 990,1490,2380,2820,4010,2660,1710,2270,3290,4380,4080,2660,1490],
+      grossSales: 43520.0, refunds: 195.0, tips: 5160.0,
+      payMix: {Card:34280, Cash:3120, Mobile:3680, 'Gift card':800},
+      svcMix: {'Dine-in':29920,'Takeout':7180,'Delivery':3420,'Bar':1360},
+      catSales: {'Burgers':9680,'Mains':15850,'Starters':5480,'Bar':10020,'Dessert':3220},
+      daypart: {'Lunch (11–4)':15580,'Happy Hr (4–6)':5910,'Dinner (6–9)':16990,'Late (9–close)':3400},
+      taxable: 39320.0, exempt: 2560.0, taxCollected: 3244.4
+    },
+    mtd: {
+      netSales: 168240.0, covers: 4280, checks: 1342,
+      voids: 58, voidAmt: 842.0, comps: 38, compAmt: 582.0, discounts: 96, discAmt: 1620.0,
+      laborCost: 42300, laborHours: 1920,
+      hourly:   [4300,6900,10400,12200,17400,11500,7300,9700,14100,18700,17300,11300,6500],
+      hourlyLW: [4060,6480,9850,11540,16410,10880,6920,9170,13340,17680,16380,10680,6160],
+      grossSales: 174860.0, refunds: 820.0, tips: 20700.0,
+      payMix: {Card:137660, Cash:12500, Mobile:14780, 'Gift card':3300},
+      svcMix: {'Dine-in':120140,'Takeout':28850,'Delivery':13760,'Bar':5490},
+      catSales: {'Burgers':38800,'Mains':63600,'Starters':22000,'Bar':40280,'Dessert':12900},
+      daypart: {'Lunch (11–4)':62540,'Happy Hr (4–6)':23720,'Dinner (6–9)':68210,'Late (9–close)':13770},
+      taxable: 157950.0, exempt: 10290.0, taxCollected: 13030.9
+    }
+  };
+
+  function scaleObj(o, k){ var r={}; for (var p in o) r[p] = Math.round(o[p]*k*100)/100; return r; }
+  function scaleArr(a, k){ return a.map(function(v){ return Math.round(v*k); }); }
+
+  // For Custom we derive a synthetic range from N days: today scaled linearly
+  // with a small variance per day to look believable. Not perfect, but
+  // enough for a pitch.
+  function customRangeFor(days){
+    var k = days; // each day ~= today's volume
+    var t = TODAY;
+    return {
+      netSales: Math.round(t.netSales*k*100)/100,
+      covers: Math.round(t.covers*k),
+      checks: Math.round(t.checks*k),
+      voids: Math.round(t.voids*k), voidAmt: Math.round(t.voidAmt*k*100)/100,
+      comps: Math.round(t.comps*k), compAmt: Math.round(t.compAmt*k*100)/100,
+      discounts: Math.round(t.discounts*k), discAmt: Math.round(t.discAmt*k*100)/100,
+      laborCost: Math.round(t.laborCost*k), laborHours: Math.round(t.laborHours*k*10)/10,
+      hourly: scaleArr(t.hourly, k), hourlyLW: scaleArr(t.hourlyLW, k*0.94),
+      grossSales: Math.round(t.grossSales*k*100)/100,
+      refunds: Math.round(t.refunds*k*100)/100, tips: Math.round(t.tips*k*100)/100,
+      payMix: scaleObj(t.payMix, k), svcMix: scaleObj(t.svcMix, k),
+      catSales: scaleObj(t.catSales, k), daypart: scaleObj(t.daypart, k),
+      taxable: Math.round(t.taxable*k*100)/100,
+      exempt: Math.round(t.exempt*k*100)/100,
+      taxCollected: Math.round(t.taxCollected*k*100)/100
+    };
+  }
+
+  function applyRange(overlay){
+    // Reset to today snapshot first (cheap deep clone of the touched keys)
+    Object.keys(overlay).forEach(function(k){ state.rep[k] = TODAY[k] ? JSON.parse(JSON.stringify(TODAY[k])) : state.rep[k]; });
+    // Now overlay the new range's values
+    Object.keys(overlay).forEach(function(k){ state.rep[k] = overlay[k]; });
+    if (typeof renderReports === 'function') renderReports();
+  }
+
+  function ready(fn){ if(document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded',fn); }
+  ready(function(){
+    var btns = document.querySelectorAll('#dateRange button');
+    if (!btns.length) return;
+    if (typeof btns[0].addEventListener !== 'function') return;
+
+    var keys = ['yesterday','today','wtd','mtd','custom'];
+    function setActive(b){ btns.forEach(function(x){ x.classList.remove('on'); }); b.classList.add('on'); }
+
+    btns.forEach(function(b, i){
+      b.addEventListener('click', function(){
+        var key = keys[i];
+        if (key === 'custom') { setActive(b); openCustom(); return; }
+        setActive(b);
+        applyRange(RANGES[key] || {});
+        if (typeof toast === 'function') {
+          var label = b.textContent.trim();
+          toast('fire', 'Date range: <b>'+label+'</b>');
+        }
+      });
+    });
+
+    // Custom modal
+    var mask = document.getElementById('drMask');
+    var fromI = document.getElementById('drFrom');
+    var toI   = document.getElementById('drTo');
+    function fmt(d){ return d.toISOString().slice(0,10); }
+    var today = new Date(); var weekAgo = new Date(today.getTime() - 6*864e5);
+    if (fromI) fromI.value = fmt(weekAgo);
+    if (toI)   toI.value   = fmt(today);
+
+    function openCustom(){ if (mask) { mask.classList.add('show'); document.body.style.overflow='hidden'; } }
+    function shutCustom(){ if (mask) { mask.classList.remove('show'); document.body.style.overflow=''; } }
+
+    var closeBtn = document.getElementById('drClose');
+    var cancel   = document.getElementById('drCancel');
+    var apply    = document.getElementById('drApply');
+    if (closeBtn) closeBtn.addEventListener('click', shutCustom);
+    if (cancel)   cancel.addEventListener('click',   shutCustom);
+    if (mask)     mask.addEventListener('click', function(e){ if (e.target === mask) shutCustom(); });
+    document.addEventListener('keydown', function(e){ if (e.key==='Escape' && mask && mask.classList.contains('show')) shutCustom(); });
+
+    if (apply) apply.addEventListener('click', function(){
+      var f = new Date(fromI.value); var t = new Date(toI.value);
+      if (isNaN(f) || isNaN(t) || t < f) { if (typeof toast === 'function') toast('warn', 'Pick valid dates'); return; }
+      var days = Math.max(1, Math.round((t - f)/864e5) + 1);
+      applyRange(customRangeFor(days));
+      var label = days + (days === 1 ? ' day' : ' days');
+      btns[4].textContent = label;
+      shutCustom();
+      if (typeof toast === 'function') toast('fire', 'Custom range: <b>'+label+'</b>');
+    });
+
+    // Initial state: Today selected
+    var todayBtn = btns[1]; if (todayBtn) todayBtn.classList.add('on');
+  });
+})();
+/* <<< DATERANGE-JS <<< */
 </script>
 
+
+<!-- >>> CUSTOM-RANGE-MODAL >>> -->
+<div class="dr-mask" id="drMask" role="dialog" aria-modal="true">
+  <div class="dr-modal">
+    <button class="dr-x" id="drClose" aria-label="Close">✕</button>
+    <div class="dr-head">
+      <div class="dr-eyebrow">CUSTOM RANGE</div>
+      <div class="dr-title">Pick a start and end date</div>
+      <div class="dr-sub">Reports will scale to the number of days in the range. Demo data only — real builds pull from the warehouse.</div>
+    </div>
+    <div class="dr-fields">
+      <label>From <input type="date" id="drFrom"></label>
+      <label>To <input type="date" id="drTo"></label>
+    </div>
+    <div class="dr-foot">
+      <button class="dr-cancel" id="drCancel">Cancel</button>
+      <button class="dr-apply" id="drApply">Apply</button>
+    </div>
+  </div>
+</div>
+<!-- <<< CUSTOM-RANGE-MODAL <<< -->
 </body>
 </html>
