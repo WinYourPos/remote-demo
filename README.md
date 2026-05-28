@@ -1,23 +1,28 @@
 # Spark POS — Demo
 
+> 🚀 **Live demo:** **<https://winyourpos.github.io/remote-demo/spark-pos.html>**
+> Open the **Test-drive the POS ↗** button or the **Try it yourself 📱** QR (scan from any phone — mobile-optimised UI).
+
 Two standalone, zero-build HTML demos for pitching **Spark POS** — a white-label
 restaurant point-of-sale platform — to a US reseller partner.
 
-| File | What it is |
-|------|------------|
-| **`spark-pos.html`** | Partner-facing landing/marketing page. Hero → live white-label brand-swap → **13 device-surface mockups** → 13 AI services → partner-activation pipeline → ROI/residual calculator → competitor comparison → partner economics → "production-ready" tech block → FAQ → CTA. |
-| **`spark-system.html`** | Interactive product demo. **Order + Kitchen (KDS) + Reports**, wired together: ring an item with modifiers → fire to the kitchen → close the check → reporting updates live. |
+| File | What it is | Live |
+|------|------------|------|
+| **`spark-pos.html`** | Partner-facing landing/marketing page. Hero → live white-label brand-swap → **13 device-surface mockups** → 13 AI services → partner-activation pipeline → ROI/residual calculator → competitor comparison → partner economics → "production-ready" tech block → FAQ → CTA. | [open ↗](https://winyourpos.github.io/remote-demo/spark-pos.html) |
+| **`spark-system.html`** | Interactive product demo. **Order + Kitchen (KDS) + Reports**, wired together: ring an item with modifiers → fire to the kitchen → close the check → reporting updates live. Mobile-optimised — works on phone via the in-hero QR scan. | [open ↗](https://winyourpos.github.io/remote-demo/spark-system.html) |
 
 ## Open the demos
 
-No install needed — just open either file in a browser by double-clicking it.
+Just visit the live URL above, no install needed.
 
-Or serve the folder so the relative link from the landing to `spark-system.html` works the same as on the web:
+Or run locally — double-click either file, or serve the folder:
 
 ```bash
 python3 -m http.server 8000
 # then visit http://localhost:8000/spark-pos.html
 ```
+
+> The **Try it yourself 📱** button always points at the live Pages URL above, so partners scanning from any device land on the public deployment regardless of how the presenter opened the page.
 
 The hero on `spark-pos.html` has a single CTA — **Test-drive the POS ↗** — that opens `spark-system.html` in a new tab.
 

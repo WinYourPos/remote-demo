@@ -328,6 +328,148 @@ button{font-family:inherit;cursor:pointer}
 .tag.refund{background:rgba(255,107,0,.18);color:#FF6B00}
 .tag.cash{background:rgba(255,255,255,.12);color:#fff}
 /* <<< HEATMAP-CSS <<< */
+
+/* >>> MOBILE-CSS >>> */
+@media (max-width: 720px) {
+  html, body { height: auto; min-height: 100%; }
+  body { overflow: auto; -webkit-text-size-adjust: 100%; touch-action: manipulation; }
+  .app { height: auto; min-height: 100vh; }
+  .view { overflow: visible; }
+  .view.active { display: flex; flex-direction: column; }
+
+  /* Topbar — wrap, segment fills row 2 */
+  .topbar { padding: 10px 14px; gap: 10px; flex-wrap: wrap; position: sticky; top: 0; }
+  .logo { font-size: 14px; }
+  .logo small { display: none; }
+  .topbar .clock { font-size: 10.5px; order: 2; margin-left: auto; }
+  .seg { width: 100%; margin: 0; order: 3; padding: 3px; gap: 1px; }
+  .seg button { flex: 1; justify-content: center; padding: 9px 6px; font-size: 12.5px; gap: 5px; }
+  .seg button .lbl-txt { font-size: 12px; }
+  .seg button .badge { font-size: 9px; padding: 0 5px; }
+
+  /* ORDER — stack menu + check vertically */
+  #order { flex-direction: column; }
+  .menu-pane { flex: none; border-right: none; border-bottom: 1px solid var(--border); }
+  .menu-top { padding: 12px 14px; }
+  .menu-top h2 { font-size: 17px; }
+  .menu-top p { font-size: 11.5px; }
+  .cats { padding: 10px 14px; gap: 6px; }
+  .cat { padding: 8px 13px; font-size: 12.5px; }
+  .items { grid-template-columns: repeat(2, 1fr); padding: 14px; gap: 10px; max-height: 50vh; }
+  .item { padding: 12px; border-radius: 14px; }
+  .item .nm { font-size: 13.5px; max-width: 78%; }
+  .item .ds { font-size: 10.5px; height: 28px; }
+  .item .pr { font-size: 13px; }
+  .item .st { font-size: 8px; padding: 2px 5px; top: 10px; right: 10px; }
+  .check-pane { width: 100%; flex: none; }
+  .check-top { padding: 12px 14px; }
+  .ctype button { padding: 9px 4px; font-size: 11.5px; }
+  .cmeta { gap: 8px; }
+  .lines { padding: 6px 14px; max-height: 240px; }
+  .check-foot { padding: 12px 14px; }
+  .frow.tot { font-size: 17px; margin: 8px 0 10px; }
+  .frow.tot .mono { font-size: 17px; }
+  .facts button { padding: 12px; font-size: 13.5px; }
+
+  /* Modifier sheet — full-screen on phone */
+  .sheet-bg { padding: 0; align-items: stretch; }
+  .sheet { max-width: 100%; max-height: 100%; height: 100dvh; border-radius: 0; }
+  .sheet-h { padding: 18px 18px 14px; }
+  .sheet-h h3 { font-size: 20px; margin: 10px 0 3px; }
+  .sheet-h p { font-size: 12.5px; }
+  .sheet-h .x { top: 16px; right: 16px; width: 32px; height: 32px; }
+  .sheet-body { padding: 16px 18px; }
+  .mgroup { margin-bottom: 18px; }
+  .mgroup .gh .gn { font-size: 14px; }
+  .opts { grid-template-columns: 1fr; gap: 6px; }
+  .opt { padding: 11px 13px; font-size: 13px; }
+  .sheet-f { padding: 14px 18px; gap: 10px; }
+  .add-btn { padding: 13px; font-size: 14px; padding-left: 16px; padding-right: 16px; }
+  .notes { font-size: 13px; height: 56px; }
+
+  /* KDS — single column, bigger tap targets */
+  .kds-bar { padding: 10px 14px; gap: 8px; }
+  .kstation { padding: 8px 13px; font-size: 12px; }
+  .recall, .ktoggle { padding: 8px 12px; font-size: 12px; }
+  .kds-board { grid-template-columns: 1fr; padding: 14px; gap: 12px; }
+  .ticket { border-radius: 14px; }
+  .tk-h { padding: 12px 14px; }
+  .tk-h .onum { font-size: 15px; }
+  .tk-h .timer { font-size: 15px; }
+  .tk-body { padding: 8px 14px; }
+  .ki .kn { font-size: 14px; }
+  .tk-f { padding: 10px 14px; }
+  .tk-f button { padding: 11px; font-size: 13px; }
+  .allday { padding: 16px; }
+  .ad-grid { grid-template-columns: 1fr; }
+  .ad-card { padding: 14px; }
+  .ad-card .big { font-size: 30px; min-width: 44px; }
+
+  /* REPORTS — sidebar becomes a horizontal scrolling chip strip on top */
+  #reports { flex-direction: column; overflow: visible; }
+  .rep-side {
+    width: 100%; height: auto; max-height: none;
+    border-right: none; border-bottom: 1px solid var(--border);
+    padding: 10px 12px;
+    display: flex; gap: 4px; flex-wrap: nowrap;
+    overflow-x: auto; overflow-y: hidden;
+    -webkit-overflow-scrolling: touch; scrollbar-width: thin;
+    position: sticky; top: 0; background: var(--bg); z-index: 5;
+  }
+  .rep-side .grp { display: flex; align-items: center; gap: 3px; margin-bottom: 0; flex-shrink: 0; }
+  .rep-side .grp .gl { display: none; }
+  .rep-side a {
+    white-space: nowrap; padding: 7px 11px; font-size: 12px;
+    gap: 6px; flex-shrink: 0;
+  }
+  .rep-side a span:not(.ic) { display: inline; }
+  .rep-side a .ic { width: 14px; font-size: 12px; }
+
+  .rep-main { overflow: visible; }
+  .rep-head { padding: 12px 14px; gap: 8px; flex-wrap: wrap; }
+  .rep-head h2 { font-size: 16px; }
+  .rep-head .desc { font-size: 11px; }
+  .rep-head .daterange { gap: 4px; width: 100%; order: 3; overflow-x: auto; }
+  .rep-head .daterange button { padding: 6px 10px; font-size: 11.5px; flex-shrink: 0; }
+  .exportbtn { padding: 6px 11px; font-size: 11.5px; }
+
+  .rep-content { padding: 14px 12px 60px; }
+  .kpis { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+  .kpi { padding: 14px; border-radius: 14px; }
+  .kpi .lab { font-size: 10.5px; }
+  .kpi .val { font-size: 22px; margin: 6px 0 3px; }
+  .kpi .delta { font-size: 11px; }
+  .rep-grid, .rep-grid.eq { grid-template-columns: 1fr; gap: 12px; margin-bottom: 12px; }
+  .panel { padding: 16px; border-radius: 14px; }
+  .panel h3 { font-size: 14px; }
+  .panel .ph-sub { font-size: 11px; margin-bottom: 12px; }
+
+  /* Charts shrink */
+  .hbars { height: 140px; gap: 4px; }
+  .hbars .col .lbl { font-size: 8.5px; }
+  .donut-wrap { flex-direction: column; gap: 14px; align-items: center; }
+  .legend { width: 100%; }
+
+  /* Tables: tighter + horizontal scroll if very wide */
+  .rtable { font-size: 12px; }
+  .rtable th { font-size: 9.5px; padding: 7px 6px; }
+  .rtable td { padding: 9px 6px; font-size: 12px; }
+  .panel { overflow-x: auto; }
+
+  /* Heatmap shrinks */
+  .heatmap { font-size: 9px; }
+  .hm-row { grid-template-columns: 36px repeat(7, 1fr); gap: 1.5px; }
+  .hm-c { padding: 4px 0; }
+
+  /* Receipt overlay */
+  .receipt .card { padding: 30px 24px; max-width: calc(100% - 32px); }
+  .receipt h3 { font-size: 22px; }
+
+  /* Toast */
+  .toast-wrap { bottom: 16px; }
+  .toast { font-size: 12.5px; padding: 11px 16px; max-width: calc(100vw - 32px); }
+}
+/* <<< MOBILE-CSS <<< */
 </style>
 </head>
 <body>
