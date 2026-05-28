@@ -9,7 +9,7 @@ restaurant point-of-sale platform — to a US reseller partner.
 | File | What it is | Live |
 |------|------------|------|
 | **`try.html`** | Branded welcome splash partners see after scanning the QR. New POS + lightning-bolt logo (120 / 84 / 90px depending on viewport), eyebrow "● LIVE DEMO", "Next-gen restaurant POS" headline, 5 capability chips, one big "Try the live system →" CTA → `spark-system.html`. Portrait + landscape layouts. | [open ↗](https://winyourpos.github.io/remote-demo/try.html) |
-| **`spark-pos.html`** | Partner-facing landing/marketing page. Hero → live white-label brand-swap → **13 device-surface mockups** → 13 AI services → partner-activation pipeline → ROI/residual calculator → competitor comparison → partner economics → "production-ready" tech block → FAQ → CTA. | [open ↗](https://winyourpos.github.io/remote-demo/spark-pos.html) |
+| **`spark-pos.html`** | Partner-facing landing/marketing page. Hero → live white-label brand-swap → **13 device-surface mockups** → **Ask Guru AI advisor** → partner-activation pipeline → ROI/residual calculator → competitor comparison → partner economics → "production-ready" tech block → FAQ → CTA. | [open ↗](https://winyourpos.github.io/remote-demo/spark-pos.html) |
 | **`spark-system.html`** | Interactive product demo. **Order + Kitchen (KDS) + Reports**, wired together: ring an item with modifiers → fire to the kitchen → close the check → reporting updates live. Mobile + landscape optimised — works on phone via the in-hero QR scan (lands on `try.html` first). | [open ↗](https://winyourpos.github.io/remote-demo/spark-system.html) |
 
 ## Open the demos
@@ -61,6 +61,18 @@ python3 -m http.server 8000
 - **Operations** — Cash · Speed of service · Station throughput · Open tickets · Sales heatmap (hour × DOW) · End-of-day Z-report
 - **Inventory** — On-hand · Cost of goods (food / bev / prime)
 - **Multi-Unit** — Location comparison
+
+Every report icon in the sidebar drawer now renders through the same Lucide stroke-currentColor SVG path — three previously stray emojis (⭐ / ↩️ / 🎟) were swapped to mapped equivalents (🏅 award / 🔁 repeat-2 / 🎁 gift) so the rendered drawer is fully consistent.
+
+## Ask Guru (replaces the old "13 AI services" grid)
+
+The AI section on the landing is no longer a feature catalogue — it's a single interactive advisor with one job: read the data and give a starting point.
+
+- **Input + Ask Guru →** for free-form questions; tiny keyword router maps to the closest canned answer (`camp/promo` → campaign, `dish/menu/add` → dish, `margin/cogs/cost` → margin, otherwise → biggest opportunity).
+- **Four chip starters**: *What campaign should I run this week?* · *What new dish should I add to the menu?* · *What's my biggest opportunity right now?* · *How's my margin trending?*
+- Each answer is structured as **Read of your data → Recommendation → Why it'll work → Expected outcome**, with JetBrains Mono section labels, mixed-bullet lists, brand-orange highlighted figures.
+- Built-in **disclaimer** in every answer: "Starting point only. Guru reads what's in your data — for pricing, supplier or staffing calls, please consult a restaurant industry specialist before acting."
+- The four canned answers cover business tips, campaign suggestions, menu ideas and margin diagnostics — the four pitches a restaurateur actually wants AI to help with.
 
 **Mobile** (≤720px viewport — the QR target)
 - Order screen stacks menu + check vertically; modifier sheet goes full-screen
