@@ -1869,7 +1869,7 @@ function mixArr(){
    ========================================================= */
 const REPORTS=[
  {group:'Insights',items:[
-   {id:'guru',ic:'🔮',name:'Ask Guru',desc:'Your AI advisor — campaigns · menu · margin',fn:repGuru}
+   {id:'guru',ic:'<svg class="ic" aria-hidden="true"><use href="#i-message-square"/></svg>',name:'Ask Guru',desc:'Your AI advisor — opens in a new tab',external:'guru.html',fn:repGuru}
  ]},
  {group:'Overview',items:[
    {id:'dashboard',ic:'🏠',name:'Dashboard',desc:'Today at a glance · live',fn:repDashboard}
@@ -2569,10 +2569,19 @@ const GURU_DATA = {
 function setupReportsSidebar(){
   const side=document.getElementById('repSide');
   side.innerHTML=REPORTS.map(g=>`<div class="grp"><div class="gl">${g.group}</div>`+
-    g.items.map(it=>`<a data-r="${it.id}" class="${it.id===state.activeReport?'on':''}"><span class="ic">${it.ic}</span><span>${it.name}</span></a>`).join('')+
+    g.items.map(it=>{
+      const iconHtml = (typeof it.ic==='string' && it.ic.charAt(0)==='<') ? it.ic : `<span class="ic">${it.ic}</span>`;
+      if (it.external) {
+        return `<a href="${it.external}" target="_blank" rel="noopener" class="ext" data-ext="1">${iconHtml}<span>${it.name}</span></a>`;
+      }
+      return `<a data-r="${it.id}" class="${it.id===state.activeReport?'on':''}">${iconHtml}<span>${it.name}</span></a>`;
+    }).join('')+
     `</div>`).join('');
-  side.querySelectorAll('a').forEach(a=>a.onclick=()=>{state.activeReport=a.dataset.r;
-    side.querySelectorAll('a').forEach(x=>x.classList.toggle('on',x===a));renderReports();});
+  side.querySelectorAll('a').forEach(a=>{
+    if (a.dataset.ext) return; // external links — let the browser open them
+    a.onclick=()=>{state.activeReport=a.dataset.r;
+      side.querySelectorAll('a').forEach(x=>x.classList.toggle('on',x===a));renderReports();};
+  });
   document.getElementById('exportBtn').onclick=()=>toast('pay',`Exported <b>${REPORT_INDEX[state.activeReport].name}</b> to CSV`);
 }
 function renderReports(){
