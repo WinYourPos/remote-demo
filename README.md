@@ -64,15 +64,22 @@ python3 -m http.server 8000
 
 Every report icon in the sidebar drawer now renders through the same Lucide stroke-currentColor SVG path — three previously stray emojis (⭐ / ↩️ / 🎟) were swapped to mapped equivalents (🏅 award / 🔁 repeat-2 / 🎁 gift) so the rendered drawer is fully consistent.
 
-## Ask Guru (replaces the old "13 AI services" grid)
+## Ask Guru — the AI advisor (replaces the old "13 AI services" grid)
 
-The AI section on the landing is no longer a feature catalogue — it's a single interactive advisor with one job: read the data and give a starting point.
+The AI surface is no longer a feature catalogue — it's one advisor that reads the data and gives a starting point.
 
-- **Input + Ask Guru →** for free-form questions; tiny keyword router maps to the closest canned answer (`camp/promo` → campaign, `dish/menu/add` → dish, `margin/cogs/cost` → margin, otherwise → biggest opportunity).
-- **Four chip starters**: *What campaign should I run this week?* · *What new dish should I add to the menu?* · *What's my biggest opportunity right now?* · *How's my margin trending?*
-- Each answer is structured as **Read of your data → Recommendation → Why it'll work → Expected outcome**, with JetBrains Mono section labels, mixed-bullet lists, brand-orange highlighted figures.
-- Built-in **disclaimer** in every answer: "Starting point only. Guru reads what's in your data — for pricing, supplier or staffing calls, please consult a restaurant industry specialist before acting."
-- The four canned answers cover business tips, campaign suggestions, menu ideas and margin diagnostics — the four pitches a restaurateur actually wants AI to help with.
+**On the landing (`spark-pos.html#ai`)** — embedded teaser with an input + four chip starters and a single-panel answer.
+
+**Inside the POS (`spark-system.html`)** — the **Reports → Insights → Ask Guru** entry now ships an inline `<svg class="ic"><use href="#i-message-square"/></svg>` (no emoji, no runtime replacer dependency — identical stroke-currentColor look as every other report icon) and opens **`guru.html` in a new tab** for a full chat conversation.
+
+**`guru.html` — full chat page (linked from both surfaces)**
+- Brand topbar: POS+bolt logo · "Ask Guru · your AI advisor" · LIVE dot · ← Back to `spark-system.html`
+- **Conversation layout**: user bubbles right-aligned in the orange gradient, Guru bubbles left-aligned with a soft orange tint and avatar
+- **Four starter chips** above the composer stay visible for the whole session — partners can keep one-tapping
+- **Thinking-dots animation** for ~1.9s on every reply, followed by a **block-by-block staggered reveal** (380 ms between *Read of your data → Recommendation → Why it'll work → Expected outcome*, then a final beat for the disclaimer) so an answer materialises like a considered read rather than a lookup
+- **Free-form composer**: input + paper-plane send button, Enter sends, iOS safe-area-aware padding
+- Same four canned answers (business tips, campaign suggestions, menu ideas, margin diagnostics) plus a graceful "I haven't trained on that yet — try one of these" fallback when the keyword router (`camp/promo`, `dish/menu/add`, `margin/cogs/cost`, `opp/grow/focus/priorit`) can't match
+- Every answer carries the disclaimer: *"Starting point only. Guru reads what's in your data — for pricing, supplier or staffing calls, consult a restaurant industry specialist before acting."*
 
 **Mobile** (≤720px viewport — the QR target)
 - Order screen stacks menu + check vertically; modifier sheet goes full-screen
@@ -111,6 +118,7 @@ remote-demo/
 ├── try.html                  # branded welcome splash (QR landing target)
 ├── spark-pos.html            # landing / partner pitch page
 ├── spark-system.html         # Order + KDS + Reports interactive demo
+├── guru.html                 # Ask Guru full chat page (opens from POS sidebar)
 ├── index.html                # redirects → spark-pos.html
 ├── docs/RESEARCH_SUMMARY.md  # strategy & competitive research (the "why")
 └── scripts/test.js           # syntax + render harness for spark-system.html
