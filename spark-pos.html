@@ -3600,10 +3600,10 @@ var qrcode = function() {
     var copy = document.getElementById('qrCopy');
     var hint = document.getElementById('qrHint');
     if(!btn||!mask) return;
-    function targetUrl(){
-      try { return new URL('spark-system.html', location.href).href; }
-      catch(e){ return location.href.replace(/[^/]*$/,'') + 'spark-system.html'; }
-    }
+    // Always point the QR at the public Pages mirror so partners can scan
+    // from anywhere, even when the demo is opened from localhost / file://.
+    var PUBLIC_URL = 'https://winyourpos.github.io/remote-demo/spark-system.html';
+    function targetUrl(){ return PUBLIC_URL; }
     function isLocal(u){ return /localhost|127\.0\.0\.1|^file:|192\.168\.|^10\.|^172\.(1[6-9]|2\d|3[01])\./.test(u); }
     function renderQR(){
       var u = targetUrl();
