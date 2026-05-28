@@ -39,7 +39,7 @@ competitive framing.
 - **Lightspeed** — strong inventory/international, dated UX.
 - **SpotOn** — restaurant-built, transparent pricing, but closed API/dev experience.
 - **Heartland/Genius** — payments-first, deep features, but captive economics, owns merchant data.
-- **Spark's gap to fill:** modern AI-native iOS UI that is **white-label by default** with
+- **Spark's gap to fill:** modern, AI-native UI that is **white-label by default** with
   **processor flexibility** — no incumbent offers all three.
 
 ## Persuasion levers used in the demo
