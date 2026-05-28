@@ -8,8 +8,9 @@ restaurant point-of-sale platform — to a US reseller partner.
 
 | File | What it is | Live |
 |------|------------|------|
+| **`try.html`** | Branded welcome splash partners see after scanning the QR. New POS + lightning-bolt logo (120 / 84 / 90px depending on viewport), eyebrow "● LIVE DEMO", "Next-gen restaurant POS" headline, 5 capability chips, one big "Try the live system →" CTA → `spark-system.html`. Portrait + landscape layouts. | [open ↗](https://winyourpos.github.io/remote-demo/try.html) |
 | **`spark-pos.html`** | Partner-facing landing/marketing page. Hero → live white-label brand-swap → **13 device-surface mockups** → 13 AI services → partner-activation pipeline → ROI/residual calculator → competitor comparison → partner economics → "production-ready" tech block → FAQ → CTA. | [open ↗](https://winyourpos.github.io/remote-demo/spark-pos.html) |
-| **`spark-system.html`** | Interactive product demo. **Order + Kitchen (KDS) + Reports**, wired together: ring an item with modifiers → fire to the kitchen → close the check → reporting updates live. Mobile-optimised — works on phone via the in-hero QR scan. | [open ↗](https://winyourpos.github.io/remote-demo/spark-system.html) |
+| **`spark-system.html`** | Interactive product demo. **Order + Kitchen (KDS) + Reports**, wired together: ring an item with modifiers → fire to the kitchen → close the check → reporting updates live. Mobile + landscape optimised — works on phone via the in-hero QR scan (lands on `try.html` first). | [open ↗](https://winyourpos.github.io/remote-demo/spark-system.html) |
 
 ## Open the demos
 
@@ -64,15 +65,21 @@ python3 -m http.server 8000
 **Mobile** (≤720px viewport — the QR target)
 - Order screen stacks menu + check vertically; modifier sheet goes full-screen
 - KDS becomes single-column with bigger bump / rush tap targets
-- Reports sidebar collapses behind a **☰** button → slide-in drawer with all 36 reports grouped, backdrop blur, Esc / tap-outside / ✕ to close, auto-close after pick
+- Reports sidebar collapses behind a Lucide-style three-line button → slide-in drawer with all 36 reports grouped, backdrop blur, Esc / tap-outside / ✕ to close, auto-close after pick
 
-## Design
+**Landscape** (orientation:landscape and max-height ≤ 520px)
+- Topbar slimmed down, Order side-by-side preserved, KDS reflows at 240px minimum
+- Reports sidebar collapses to 200px; modifier sheet caps at 96vh with a 3-column options grid; Pay modal lays out all 6 tender methods inline
 
-Dark-first iOS-style interface, single orange accent (`#FF9500 → #FF6B00`).
-Typography: **Sora** (display + body) + **JetBrains Mono** (labels, numerals).
-Icons: inline Lucide SVG sprite (ISC, bundled — no CDN).
+## Brand & design
 
-Production frontend (separate repo `WinYourPos/PDA-front`, Angular 21 + Tailwind v4) is aligned to the same tokens so what a partner sees here is what their restaurant clients will see in the real app.
+- **Logo:** new "POS terminal with lightning bolt emerging from the screen" mark. Defined once as `<symbol id="brand-spark-pos">` + two `<linearGradient>` defs inside the Lucide sprite, then referenced via `<svg class="brand-logo"><use href="#brand-spark-pos"/></svg>` from every consumer (sm 24 / default 32 / lg 96). `try.html` inlines the same artwork.
+- **Palette:** dark-first, single orange accent (`#FF9500 → #FF6B00`).
+- **Typography:** **Sora** display + body + **JetBrains Mono** for labels and numerals.
+- **Icons:** Lucide SVG sprite (ISC, bundled — no CDN).
+- **Buttons:** the reports header bar (date range pills, Export, ☰ drawer toggle) shares one consistent pill spec — 34px height (40px for the toggle), 10px radius, Sora 12.5/600, surface-2 default, hover lifts to surface-3 with brighter border, active scales to .97.
+
+Production frontend (separate repo `WinYourPos/PDA-front`, Angular 21 + Tailwind v4) is aligned to the same tokens and icon system so what a partner sees here is what their restaurant clients will see in the real app.
 
 ## Verify edits
 
@@ -86,11 +93,13 @@ node scripts/test.js
 ## Files
 
 ```
-demo-repository/
+remote-demo/
 ├── CLAUDE.md                 # project context for AI assistants
 ├── README.md                 # this file
+├── try.html                  # branded welcome splash (QR landing target)
 ├── spark-pos.html            # landing / partner pitch page
 ├── spark-system.html         # Order + KDS + Reports interactive demo
+├── index.html                # redirects → spark-pos.html
 ├── docs/RESEARCH_SUMMARY.md  # strategy & competitive research (the "why")
 └── scripts/test.js           # syntax + render harness for spark-system.html
 ```
