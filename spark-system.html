@@ -1,0 +1,2101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Spark POS — Live System Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#000;--surface:#0f0f10;--surface-2:#161618;--surface-3:#1d1d20;
+  --border:rgba(255,255,255,.08);--border-2:rgba(255,255,255,.15);
+  --text:#fff;--dim:rgba(255,255,255,.62);--dim-2:rgba(255,255,255,.4);
+  --primary:#FF9500;--primary-2:#FF6B00;--grad:linear-gradient(135deg,#FF9500,#FF6B00);
+  --success:#34C759;--warn:#FFD60A;--error:#FF453A;--blue:#0A84FF;--purple:#BF5AF2;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+.mono{font-family:'JetBrains Mono',monospace}
+button{font-family:inherit;cursor:pointer}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:8px}
+
+/* ---------- APP SHELL ---------- */
+.app{display:flex;flex-direction:column;height:100vh}
+.topbar{display:flex;align-items:center;gap:18px;padding:12px 20px;border-bottom:1px solid var(--border);background:rgba(0,0,0,.6);backdrop-filter:blur(16px);z-index:50}
+.logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px;letter-spacing:-.02em}
+.logo .spark{width:26px;height:26px;border-radius:8px;background:var(--grad);display:grid;place-items:center;box-shadow:0 4px 14px rgba(255,107,0,.45)}
+.logo .spark svg{width:15px;height:15px}
+.logo small{font-weight:400;opacity:.5}
+.seg{display:flex;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:4px;gap:2px;margin:0 auto}
+.seg button{border:none;background:none;color:var(--dim);padding:9px 20px;border-radius:9px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;transition:.18s}
+.seg button .badge{font-family:'JetBrains Mono';font-size:10px;background:var(--error);color:#fff;border-radius:999px;padding:1px 6px;min-width:16px;text-align:center}
+.seg button.active{background:var(--grad);color:#160a00;box-shadow:0 4px 14px rgba(255,107,0,.35)}
+.topbar .clock{font-family:'JetBrains Mono';font-size:13px;color:var(--dim);display:flex;align-items:center;gap:8px}
+.topbar .clock .live{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 10px var(--success);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.4}}
+.view{flex:1;overflow:hidden;display:none}
+.view.active{display:flex}
+
+/* ---------- ORDER VIEW ---------- */
+#order{display:none}
+#order.active{display:flex}
+.menu-pane{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border)}
+.menu-top{padding:18px 22px;border-bottom:1px solid var(--border)}
+.menu-top h2{font-size:20px;font-weight:700}
+.menu-top p{color:var(--dim);font-size:13px;margin-top:2px}
+.cats{display:flex;gap:8px;padding:14px 22px;overflow-x:auto;border-bottom:1px solid var(--border)}
+.cat{flex-shrink:0;padding:9px 16px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border);color:var(--dim);font-size:13.5px;font-weight:600;transition:.15s}
+.cat.on{background:var(--grad);color:#160a00;border-color:transparent}
+.items{flex:1;overflow-y:auto;padding:20px 22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;align-content:start}
+.item{background:var(--surface-2);border:1px solid var(--border);border-radius:16px;padding:16px;text-align:left;transition:.16s;position:relative;overflow:hidden}
+.item:hover{border-color:var(--primary);transform:translateY(-3px)}
+.item:active{transform:scale(.97)}
+.item .st{position:absolute;top:12px;right:12px;font-family:'JetBrains Mono';font-size:9px;letter-spacing:.05em;text-transform:uppercase;padding:3px 7px;border-radius:6px;background:rgba(255,255,255,.06);color:var(--dim-2)}
+.item .nm{font-weight:600;font-size:15px;line-height:1.25;max-width:80%}
+.item .ds{font-size:11.5px;color:var(--dim-2);margin-top:5px;line-height:1.4;height:32px;overflow:hidden}
+.item .pr{font-family:'JetBrains Mono';font-size:14px;color:var(--primary);margin-top:10px;font-weight:600}
+.item .cz{font-size:10px;color:var(--dim-2);margin-top:3px}
+
+/* check pane */
+.check-pane{width:380px;flex-shrink:0;display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
+.check-top{padding:16px 20px;border-bottom:1px solid var(--border)}
+.ctype{display:flex;gap:6px;margin-bottom:12px}
+.ctype button{flex:1;padding:8px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border);color:var(--dim);font-size:12.5px;font-weight:600;transition:.15s}
+.ctype button.on{background:rgba(255,149,0,.14);border-color:var(--primary);color:var(--primary)}
+.cmeta{display:flex;gap:10px}
+.cmeta .f{flex:1}
+.cmeta label{font-size:10px;color:var(--dim-2);font-family:'JetBrains Mono';text-transform:uppercase;letter-spacing:.06em}
+.cmeta .row{display:flex;align-items:center;gap:8px;margin-top:5px}
+.cmeta .row button{width:30px;height:30px;border-radius:8px;background:var(--surface-2);border:1px solid var(--border);color:#fff;font-size:16px;font-weight:700}
+.cmeta .row .v{flex:1;text-align:center;font-family:'JetBrains Mono';font-weight:600;font-size:15px}
+.cmeta input{width:100%;margin-top:5px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:#fff;font-family:'JetBrains Mono';font-size:14px}
+.lines{flex:1;overflow-y:auto;padding:8px 16px}
+.empty{text-align:center;color:var(--dim-2);font-size:14px;padding:60px 20px;line-height:1.6}
+.line{padding:12px 0;border-bottom:1px solid var(--border);animation:slideIn .25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(10px)}}
+.line .lh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.line .lh .nm{font-size:14.5px;font-weight:600;display:flex;gap:8px;align-items:baseline}
+.line .lh .nm .q{font-family:'JetBrains Mono';font-size:11px;background:rgba(255,149,0,.16);color:var(--primary);border-radius:6px;padding:2px 7px}
+.line .lh .p{font-family:'JetBrains Mono';font-size:14px;color:#fff;font-weight:600;white-space:nowrap}
+.line .mods{margin:7px 0 0 26px;display:flex;flex-direction:column;gap:3px}
+.line .mods .m{font-size:11.5px;color:var(--dim);display:flex;justify-content:space-between}
+.line .mods .m.rm{color:var(--error)}
+.line .mods .m .mp{font-family:'JetBrains Mono';color:var(--dim-2)}
+.line .lact{display:flex;gap:10px;margin:8px 0 0 26px}
+.line .lact button{font-size:11px;color:var(--dim-2);background:none;border:none;text-decoration:underline}
+.line .lact button:hover{color:var(--error)}
+.check-foot{border-top:1px solid var(--border);padding:16px 20px;background:#0b0b0d}
+.frow{display:flex;justify-content:space-between;font-size:13px;color:var(--dim);margin-bottom:6px}
+.frow.tot{font-size:20px;font-weight:800;color:#fff;margin:10px 0 14px}
+.frow.tot .mono{font-size:20px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.facts button{padding:13px;border-radius:12px;font-weight:600;font-size:14px;border:1px solid var(--border-2);background:var(--surface-2);color:#fff;transition:.15s}
+.facts button:hover:not(:disabled){background:var(--surface-3)}
+.facts button.fire{grid-column:1/-1;background:linear-gradient(135deg,#0A84FF,#0050d6);border:none;color:#fff;box-shadow:0 6px 20px rgba(10,132,255,.35)}
+.facts button.pay{grid-column:1/-1;background:var(--grad);border:none;color:#160a00;box-shadow:0 6px 20px rgba(255,107,0,.35)}
+.facts button:disabled{opacity:.35;cursor:not-allowed}
+
+/* modifier sheet */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:24px}
+.sheet-bg.show{display:flex;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.sheet{background:var(--surface);border:1px solid var(--border-2);border-radius:24px;width:100%;max-width:560px;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.7);animation:rise .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes rise{from{transform:translateY(30px) scale(.97);opacity:0}}
+.sheet-h{padding:24px 26px 18px;border-bottom:1px solid var(--border);position:relative}
+.sheet-h .st{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--primary);background:rgba(255,149,0,.12);padding:4px 9px;border-radius:6px}
+.sheet-h h3{font-size:24px;font-weight:800;margin:12px 0 5px;letter-spacing:-.02em}
+.sheet-h p{color:var(--dim);font-size:13.5px}
+.sheet-h .x{position:absolute;top:22px;right:22px;width:34px;height:34px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);color:var(--dim);font-size:18px}
+.sheet-body{flex:1;overflow-y:auto;padding:20px 26px}
+.mgroup{margin-bottom:24px}
+.mgroup .gh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.mgroup .gh .gn{font-size:15px;font-weight:700}
+.mgroup .gh .tag{font-family:'JetBrains Mono';font-size:10px;padding:3px 8px;border-radius:6px;letter-spacing:.04em;text-transform:uppercase}
+.tag.req{background:rgba(255,69,58,.14);color:var(--error)}
+.tag.opt{background:rgba(255,255,255,.07);color:var(--dim-2)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:12px;background:var(--surface-2);border:1.5px solid var(--border);transition:.13s;font-size:13.5px}
+.opt:hover{border-color:var(--border-2)}
+.opt.sel{border-color:var(--primary);background:rgba(255,149,0,.1)}
+.opt .on{font-weight:600}
+.opt .up{font-family:'JetBrains Mono';font-size:12px;color:var(--success)}
+.opt.sel .check{color:var(--primary)}
+.opt .check{color:transparent;font-size:15px;font-weight:700}
+.notes{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px;color:#fff;font-family:'Sora';font-size:13.5px;resize:none;height:64px}
+.notes::placeholder{color:var(--dim-2)}
+.sheet-f{padding:18px 26px;border-top:1px solid var(--border);display:flex;align-items:center;gap:14px;background:#0b0b0d}
+.qty{display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:6px}
+.qty button{width:32px;height:32px;border-radius:8px;background:var(--surface-3);border:none;color:#fff;font-size:18px;font-weight:700}
+.qty .v{min-width:26px;text-align:center;font-family:'JetBrains Mono';font-weight:700}
+.add-btn{flex:1;padding:15px;border-radius:14px;background:var(--grad);border:none;color:#160a00;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:space-between;padding-left:20px;padding-right:20px;box-shadow:0 6px 20px rgba(255,107,0,.35);transition:.15s}
+.add-btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+.add-btn .ap{font-family:'JetBrains Mono'}
+
+/* ---------- KDS VIEW ---------- */
+#kds{flex-direction:column}
+.kds-bar{display:flex;align-items:center;gap:10px;padding:14px 22px;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto}
+.kds-bar .stf{display:flex;gap:6px}
+.kstation{padding:9px 16px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border);color:var(--dim);font-size:13px;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.kstation .ct{font-family:'JetBrains Mono';font-size:11px;background:rgba(255,255,255,.1);border-radius:999px;padding:1px 7px}
+.kstation.on{background:var(--grad);color:#160a00;border-color:transparent}
+.kstation.on .ct{background:rgba(0,0,0,.2)}
+.kds-bar .right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.ktoggle{padding:9px 16px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border);color:var(--dim);font-size:13px;font-weight:600}
+.ktoggle.on{background:rgba(52,199,89,.14);border-color:var(--success);color:var(--success)}
+.recall{padding:9px 16px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border-2);color:#fff;font-size:13px;font-weight:600}
+.kds-board{flex:1;overflow:auto;padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;align-content:start}
+.kds-empty{grid-column:1/-1;text-align:center;color:var(--dim-2);padding:80px 20px;font-size:15px;line-height:1.7}
+.ticket{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;animation:slideIn .3s ease;border-top:4px solid var(--success)}
+.ticket.warn{border-top-color:var(--warn)}
+.ticket.late{border-top-color:var(--error);animation:slideIn .3s ease, flash 1.6s infinite}
+@keyframes flash{50%{box-shadow:0 0 0 2px rgba(255,69,58,.4)}}
+.tk-h{padding:14px 16px;border-bottom:1px solid var(--border);background:var(--surface-2)}
+.tk-h .r1{display:flex;justify-content:space-between;align-items:center}
+.tk-h .onum{font-weight:800;font-size:16px}
+.tk-h .timer{font-family:'JetBrains Mono';font-weight:700;font-size:17px;padding:3px 10px;border-radius:8px}
+.timer.g{background:rgba(52,199,89,.16);color:var(--success)}
+.timer.y{background:rgba(255,214,10,.16);color:var(--warn)}
+.timer.r{background:rgba(255,69,58,.18);color:var(--error)}
+.tk-h .r2{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.tk-h .chip{font-family:'JetBrains Mono';font-size:10.5px;padding:3px 8px;border-radius:6px;background:rgba(255,255,255,.06);color:var(--dim)}
+.tk-h .chip.type{background:rgba(10,132,255,.16);color:var(--blue)}
+.tk-body{flex:1;padding:10px 16px}
+.ki{padding:9px 0;border-bottom:1px solid var(--border)}
+.ki:last-child{border:none}
+.ki.done .kn{text-decoration:line-through;opacity:.4}
+.ki .kn{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:8px;cursor:pointer}
+.ki .kn .q{font-family:'JetBrains Mono';color:var(--primary)}
+.ki .kn .stn{font-family:'JetBrains Mono';font-size:9px;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:rgba(255,255,255,.07);color:var(--dim-2);margin-left:auto}
+.ki .km{margin:5px 0 0 20px;display:flex;flex-direction:column;gap:2px}
+.ki .km span{font-size:12px;color:var(--dim)}
+.ki .km span.rm{color:var(--error);font-weight:600}
+.ki .km span.temp{color:var(--warn);font-weight:600}
+.ki .km span.add{color:var(--success)}
+.tk-f{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px}
+.tk-f button{flex:1;padding:11px;border-radius:10px;font-weight:700;font-size:13px;border:none}
+.tk-f .bump{background:var(--grad);color:#160a00}
+.tk-f .rush{background:var(--surface-2);border:1px solid var(--border-2);color:#fff;flex:0 0 auto;padding:11px 14px}
+/* all-day */
+.allday{flex:1;overflow:auto;padding:24px;display:none}
+.allday.show{display:block}
+.allday h3{font-size:18px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.ad-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.ad-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;display:flex;align-items:center;gap:16px}
+.ad-card .big{font-size:38px;font-weight:800;font-family:'JetBrains Mono';background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;min-width:54px}
+.ad-card .info .n{font-weight:600;font-size:15px}
+.ad-card .info .s{font-size:11px;color:var(--dim-2);font-family:'JetBrains Mono';text-transform:uppercase}
+
+/* ---------- REPORTS VIEW ---------- */
+#reports{flex-direction:row;overflow:hidden}
+.rep-side{width:250px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;padding:14px 10px;background:var(--surface)}
+.rep-side .grp{margin-bottom:12px}
+.rep-side .grp .gl{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim-2);padding:8px 12px 4px}
+.rep-side a{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:10px;font-size:13.5px;color:var(--dim);cursor:pointer;transition:.12s}
+.rep-side a:hover{background:var(--surface-2);color:#fff}
+.rep-side a.on{background:rgba(255,149,0,.12);color:var(--primary);font-weight:600}
+.rep-side a .ic{width:18px;text-align:center;font-size:14px;flex-shrink:0}
+.rep-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.rep-head{display:flex;align-items:center;gap:14px;padding:15px 26px;border-bottom:1px solid var(--border);background:rgba(0,0,0,.5);flex-shrink:0}
+.rep-head h2{font-size:19px;font-weight:700}
+.rep-head .desc{font-size:12px;color:var(--dim-2);margin-top:2px}
+.rep-head .daterange{display:flex;gap:6px;margin-left:auto}
+.rep-head .daterange button{padding:7px 13px;border-radius:9px;background:var(--surface-2);border:1px solid var(--border);color:var(--dim);font-size:12.5px;font-weight:600}
+.rep-head .daterange button.on{background:rgba(255,149,0,.14);border-color:var(--primary);color:var(--primary)}
+.exportbtn{padding:8px 14px;border-radius:9px;background:var(--surface-2);border:1px solid var(--border-2);color:#fff;font-size:12.5px;font-weight:600}
+.rep-content{flex:1;overflow-y:auto;padding:22px 26px 60px}
+.rep-content .secrow{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim-2);margin:26px 0 12px}
+.rep-content .secrow:first-child{margin-top:0}
+@media(max-width:760px){.rep-side{width:62px}.rep-side a span:not(.ic){display:none}.rep-side .grp .gl{text-align:center;font-size:8px}}
+.rep-top{display:flex;align-items:center;gap:14px;padding:18px 26px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(0,0,0,.7);backdrop-filter:blur(14px);z-index:10}
+.rep-top h2{font-size:20px;font-weight:700}
+.rep-top .daterange{display:flex;gap:6px;margin-left:auto}
+.rep-top .daterange button{padding:8px 14px;border-radius:9px;background:var(--surface-2);border:1px solid var(--border);color:var(--dim);font-size:13px;font-weight:600}
+.rep-top .daterange button.on{background:rgba(255,149,0,.14);border-color:var(--primary);color:var(--primary)}
+.rep-body{padding:24px 26px 60px;max-width:1300px;width:100%;margin:0 auto}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:14px;margin-bottom:20px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;position:relative;overflow:hidden}
+.kpi .glow{position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:radial-gradient(circle,rgba(255,107,0,.1),transparent 70%)}
+.kpi .lab{font-size:12px;color:var(--dim);font-family:'JetBrains Mono';text-transform:uppercase;letter-spacing:.05em}
+.kpi .val{font-size:30px;font-weight:800;margin:8px 0 4px;letter-spacing:-.02em}
+.kpi .val .mono{font-family:'JetBrains Mono'}
+.kpi .delta{font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px}
+.kpi .delta.up{color:var(--success)}.kpi .delta.down{color:var(--error)}
+.kpi .delta .sub{color:var(--dim-2);font-weight:400}
+.rep-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:980px){.rep-grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px}
+.panel h3{font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between}
+.panel .ph-sub{font-size:12px;color:var(--dim-2);margin-bottom:18px}
+.panel h3 .tag{font-family:'JetBrains Mono';font-size:10px;font-weight:500;color:var(--success);background:rgba(52,199,89,.12);padding:3px 8px;border-radius:6px}
+/* bars chart */
+.hbars{display:flex;align-items:flex-end;gap:6px;height:200px;padding-top:10px}
+.hbars .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.hbars .col .bar{width:100%;max-width:30px;background:var(--grad);border-radius:5px 5px 0 0;transition:height .6s cubic-bezier(.2,.8,.2,1);position:relative;min-height:3px}
+.hbars .col .bar:hover{opacity:.85}
+.hbars .col .bar .tip{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:6px;background:#000;border:1px solid var(--border-2);border-radius:7px;padding:5px 9px;font-family:'JetBrains Mono';font-size:11px;white-space:nowrap;opacity:0;pointer-events:none;transition:.15s}
+.hbars .col .bar:hover .tip{opacity:1}
+.hbars .col .lbl{font-family:'JetBrains Mono';font-size:9.5px;color:var(--dim-2)}
+/* donut */
+.donut-wrap{display:flex;align-items:center;gap:22px}
+.donut{flex-shrink:0}
+.legend{display:flex;flex-direction:column;gap:10px;flex:1}
+.legend .li{display:flex;align-items:center;gap:10px;font-size:13px}
+.legend .li .sw{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+.legend .li .nm{color:var(--dim)}
+.legend .li .vl{margin-left:auto;font-family:'JetBrains Mono';font-weight:600}
+/* tables */
+.rtable{width:100%;border-collapse:collapse}
+.rtable th{text-align:left;font-family:'JetBrains Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--dim-2);padding:8px 10px;border-bottom:1px solid var(--border);font-weight:600}
+.rtable th.num,.rtable td.num{text-align:right}
+.rtable td{padding:11px 10px;border-bottom:1px solid var(--border);font-size:13.5px}
+.rtable tr:last-child td{border:none}
+.rtable td.num{font-family:'JetBrains Mono'}
+.rtable .mixbar{height:5px;border-radius:5px;background:var(--surface-3);overflow:hidden;margin-top:5px}
+.rtable .mixbar i{display:block;height:100%;background:var(--grad);border-radius:5px}
+.rank{width:22px;height:22px;border-radius:7px;background:var(--surface-3);display:inline-grid;place-items:center;font-family:'JetBrains Mono';font-size:11px;font-weight:700;color:var(--dim);margin-right:8px}
+.rank.top{background:var(--grad);color:#160a00}
+.pos-neg{font-family:'JetBrains Mono';font-size:12px}
+.reason{font-size:11px;color:var(--dim-2)}
+.exc-tag{font-family:'JetBrains Mono';font-size:9.5px;padding:2px 6px;border-radius:5px;text-transform:uppercase}
+.exc-tag.void{background:rgba(255,69,58,.14);color:var(--error)}
+.exc-tag.comp{background:rgba(255,214,10,.14);color:var(--warn)}
+.exc-tag.disc{background:rgba(10,132,255,.14);color:var(--blue)}
+.exc-tag.star{background:rgba(52,199,89,.16);color:var(--success)}
+.exc-tag.plow{background:rgba(255,149,0,.16);color:var(--primary)}
+.exc-tag.puzzle{background:rgba(10,132,255,.16);color:var(--blue)}
+.exc-tag.dog{background:rgba(255,69,58,.16);color:var(--error)}
+.rep-grid.eq{grid-template-columns:1fr 1fr}
+.rep-grid.full{grid-template-columns:1fr}
+.row-low td{color:var(--error)!important}
+.row-low td.num{color:var(--error)!important}
+.bigstat{display:flex;flex-direction:column;gap:4px}
+.bigstat .b{font-size:40px;font-weight:800;font-family:'JetBrains Mono';letter-spacing:-.02em}
+.cashrow{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);font-size:14px}
+.cashrow .v{font-family:'JetBrains Mono';font-weight:600}
+.cashrow.tot{font-size:17px;font-weight:800;border:none;padding-top:14px}
+.cashrow.var .v{color:var(--error)}
+.gauge{height:10px;border-radius:10px;background:var(--surface-3);overflow:hidden;margin:10px 0 4px}
+.gauge i{display:block;height:100%;border-radius:10px;transition:width .6s}
+.gtitle{display:flex;justify-content:space-between;font-size:13px;margin-bottom:2px}
+.gtitle .vv{font-family:'JetBrains Mono';font-weight:700}
+
+/* toast */
+.toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:10px;align-items:center}
+.toast{background:var(--surface-2);border:1px solid var(--border-2);border-radius:14px;padding:13px 20px;font-size:13.5px;display:flex;align-items:center;gap:12px;box-shadow:0 16px 50px rgba(0,0,0,.6);animation:toastIn .35s cubic-bezier(.2,.8,.2,1)}
+.toast .ic{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex-shrink:0}
+.toast.fire .ic{background:rgba(10,132,255,.18);color:var(--blue)}
+.toast.pay .ic{background:rgba(52,199,89,.18);color:var(--success)}
+.toast b{color:var(--primary)}
+@keyframes toastIn{from{transform:translateY(20px);opacity:0}}
+
+/* receipt overlay */
+.receipt{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);z-index:150;display:none;align-items:center;justify-content:center}
+.receipt.show{display:flex;animation:fade .25s}
+.receipt .card{background:var(--surface);border:1px solid var(--border-2);border-radius:24px;padding:40px;text-align:center;max-width:380px;animation:rise .3s}
+.receipt .ok{width:72px;height:72px;border-radius:50%;background:var(--success);display:grid;place-items:center;margin:0 auto 20px;animation:rise .4s}
+.receipt h3{font-size:26px;font-weight:800}
+.receipt p{color:var(--dim);font-size:14px;margin-top:8px;line-height:1.6}
+.receipt button{margin-top:24px;padding:13px 28px;border-radius:12px;background:var(--grad);border:none;color:#160a00;font-weight:700;font-size:15px}
+
+@media(max-width:820px){
+  .check-pane{width:320px}
+  .seg button{padding:9px 13px;font-size:13px}
+  .seg button .lbl-txt{display:none}
+}
+
+
+
+/* >>> ICON-SYSTEM-CSS >>> */
+.ic{display:inline-block;width:1em;height:1em;vertical-align:-.15em;stroke-width:2;stroke:currentColor;fill:none;flex-shrink:0;line-height:1}
+.ic.lg{width:1.4em;height:1.4em;vertical-align:-.3em}
+/* <<< ICON-SYSTEM-CSS <<< */
+
+/* >>> HEATMAP-CSS >>> */
+.heatmap{display:flex;flex-direction:column;gap:2px;font-family:'JetBrains Mono';font-size:11px;margin-top:8px}
+.hm-row{display:grid;grid-template-columns:48px repeat(7,1fr);gap:2px}
+.hm-c{padding:6px 0;text-align:center;border-radius:4px}
+.hm-blank{background:transparent}
+.hm-head-c{color:var(--dim-2);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:10px}
+.hm-row-h{color:var(--dim-2);text-align:right;padding-right:8px;align-self:center}
+.hm-cell{font-weight:700;transition:transform .15s}
+.hm-cell:hover{transform:scale(1.08);outline:1.5px solid var(--text)}
+.tag.void{background:rgba(255,69,58,.18);color:#FF453A}
+.tag.comp{background:rgba(255,214,10,.18);color:#FFD60A}
+.tag.disc{background:rgba(10,132,255,.18);color:#0A84FF}
+.tag.refund{background:rgba(255,107,0,.18);color:#FF6B00}
+.tag.cash{background:rgba(255,255,255,.12);color:#fff}
+/* <<< HEATMAP-CSS <<< */
+</style>
+</head>
+<body>
+<!-- >>> ICON-SYSTEM-SPRITE >>> -->
+<!-- ============================================================
+     Lucide icon sprite + emoji-to-icon replacer
+     (Inlined; no external icon dependency. Lucide ISC license.)
+     ============================================================ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<defs>
+<symbol id="i-smartphone" viewBox="0 0 24 24"><rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+  <path d="M12 18h.01" /></symbol>
+<symbol id="i-tablet" viewBox="0 0 24 24"><rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
+  <line x1="12" x2="12.01" y1="18" y2="18" /></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z" />
+  <circle cx="12" cy="13" r="3" /></symbol>
+<symbol id="i-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2" />
+  <line x1="8" x2="16" y1="21" y2="21" />
+  <line x1="12" x2="12" y1="17" y2="21" /></symbol>
+<symbol id="i-credit-card" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2" />
+  <line x1="2" x2="22" y1="10" y2="10" /></symbol>
+<symbol id="i-dollar-sign" viewBox="0 0 24 24"><line x1="12" x2="12" y1="2" y2="22" />
+  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></symbol>
+<symbol id="i-banknote" viewBox="0 0 24 24"><rect width="20" height="12" x="2" y="6" rx="2" />
+  <circle cx="12" cy="12" r="2" />
+  <path d="M6 12h.01M18 12h.01" /></symbol>
+<symbol id="i-chart-column" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16" />
+  <path d="M18 17V9" />
+  <path d="M13 17V5" />
+  <path d="M8 17v-3" /></symbol>
+<symbol id="i-trending-up" viewBox="0 0 24 24"><path d="M16 7h6v6" />
+  <path d="m22 7-8.5 8.5-5-5L2 17" /></symbol>
+<symbol id="i-shield-check" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+  <path d="m9 12 2 2 4-4" /></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+  <circle cx="12" cy="12" r="3" /></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" />
+  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+  <path d="M2 12h20" /></symbol>
+<symbol id="i-utensils-crossed" viewBox="0 0 24 24"><path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8" />
+  <path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7" />
+  <path d="m2.1 21.8 6.4-6.3" />
+  <path d="m19 5-7 7" /></symbol>
+<symbol id="i-utensils" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+  <path d="M7 2v20" />
+  <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" /></symbol>
+<symbol id="i-gift" viewBox="0 0 24 24"><path d="M12 7v14" />
+  <path d="M20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8" />
+  <path d="M7.5 7a1 1 0 0 1 0-5A4.8 8 0 0 1 12 7a4.8 8 0 0 1 4.5-5 1 1 0 0 1 0 5" />
+  <rect x="3" y="7" width="18" height="4" rx="1" /></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+  <path d="M16 3.128a4 4 0 0 1 0 7.744" />
+  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+  <circle cx="9" cy="7" r="4" /></symbol>
+<symbol id="i-message-square" viewBox="0 0 24 24"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" /></symbol>
+<symbol id="i-repeat-2" viewBox="0 0 24 24"><path d="m2 9 3-3 3 3" />
+  <path d="M13 18H7a2 2 0 0 1-2-2V6" />
+  <path d="m22 15-3 3-3-3" />
+  <path d="M11 6h6a2 2 0 0 1 2 2v10" /></symbol>
+<symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" />
+  <path d="M20 2v4" />
+  <path d="M22 4h-4" />
+  <circle cx="4" cy="20" r="2" /></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><path d="M8 2v4" />
+  <path d="M16 2v4" />
+  <rect width="18" height="18" x="3" y="4" rx="2" />
+  <path d="M3 10h18" /></symbol>
+<symbol id="i-car" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
+  <circle cx="7" cy="17" r="2" />
+  <path d="M9 17h6" />
+  <circle cx="17" cy="17" r="2" /></symbol>
+<symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="3" />
+  <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" />
+  <circle cx="18" cy="5" r="3" /></symbol>
+<symbol id="i-receipt" viewBox="0 0 24 24"><path d="M12 17V7" />
+  <path d="M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8" />
+  <path d="M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z" /></symbol>
+<symbol id="i-armchair" viewBox="0 0 24 24"><path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3" />
+  <path d="M3 16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V11a2 2 0 0 0-4 0z" />
+  <path d="M5 18v2" />
+  <path d="M19 18v2" /></symbol>
+<symbol id="i-package" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" /></symbol>
+<symbol id="i-triangle-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" /></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4" /></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" />
+  <path d="M12 6v6l4 2" /></symbol>
+<symbol id="i-sunrise" viewBox="0 0 24 24"><path d="M12 2v8" />
+  <path d="m4.93 10.93 1.41 1.41" />
+  <path d="M2 18h2" />
+  <path d="M20 18h2" />
+  <path d="m19.07 10.93-1.41 1.41" />
+  <path d="M22 22H2" />
+  <path d="m8 6 4-4 4 4" />
+  <path d="M16 18a4 4 0 0 0-8 0" /></symbol>
+<symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" />
+  <circle cx="12" cy="12" r="6" />
+  <circle cx="12" cy="12" r="2" /></symbol>
+<symbol id="i-award" viewBox="0 0 24 24"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526" />
+  <circle cx="12" cy="8" r="6" /></symbol>
+<symbol id="i-house" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></symbol>
+<symbol id="i-building-2" viewBox="0 0 24 24"><path d="M10 12h4" />
+  <path d="M10 8h4" />
+  <path d="M14 21v-3a2 2 0 0 0-4 0v3" />
+  <path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2" />
+  <path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16" /></symbol>
+<symbol id="i-hard-hat" viewBox="0 0 24 24"><path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5" />
+  <path d="M14 6a6 6 0 0 1 6 6v3" />
+  <path d="M4 15v-3a6 6 0 0 1 6-6" />
+  <rect x="2" y="15" width="20" height="4" rx="1" /></symbol>
+<symbol id="i-trending-down" viewBox="0 0 24 24"><path d="M16 17h6v-6" />
+  <path d="m22 17-8.5-8.5-5 5L2 7" /></symbol>
+<symbol id="i-file-text" viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+  <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+  <path d="M10 9H8" />
+  <path d="M16 13H8" />
+  <path d="M16 17H8" /></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M10.268 21a2 2 0 0 0 3.464 0" />
+  <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" /></symbol>
+<symbol id="i-folder-tree" viewBox="0 0 24 24"><path d="M20 10a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2.5a1 1 0 0 1-.8-.4l-.9-1.2A1 1 0 0 0 15 3h-2a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z" />
+  <path d="M20 21a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-2.9a1 1 0 0 1-.88-.55l-.42-.85a1 1 0 0 0-.92-.6H13a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z" />
+  <path d="M3 5a2 2 0 0 0 2 2h3" />
+  <path d="M3 3v13a2 2 0 0 0 2 2h3" /></symbol>
+<symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528" /></symbol>
+<symbol id="i-concierge-bell" viewBox="0 0 24 24"><path d="M3 20a1 1 0 0 1-1-1v-1a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1Z" />
+  <path d="M20 16a8 8 0 1 0-16 0" />
+  <path d="M12 4v4" />
+  <path d="M10 4h4" /></symbol>
+<symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" /></symbol>
+<symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18" />
+  <path d="m19 8 3 8a5 5 0 0 1-6 0zV7" />
+  <path d="M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1" />
+  <path d="m5 8 3 8a5 5 0 0 1-6 0zV7" />
+  <path d="M7 21h10" /></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18" />
+  <path d="m6 6 12 12" /></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" /></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14" />
+  <path d="M12 5v14" /></symbol>
+<symbol id="i-thermometer" viewBox="0 0 24 24"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z" /></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
+  <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" /></symbol>
+<symbol id="i-timer" viewBox="0 0 24 24"><line x1="10" x2="14" y1="2" y2="2" />
+  <line x1="12" x2="15" y1="14" y2="11" />
+  <circle cx="12" cy="14" r="8" /></symbol>
+</defs>
+</svg>
+<!-- <<< ICON-SYSTEM-SPRITE <<< -->
+
+
+
+<div class="app">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo">
+      <span class="spark"><svg viewBox="0 0 24 24" fill="none"><path d="M13 2L4.5 13.5H11L9 22l9-12h-6.5L13 2z" fill="#160a00"/></svg></span>
+      Spark<small>POS</small>
+    </div>
+    <div class="seg" id="seg">
+      <button data-v="order" class="active">🧾 <span class="lbl-txt">Order</span></button>
+      <button data-v="kds">🍳 <span class="lbl-txt">Kitchen</span> <span class="badge" id="kdsBadge" style="display:none">0</span></button>
+      <button data-v="reports">📊 <span class="lbl-txt">Reports</span></button>
+    </div>
+    <div class="clock"><span class="live"></span><span id="clock">--:--</span> · The Ember Room</div>
+  </div>
+
+  <!-- ============ ORDER VIEW ============ -->
+  <div class="view active" id="order">
+    <div class="menu-pane">
+      <div class="menu-top">
+        <h2>Menu</h2>
+        <p>Tap an item to build it — sizes, temperature, add-ons, removals. Required steps are marked.</p>
+      </div>
+      <div class="cats" id="cats"></div>
+      <div class="items" id="items"></div>
+    </div>
+    <div class="check-pane">
+      <div class="check-top">
+        <div class="ctype" id="ctype">
+          <button class="on" data-t="Dine-in">Dine-in</button>
+          <button data-t="Takeout">Takeout</button>
+          <button data-t="Delivery">Delivery</button>
+        </div>
+        <div class="cmeta">
+          <div class="f"><label>Table</label><input id="tblIn" value="14" class="mono"></div>
+          <div class="f"><label>Guests</label>
+            <div class="row"><button id="gMinus">−</button><span class="v" id="gVal">4</span><button id="gPlus">+</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="lines" id="lines"><div class="empty">No items yet.<br>Tap the menu to start a check →</div></div>
+      <div class="check-foot">
+        <div class="frow"><span>Subtotal</span><span class="mono" id="subT">$0.00</span></div>
+        <div class="frow"><span>Tax (8.25%)</span><span class="mono" id="taxT">$0.00</span></div>
+        <div class="frow tot"><span>Total</span><span class="mono" id="totT">$0.00</span></div>
+        <div class="facts">
+          <button class="fire" id="fireBtn" disabled>🔥 Send to kitchen</button>
+          <button class="pay" id="payBtn" disabled>💳 Pay &amp; close</button>
+          <button id="splitB" disabled>Split</button>
+          <button id="voidB" disabled>Void all</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ KDS VIEW ============ -->
+  <div class="view" id="kds">
+    <div class="kds-bar">
+      <div class="stf" id="stationFilter"></div>
+      <div class="right">
+        <button class="recall" id="recallBtn">↩ Recall last</button>
+        <button class="ktoggle" id="allDayBtn">All-day view</button>
+      </div>
+    </div>
+    <div class="kds-board" id="kdsBoard"></div>
+    <div class="allday" id="allDay"><h3>🍳 All-Day · total items working across all active tickets</h3><div class="ad-grid" id="adGrid"></div></div>
+  </div>
+
+  <!-- ============ REPORTS VIEW ============ -->
+  <div class="view" id="reports">
+    <div class="rep-side" id="repSide"></div>
+    <div class="rep-main">
+      <div class="rep-head">
+        <div><h2 id="repTitle">Dashboard</h2><div class="desc" id="repDesc">Today at a glance · live</div></div>
+        <div class="daterange" id="dateRange">
+          <button>Yesterday</button><button class="on">Today</button><button>WTD</button><button>MTD</button><button>Custom…</button>
+        </div>
+        <button class="exportbtn" id="exportBtn">⬇ Export CSV</button>
+      </div>
+      <div class="rep-content" id="repContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- modifier sheet -->
+<div class="sheet-bg" id="sheetBg">
+  <div class="sheet">
+    <div class="sheet-h">
+      <span class="st" id="shStation">GRILL</span>
+      <button class="x" id="shClose">✕</button>
+      <h3 id="shName">Item</h3>
+      <p id="shDesc">desc</p>
+    </div>
+    <div class="sheet-body" id="shBody"></div>
+    <div class="sheet-f">
+      <div class="qty"><button id="qMinus">−</button><span class="v" id="qVal">1</span><button id="qPlus">+</button></div>
+      <button class="add-btn" id="addBtn"><span>Add to order</span><span class="ap" id="addPrice">$0.00</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- receipt -->
+<div class="receipt" id="receipt">
+  <div class="card">
+    <div class="ok"><svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#06250f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <h3 id="rcAmt">Paid</h3>
+    <p id="rcSub">Receipt printed · loyalty points added · table closed</p>
+    <button id="rcNew">Start new check</button>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+/* =========================================================
+   DATA — menu with realistic modifier groups & upcharges
+   ========================================================= */
+const STATIONS={grill:'Grill',saute:'Sauté',cold:'Cold',bar:'Bar',dessert:'Pastry'};
+const STATION_COLORS={grill:'#FF6B00',saute:'#FF9500',cold:'#34C759',bar:'#0A84FF',dessert:'#BF5AF2'};
+
+const MENU={
+ "Brunch":[
+  {id:'eggsbenedict',nm:'Eggs Benedict',base:16,st:'saute',prep:8,ds:'Two poached eggs, English muffin, hollandaise, Canadian bacon',
+   groups:[
+    {n:'Style',req:true,min:1,max:1,opts:[['Classic','',0],['Florentine (spinach)','',1],['Lox & dill','',5],['Crab cake','',7]]},
+    {n:'Egg doneness',req:true,min:1,max:1,kind:'temp',opts:[['Soft poach','',0],['Medium poach','',0],['Hard poach','',0]]},
+    {n:'Side',req:true,min:1,max:1,opts:[['Home fries','',0],['Fresh fruit','',0],['Side salad','',1]]},
+    {n:'Add',req:false,min:0,max:3,opts:[['Avocado','',2],['Smoked salmon','',5],['Extra bacon','',3]]}
+   ],notes:true},
+  {id:'avocadotoast',nm:'Avocado Toast',base:13,st:'cold',prep:5,ds:'Sourdough, smashed avocado, chili flake, lemon',
+   groups:[
+    {n:'Add protein',req:false,min:0,max:1,opts:[['Poached egg','',2],['Smoked salmon','',5],['Grilled chicken','',5]]},
+    {n:'Remove',req:false,min:0,max:2,kind:'remove',opts:[['No chili','',0],['No lemon','',0]]}
+   ],notes:true},
+  {id:'pancakes',nm:'Buttermilk Pancakes',base:11,st:'saute',prep:7,ds:'Three-stack, maple syrup, whipped butter',
+   groups:[
+    {n:'Mix-in',req:false,min:0,max:2,opts:[['Blueberry','',2],['Banana','',1.5],['Chocolate chip','',2],['Pecan','',2]]},
+    {n:'Add',req:false,min:0,max:3,opts:[['Bacon (3)','',4],['Sausage links (2)','',4],['Two eggs','',3]]}
+   ]},
+  {id:'omelette',nm:'Three-Egg Omelette',base:14,st:'saute',prep:7,ds:'Pick three fillings, toast, home fries',
+   groups:[
+    {n:'Fillings (up to 3)',req:true,min:1,max:3,opts:[['Cheddar','',0],['Mushroom','',0],['Spinach','',0],['Tomato','',0],['Onion','',0],['Bell pepper','',0],['Ham','',1],['Bacon','',1.5],['Sausage','',1.5],['Smoked salmon','',4]]},
+    {n:'Toast',req:true,min:1,max:1,opts:[['White','',0],['Wheat','',0],['Sourdough','',0],['Gluten-free','',1.5]]}
+   ],notes:true},
+  {id:'huevos',nm:'Huevos Rancheros',base:13,st:'saute',prep:8,ds:'Two eggs, black beans, ranchero salsa, queso fresco, corn tortillas',
+   groups:[
+    {n:'Heat',req:true,min:1,max:1,opts:[['Mild','',0],['Medium','',0],['Hot','',0]]},
+    {n:'Add',req:false,min:0,max:2,opts:[['Carnitas','',4],['Avocado','',2],['Extra cheese','',1]]}
+   ]}
+ ],
+ "Burgers":[
+  {id:'byo',nm:'Build-Your-Own Burger',base:14,st:'grill',prep:9,ds:'Char-grilled, brioche bun, house sauce',
+   groups:[
+    {n:'Patty',req:true,min:1,max:1,opts:[['Single','',0],['Double patty','',5],['Plant-based','',2]]},
+    {n:'Temperature',req:true,min:1,max:1,kind:'temp',opts:[['Rare','',0],['Medium-rare','',0],['Medium','',0],['Medium-well','',0],['Well-done','',0]]},
+    {n:'Cheese',req:false,min:0,max:2,opts:[['American','',1],['Aged cheddar','',1.5],['Swiss','',1.5],['Blue cheese','',2]]},
+    {n:'Add-ons',req:false,min:0,max:5,opts:[['Smoked bacon','',2.5],['Avocado','',2],['Fried egg','',2],['Sautéed mushrooms','',1.5],['Caramelized onion','',1]]},
+    {n:'Remove',req:false,min:0,max:6,kind:'remove',opts:[['No lettuce','',0],['No tomato','',0],['No pickle','',0],['No onion','',0],['No sauce','',0]]},
+    {n:'Side',req:true,min:1,max:1,opts:[['Fries','',0],['Sweet-potato fries','',2],['Side salad','',1],['Onion rings','',3]]}
+   ],notes:true},
+  {id:'smash',nm:'Double Smash',base:13,st:'grill',prep:7,ds:'Two smashed patties, American, pickles',
+   groups:[
+    {n:'Temperature',req:true,min:1,max:1,kind:'temp',opts:[['Medium','',0],['Medium-well','',0],['Well-done','',0]]},
+    {n:'Add-ons',req:false,min:0,max:4,opts:[['Bacon','',2.5],['Extra patty','',4],['Jalapeños','',.75],['Extra cheese','',1]]},
+    {n:'Remove',req:false,min:0,max:3,kind:'remove',opts:[['No pickle','',0],['No onion','',0]]}
+   ],notes:true},
+  {id:'mushburger',nm:'Wild Mushroom Burger',base:17,st:'grill',prep:9,ds:'Truffle aioli, swiss, sautéed wild mushrooms',
+   groups:[
+    {n:'Temperature',req:true,min:1,max:1,kind:'temp',opts:[['Medium-rare','',0],['Medium','',0],['Medium-well','',0],['Well-done','',0]]},
+    {n:'Cheese',req:false,min:0,max:1,opts:[['Swiss (default)','',0],['Aged cheddar','',1],['Blue cheese','',1.5]]},
+    {n:'Add',req:false,min:0,max:3,opts:[['Bacon','',2.5],['Fried egg','',2],['Avocado','',2]]},
+    {n:'Side',req:true,min:1,max:1,opts:[['Fries','',0],['Sweet-potato fries','',2],['Side salad','',1]]}
+   ]},
+  {id:'beyond',nm:'Beyond Plant Burger',base:16,st:'grill',prep:8,ds:'Plant-based patty, vegan brioche, vegan cheese, lettuce, tomato',
+   groups:[
+    {n:'Add',req:false,min:0,max:3,opts:[['Vegan bacon','',2.5],['Avocado','',2],['Caramelized onion','',1]]},
+    {n:'Side',req:true,min:1,max:1,opts:[['Fries','',0],['Sweet-potato fries','',2],['Side salad','',1]]}
+   ],notes:true}
+ ],
+ "Sandwiches":[
+  {id:'club',nm:'Triple Club',base:14,st:'cold',prep:6,ds:'Turkey, ham, bacon, sourdough, lettuce, tomato, mayo',
+   groups:[
+    {n:'Bread',req:true,min:1,max:1,opts:[['Sourdough','',0],['Wheat','',0],['Gluten-free','',1.5]]},
+    {n:'Side',req:true,min:1,max:1,opts:[['Fries','',0],['Cup of soup','',2],['Side salad','',1]]},
+    {n:'Remove',req:false,min:0,max:3,kind:'remove',opts:[['No mayo','',0],['No tomato','',0],['No bacon','',0]]}
+   ]},
+  {id:'philly',nm:'Philly Cheesesteak',base:15,st:'grill',prep:8,ds:'Ribeye, provolone, peppers, onions, hoagie roll',
+   groups:[
+    {n:'Cheese',req:false,min:0,max:1,opts:[['Provolone (default)','',0],['Whiz','',0],['American','',0]]},
+    {n:'Add',req:false,min:0,max:3,opts:[['Mushrooms','',1],['Hot peppers','',.75],['Extra cheese','',1.5]]},
+    {n:'Side',req:true,min:1,max:1,opts:[['Fries','',0],['Onion rings','',3]]}
+   ]},
+  {id:'reuben',nm:'Classic Reuben',base:14,st:'grill',prep:6,ds:'Corned beef, swiss, sauerkraut, Russian dressing, rye',
+   groups:[
+    {n:'Side',req:true,min:1,max:1,opts:[['Fries','',0],['Cup of soup','',2],['Coleslaw','',0]]}
+   ]},
+  {id:'chickensand',nm:'Crispy Chicken Sandwich',base:13,st:'grill',prep:8,ds:'Buttermilk-fried, pickles, slaw, brioche',
+   groups:[
+    {n:'Heat',req:true,min:1,max:1,opts:[['Plain','',0],['Nashville hot','',0],['Inferno','',1]]},
+    {n:'Add',req:false,min:0,max:2,opts:[['Cheese','',1.5],['Bacon','',2.5]]},
+    {n:'Side',req:true,min:1,max:1,opts:[['Fries','',0],['Sweet-potato fries','',2]]}
+   ]}
+ ],
+ "Mains":[
+  {id:'ribeye',nm:'12oz Ribeye',base:38,st:'grill',prep:14,ds:'Dry-aged, herb butter',
+   groups:[
+    {n:'Temperature',req:true,min:1,max:1,kind:'temp',opts:[['Rare','',0],['Medium-rare','',0],['Medium','',0],['Medium-well','',0],['Well-done','',0]]},
+    {n:'Sauce',req:false,min:0,max:1,opts:[['Peppercorn','',2],['Chimichurri','',2],['Béarnaise','',2.5]]},
+    {n:'Sides (pick 2)',req:true,min:2,max:2,opts:[['Mashed potato','',0],['Grilled asparagus','',0],['Mac & cheese','',2],['Truffle fries','',3],['Creamed spinach','',1]]}
+   ],notes:true},
+  {id:'salmon',nm:'Grilled Salmon',base:26,st:'saute',prep:11,ds:'Faroe Island, lemon beurre blanc',
+   groups:[
+    {n:'Doneness',req:true,min:1,max:1,kind:'temp',opts:[['Medium','',0],['Well-done','',0]]},
+    {n:'Side',req:true,min:1,max:1,opts:[['Wild rice','',0],['Asparagus','',0],['Truffle fries','',3]]},
+    {n:'Add',req:false,min:0,max:2,opts:[['Extra lemon','',0],['Capers','',.5]]}
+   ],notes:true},
+  {id:'risotto',nm:'Truffle Risotto',base:24,st:'saute',prep:13,ds:'Carnaroli, parmesan, black truffle',
+   groups:[
+    {n:'Protein',req:false,min:0,max:1,opts:[['Add chicken','',6],['Add shrimp','',8],['Add scallops','',12]]},
+    {n:'Remove',req:false,min:0,max:2,kind:'remove',opts:[['No truffle','',0],['No parmesan','',0]]}
+   ],notes:true},
+  {id:'shortrib',nm:'Braised Short Rib',base:32,st:'saute',prep:14,ds:'Red wine jus, creamy polenta',
+   groups:[
+    {n:'Side',req:true,min:1,max:1,opts:[['Polenta (default)','',0],['Mashed potato','',0],['Truffle fries','',3]]},
+    {n:'Add',req:false,min:0,max:2,opts:[['Bone marrow','',6],['Extra jus','',0]]}
+   ]},
+  {id:'chicken',nm:'Half Roasted Chicken',base:24,st:'grill',prep:13,ds:'Lemon, thyme, fingerling potatoes',
+   groups:[
+    {n:'Sauce',req:false,min:0,max:1,opts:[['Pan jus','',0],['Salsa verde','',1.5],['Chimichurri','',2]]},
+    {n:'Side',req:true,min:1,max:1,opts:[['Fingerlings (default)','',0],['Roasted vegetables','',0],['Truffle fries','',3]]}
+   ]},
+  {id:'porkchop',nm:'12oz Bone-In Pork Chop',base:28,st:'grill',prep:13,ds:'Apple-mustard glaze, braised greens',
+   groups:[
+    {n:'Temperature',req:true,min:1,max:1,kind:'temp',opts:[['Medium','',0],['Medium-well','',0],['Well-done','',0]]},
+    {n:'Side',req:true,min:1,max:1,opts:[['Braised greens (default)','',0],['Mashed potato','',0],['Truffle fries','',3]]}
+   ]}
+ ],
+ "Pasta":[
+  {id:'carbonara',nm:'Spaghetti Carbonara',base:18,st:'saute',prep:9,ds:'Guanciale, pecorino, black pepper, egg yolk',
+   groups:[
+    {n:'Add protein',req:false,min:0,max:1,opts:[['Grilled chicken','',5],['Shrimp','',7]]},
+    {n:'Remove',req:false,min:0,max:2,kind:'remove',opts:[['No guanciale','',0],['No pecorino','',0]]}
+   ]},
+  {id:'tagliatelle',nm:'Truffle Tagliatelle',base:22,st:'saute',prep:10,ds:'Fresh pasta, butter, parmesan, shaved truffle',
+   groups:[
+    {n:'Add protein',req:false,min:0,max:1,opts:[['Chicken','',5],['Shrimp','',7],['Lobster','',14]]}
+   ]},
+  {id:'lasagna',nm:'House Lasagna',base:19,st:'saute',prep:12,ds:'Beef ragu, béchamel, four cheeses'},
+  {id:'arrabiata',nm:'Penne Arrabbiata',base:16,st:'saute',prep:8,ds:'Spicy tomato, garlic, basil',
+   groups:[
+    {n:'Heat',req:true,min:1,max:1,opts:[['Mild','',0],['Hot','',0],['Inferno','',1]]},
+    {n:'Add protein',req:false,min:0,max:1,opts:[['Chicken','',5],['Italian sausage','',5]]}
+   ]}
+ ],
+ "Pizza":[
+  {id:'margherita',nm:'Margherita Pizza',base:16,st:'saute',prep:11,ds:'San Marzano, fresh mozzarella, basil, EVOO',
+   groups:[
+    {n:'Size',req:true,min:1,max:1,opts:[['12"','',0],['16"','',6]]},
+    {n:'Crust',req:true,min:1,max:1,opts:[['Thin (default)','',0],['Pan','',1.5],['Gluten-free','',3]]},
+    {n:'Add toppings',req:false,min:0,max:5,opts:[['Pepperoni','',2],['Mushroom','',1.5],['Sausage','',2],['Bell pepper','',1],['Black olive','',1],['Anchovy','',2]]}
+   ]},
+  {id:'pepperoni',nm:'Classic Pepperoni',base:18,st:'saute',prep:11,ds:'Crispy pepperoni, mozzarella, oregano',
+   groups:[
+    {n:'Size',req:true,min:1,max:1,opts:[['12"','',0],['16"','',6]]},
+    {n:'Crust',req:true,min:1,max:1,opts:[['Thin (default)','',0],['Pan','',1.5],['Gluten-free','',3]]},
+    {n:'Add toppings',req:false,min:0,max:5,opts:[['Extra pepperoni','',3],['Mushroom','',1.5],['Sausage','',2]]}
+   ]},
+  {id:'whitepie',nm:'White Truffle Pizza',base:24,st:'saute',prep:12,ds:'Ricotta, mozzarella, roasted garlic, truffle oil',
+   groups:[
+    {n:'Size',req:true,min:1,max:1,opts:[['12"','',0],['16"','',6]]},
+    {n:'Add',req:false,min:0,max:3,opts:[['Prosciutto','',4],['Arugula','',1],['Soft egg','',2]]}
+   ]}
+ ],
+ "Tacos & Bowls":[
+  {id:'tacos',nm:'Street Tacos (3)',base:14,st:'cold',prep:6,ds:'Corn tortillas, onion, cilantro, lime',
+   groups:[
+    {n:'Protein',req:true,min:1,max:1,opts:[['Carnitas','',0],['Carne asada','',2],['Al pastor','',1],['Crispy fish','',2],['Mushroom (vegan)','',0]]},
+    {n:'Salsa',req:false,min:0,max:2,opts:[['Salsa verde','',0],['Salsa roja','',0],['Habanero','',0]]},
+    {n:'Add',req:false,min:0,max:2,opts:[['Guacamole','',2],['Cotija','',1]]}
+   ]},
+  {id:'poke',nm:'Poké Bowl',base:17,st:'cold',prep:5,ds:'Sushi rice, edamame, avocado, sesame, soy-ginger',
+   groups:[
+    {n:'Protein',req:true,min:1,max:1,opts:[['Ahi tuna','',0],['Salmon','',1],['Spicy tuna','',1],['Tofu','',0]]},
+    {n:'Toppings',req:false,min:0,max:5,opts:[['Avocado','',1.5],['Mango','',1],['Pickled ginger','',0],['Crispy onion','',0],['Spicy mayo','',.5]]}
+   ]},
+  {id:'burritobowl',nm:'Burrito Bowl',base:13,st:'cold',prep:5,ds:'Rice, beans, fajita vegetables, choice of protein',
+   groups:[
+    {n:'Protein',req:true,min:1,max:1,opts:[['Grilled chicken','',0],['Carnitas','',1],['Carne asada','',3],['Tofu','',0]]},
+    {n:'Add',req:false,min:0,max:3,opts:[['Guacamole','',2],['Sour cream','',.5],['Cheese','',1]]}
+   ]}
+ ],
+ "Seafood":[
+  {id:'scampi',nm:'Shrimp Scampi',base:22,st:'saute',prep:9,ds:'Linguine, garlic-butter wine sauce, parsley'},
+  {id:'crabcakes',nm:'Jumbo Crab Cakes (2)',base:28,st:'saute',prep:10,ds:'Remoulade, lemon, slaw',
+   groups:[
+    {n:'Side',req:true,min:1,max:1,opts:[['Slaw (default)','',0],['Mashed potato','',0],['Side salad','',1]]}
+   ]},
+  {id:'lobsterroll',nm:'CT Lobster Roll',base:26,st:'cold',prep:6,ds:'Warm butter, brioche, fries on the side'},
+  {id:'fishchips',nm:'Beer-Battered Fish & Chips',base:19,st:'grill',prep:9,ds:'Cod, malt vinegar, tartar sauce'}
+ ],
+ "Starters":[
+  {id:'burrata',nm:'Burrata',base:14,st:'cold',prep:5,ds:'Heirloom tomato, basil, EVOO',
+   groups:[{n:'Add',req:false,min:0,max:2,opts:[['Prosciutto','',4],['Extra bread','',2]]}],notes:true},
+  {id:'wings',nm:'Crispy Wings',base:12,st:'grill',prep:10,ds:'Choice of sauce',
+   groups:[
+    {n:'Sauce',req:true,min:1,max:1,opts:[['Buffalo','',0],['BBQ','',0],['Honey-garlic','',0],['Dry rub','',0]]},
+    {n:'Heat',req:true,min:1,max:1,opts:[['Mild','',0],['Medium','',0],['Hot','',0],['Inferno','',1]]},
+    {n:'Dip',req:false,min:0,max:2,opts:[['Ranch','',.75],['Blue cheese','',.75]]}
+   ]},
+  {id:'caesar',nm:'Caesar Salad',base:11,st:'cold',prep:4,ds:'Romaine, parmesan, croutons',
+   groups:[
+    {n:'Add protein',req:false,min:0,max:1,opts:[['Grilled chicken','',5],['Grilled salmon','',8],['Shrimp','',7]]},
+    {n:'Remove',req:false,min:0,max:2,kind:'remove',opts:[['No croutons','',0],['No anchovy','',0]]}
+   ]},
+  {id:'calamari',nm:'Crispy Calamari',base:13,st:'saute',prep:6,ds:'Lemon, marinara, aioli'},
+  {id:'meatballs',nm:'Bone-Marrow Meatballs (3)',base:14,st:'saute',prep:8,ds:'San Marzano tomato, ricotta, focaccia'}
+ ],
+ "Sides":[
+  {id:'fries',nm:'House Fries',base:5,st:'grill',prep:4,ds:'Hand-cut, sea salt'},
+  {id:'sptfries',nm:'Sweet-Potato Fries',base:7,st:'grill',prep:4,ds:'Maple aioli'},
+  {id:'trufflefries',nm:'Truffle Fries',base:9,st:'grill',prep:4,ds:'Parmesan, truffle oil, parsley'},
+  {id:'sideSalad',nm:'Side Garden Salad',base:6,st:'cold',prep:3,ds:'Mixed greens, lemon vinaigrette'},
+  {id:'macncheese',nm:'Three-Cheese Mac',base:8,st:'saute',prep:5,ds:'Cheddar, gruyère, parmesan'},
+  {id:'brussels',nm:'Charred Brussels Sprouts',base:9,st:'grill',prep:6,ds:'Balsamic glaze, shaved parmesan'}
+ ],
+ "Kids":[
+  {id:'kidsburger',nm:'Kids Burger & Fries',base:9,st:'grill',prep:6,ds:'Mini burger, plain or with cheese',
+   groups:[{n:'Cheese',req:false,min:0,max:1,opts:[['Cheddar','',0]]}]},
+  {id:'kidsnuggets',nm:'Chicken Nuggets',base:8,st:'grill',prep:6,ds:'Five nuggets, choice of dip',
+   groups:[{n:'Dip',req:true,min:1,max:1,opts:[['Ketchup','',0],['Honey-mustard','',0],['Ranch','',0],['BBQ','',0]]}]},
+  {id:'kidsmac',nm:'Kids Mac & Cheese',base:7,st:'saute',prep:4,ds:'Three-cheese, mild'}
+ ],
+ "Bar":[
+  {id:'oldf',nm:'Old Fashioned',base:15,st:'bar',prep:4,ds:'Bourbon, bitters, orange',
+   groups:[
+    {n:'Spirit',req:true,min:1,max:1,opts:[['House bourbon','',0],['Woodford Reserve','',4],['Rye','',2],['Mezcal','',3]]},
+    {n:'Prep',req:false,min:0,max:2,opts:[['Extra bitters','',0],['Big rock ice','',0],['Orange twist','',0]]}
+   ]},
+  {id:'negroni',nm:'Negroni',base:14,st:'bar',prep:3,ds:'Gin, Campari, sweet vermouth',
+   groups:[{n:'Gin',req:true,min:1,max:1,opts:[['House','',0],['Hendrick’s','',3],['Tanqueray No. Ten','',3]]}]},
+  {id:'martini',nm:'Classic Martini',base:14,st:'bar',prep:3,ds:'Gin or vodka, dry vermouth, olive or twist',
+   groups:[
+    {n:'Spirit',req:true,min:1,max:1,opts:[['Gin','',0],['Vodka','',0]]},
+    {n:'Style',req:true,min:1,max:1,opts:[['Up','',0],['On the rocks','',0]]},
+    {n:'Dry/wet',req:true,min:1,max:1,opts:[['Dry','',0],['Wet','',0],['Extra dry','',0]]},
+    {n:'Garnish',req:false,min:0,max:2,opts:[['Olive','',0],['Twist','',0],['Cocktail onion','',0]]}
+   ]},
+  {id:'margaritamx',nm:'Margarita',base:13,st:'bar',prep:3,ds:'Blanco tequila, lime, agave',
+   groups:[
+    {n:'Tequila',req:true,min:1,max:1,opts:[['House blanco','',0],['Don Julio','',5],['Reposado','',2]]},
+    {n:'Rim',req:true,min:1,max:1,opts:[['Salt','',0],['Tajín','',0],['No rim','',0]]},
+    {n:'Flavor',req:false,min:0,max:1,opts:[['Mango','',1],['Spicy jalapeño','',1],['Cucumber','',1]]}
+   ]},
+  {id:'mojito',nm:'Mojito',base:13,st:'bar',prep:4,ds:'White rum, mint, lime, soda'}
+ ],
+ "Wine":[
+  {id:'cabglass',nm:'Cabernet (glass)',base:14,st:'bar',prep:2,ds:'Napa Valley, full-bodied'},
+  {id:'pinotglass',nm:'Pinot Noir (glass)',base:13,st:'bar',prep:2,ds:'Sonoma Coast'},
+  {id:'rieslingglass',nm:'Riesling (glass)',base:11,st:'bar',prep:2,ds:'Mosel, off-dry'},
+  {id:'champgla',nm:'Champagne (glass)',base:16,st:'bar',prep:2,ds:'Brut NV'},
+  {id:'redwine',nm:'House Red (glass)',base:12,st:'bar',prep:2,ds:'Cabernet blend'},
+  {id:'cabbtl',nm:'Cabernet (bottle)',base:62,st:'bar',prep:2,ds:'Napa Valley'},
+  {id:'champbtl',nm:'Champagne (bottle)',base:88,st:'bar',prep:2,ds:'Brut NV'}
+ ],
+ "Beer":[
+  {id:'ipa',nm:'Local IPA',base:8,st:'bar',prep:1,ds:'Draft, 16oz'},
+  {id:'pilsner',nm:'Czech Pilsner',base:7,st:'bar',prep:1,ds:'Draft, 16oz'},
+  {id:'stout',nm:'Irish Stout',base:8,st:'bar',prep:1,ds:'Nitro, 16oz'},
+  {id:'craftipa',nm:'West Coast IPA',base:9,st:'bar',prep:1,ds:'Bottle, 12oz'},
+  {id:'na',nm:'Non-Alc Lager',base:6,st:'bar',prep:1,ds:'Bottle, 12oz'}
+ ],
+ "Non-Alcoholic":[
+  {id:'soda',nm:'Fountain Soda',base:4,st:'bar',prep:1,ds:'Free refills',
+   groups:[{n:'Flavor',req:true,min:1,max:1,opts:[['Coke','',0],['Diet Coke','',0],['Sprite','',0],['Ginger ale','',0],['Root beer','',0]]}]},
+  {id:'coffee',nm:'Drip Coffee',base:4,st:'bar',prep:1,ds:'Single-origin, free refills',
+   groups:[{n:'Style',req:true,min:1,max:1,opts:[['Black','',0],['With milk','',0],['Oat milk','',.75]]}]},
+  {id:'espresso',nm:'Espresso',base:4,st:'bar',prep:1,ds:'Double shot'},
+  {id:'icedtea',nm:'Iced Tea',base:4,st:'bar',prep:1,ds:'Fresh-brewed',
+   groups:[{n:'Sweetness',req:true,min:1,max:1,opts:[['Unsweetened','',0],['Lightly sweet','',0],['Sweet','',0]]}]},
+  {id:'lemonade',nm:'Fresh Lemonade',base:5,st:'bar',prep:2,ds:'Hand-squeezed'}
+ ],
+ "Dessert":[
+  {id:'tira',nm:'Tiramisu',base:10,st:'dessert',prep:3,ds:'Espresso, mascarpone',
+   groups:[{n:'Add',req:false,min:0,max:1,opts:[['Affogato shot','',3]]}]},
+  {id:'cheesecake',nm:'NY Cheesecake',base:9,st:'dessert',prep:2,ds:'Berry compote',
+   groups:[{n:'Sauce',req:false,min:0,max:1,opts:[['Extra berry','',1],['Caramel','',1]]}]},
+  {id:'chocolatecake',nm:'Flourless Chocolate Cake',base:11,st:'dessert',prep:3,ds:'Dark chocolate, sea salt, vanilla ice cream'},
+  {id:'creme',nm:'Crème Brûlée',base:10,st:'dessert',prep:3,ds:'Vanilla bean, torched crust'}
+ ]
+};
+const ALL_ITEMS={};Object.values(MENU).flat().forEach(i=>ALL_ITEMS[i.id]=i);
+
+/* =========================================================
+   STATE
+   ========================================================= */
+let state={
+  check:[],            // current order lines
+  guests:4, table:'14', orderType:'Dine-in',
+  orderSeq:1047,
+  tickets:[],          // KDS tickets
+  recallStack:[],
+  // reporting aggregates (seeded with a realistic day)
+  rep:{
+    netSales:8412.50, covers:214, checks:71, voids:3, voidAmt:46.0,
+    comps:2, compAmt:31.0, discounts:5, discAmt:88.5, laborCost:2103, laborHours:96,
+    hourly:[210,340,520,610,880,540,360,470,690,910,840,560,310], // 11:00-23:00
+    hourlyLW:[180,300,470,560,820,510,330,440,640,860,800,520,290],
+    payMix:{Card:6890,Cash:640,Mobile:720,'Gift card':162.5},
+    svcMix:{'Dine-in':5980,'Takeout':1420,'Delivery':690,'Bar':322.5},
+    mix:{ // id: {qty, rev}
+      'byo':{q:42,r:false},'ribeye':{q:18},'salmon':{q:26},'risotto':{q:21},'caesar':{q:38},'wings':{q:31},'oldf':{q:44},'burrata':{q:19},'tira':{q:23}
+    },
+    servers:[
+      {n:'Maria G.',s:2640,c:22,v:1,cmp:0},
+      {n:'Devon W.',s:2180,c:19,v:0,cmp:1},
+      {n:'Priya S.',s:1990,c:17,v:1,cmp:0},
+      {n:'Luca R.',s:1602.5,c:13,v:1,cmp:1}
+    ],
+    exc:[
+      {t:'void',srv:'Maria G.',item:'Ribeye 12oz',amt:38,why:'Sent back — overcooked',time:'7:42p'},
+      {t:'comp',srv:'Luca R.',item:'Tiramisu',amt:10,why:'Birthday',time:'8:15p'},
+      {t:'disc',srv:'Devon W.',item:'Check #2841',amt:24,why:'Loyalty 20%',time:'8:48p'},
+      {t:'void',srv:'Priya S.',item:'Old Fashioned',amt:15,why:'Wrong drink rung',time:'9:03p'},
+      {t:'comp',srv:'Maria G.',item:'House Red',amt:12,why:'Long wait',time:'9:30p'}
+    ]
+  }
+};
+
+/* ---- extended reporting datasets (full back-office catalog) ---- */
+Object.assign(state.rep,{
+  grossSales:8746.00, refunds:42.0, tips:1037.0, serviceCharges:0,
+  catSales:{'Burgers':1932,'Mains':3164,'Starters':1098,'Bar':2010,'Dessert':642.5},
+  daypart:{'Lunch (11–4)':3120,'Happy Hr (4–6)':1180,'Dinner (6–9)':3398,'Late (9–close)':714.5},
+  laborPctByHour:[33,27,24,23,21,28,31,27,23,22,24,28,34],
+  laborByRole:[
+    {role:'Server',emp:4,hrs:29.6,cost:642},
+    {role:'Bartender',emp:1,hrs:7.5,cost:188},
+    {role:'Line cook',emp:3,hrs:33.1,cost:792},
+    {role:'Prep / dish',emp:2,hrs:15.8,cost:301},
+    {role:'Host',emp:1,hrs:6.0,cost:90},
+    {role:'Manager',emp:1,hrs:4.0,cost:90}
+  ],
+  modifiers:[
+    {n:'Add chicken',g:'Protein',q:33,rev:165},
+    {n:'Double patty',g:'Patty',q:22,rev:110},
+    {n:'Smoked bacon',g:'Add-ons',q:38,rev:95},
+    {n:'Truffle fries',g:'Side',q:27,rev:81},
+    {n:'Aged cheddar',g:'Cheese',q:41,rev:61.5},
+    {n:'Add shrimp',g:'Protein',q:8,rev:64},
+    {n:'Avocado',g:'Add-ons',q:19,rev:38},
+    {n:'No onion',g:'Remove',q:24,rev:0},
+    {n:'Medium-rare',g:'Temperature',q:31,rev:0}
+  ],
+  timeclock:[
+    {n:'Maria G.',role:'Server',in:'15:52',out:'23:14',reg:7.37,ot:0,brk:0.5,tips:286},
+    {n:'Devon W.',role:'Server',in:'16:01',out:'23:06',reg:7.08,ot:0,brk:0.5,tips:241},
+    {n:'Priya S.',role:'Server',in:'11:00',out:'19:02',reg:8.0,ot:0.03,brk:1.0,tips:198},
+    {n:'Luca R.',role:'Bartender',in:'16:00',out:'23:30',reg:7.5,ot:0,brk:0.5,tips:312},
+    {n:'Sam K.',role:'Line cook',in:'10:30',out:'22:48',reg:8.0,ot:4.3,brk:1.0,tips:0},
+    {n:'Tia M.',role:'Host',in:'16:00',out:'22:00',reg:6.0,ot:0,brk:0,tips:0}
+  ],
+  cash:{opening:300,cashSales:640,paidIn:50,paidOut:120,expected:870,counted:861,variance:-9},
+  ticketTimes:{byStation:{Grill:9.4,'Sauté':11.1,Cold:4.2,Bar:3.1,Pastry:2.8},
+    byDaypart:{'Lunch':7.8,'Happy Hr':6.2,'Dinner':10.9,'Late':8.1},avg:8.6,target:9,longest:18.3,under:0.86},
+  inventory:[
+    {item:'Ground beef 80/20',cat:'Protein',onHand:42,par:60,unit:'lb',cost:4.20,used:31},
+    {item:'Ribeye steak',cat:'Protein',onHand:18,par:24,unit:'ea',cost:12.50,used:18},
+    {item:'Salmon fillet',cat:'Protein',onHand:11,par:30,unit:'ea',cost:7.80,used:26,low:true},
+    {item:'Romaine',cat:'Produce',onHand:9,par:20,unit:'case',cost:3.10,used:14,low:true},
+    {item:'Brioche bun',cat:'Bakery',onHand:88,par:120,unit:'ea',cost:0.60,used:64},
+    {item:'House bourbon',cat:'Liquor',onHand:6,par:8,unit:'btl',cost:18.00,used:3},
+    {item:'Burrata',cat:'Dairy',onHand:14,par:18,unit:'ea',cost:2.40,used:19}
+  ],
+  cogs:{food:28.2,bev:21.4,foodTarget:30,bevTarget:22},
+  loyalty:{members:3840,newToday:11,visitsToday:62,redemptions:18,pointsIssued:8420,redeemValue:142},
+  loyaltyTop:[
+    {n:'J. Alvarez',visits:42,pts:1820,spend:2140},
+    {n:'K. Chen',visits:38,pts:1640,spend:1980},
+    {n:'M. O’Neil',visits:29,pts:1210,spend:1505},
+    {n:'R. Patel',visits:24,pts:980,spend:1320}
+  ],
+  promos:[
+    {n:'Happy Hour 4–6pm',redeem:34,rev:1180,disc:236,roi:5.0},
+    {n:'Loyalty 20% off',redeem:18,rev:540,disc:108,roi:5.0},
+    {n:'Email: free dessert',redeem:9,rev:410,disc:90,roi:4.6},
+    {n:'First-visit 10%',redeem:6,rev:198,disc:22,roi:9.0}
+  ],
+  locations:[
+    {n:'Downtown (this)',sales:8412.5,labor:25.0,covers:214,avg:118.5},
+    {n:'Riverside',sales:7120.0,labor:27.4,covers:188,avg:112.2},
+    {n:'Airport',sales:9890.0,labor:23.1,covers:301,avg:96.4},
+    {n:'Uptown',sales:5640.0,labor:29.8,covers:142,avg:108.0}
+  ],
+  taxRate:8.25,taxable:7910.0,exempt:502.5,taxCollected:652.6
+});
+/* ---- extended-extended datasets (Heartland-equivalent depth) ---- */
+Object.assign(state.rep,{
+  refundsList:[
+    {time:'12:48p',srv:'Priya S.',amt:18.0,reason:'Item missing',orig:'#2811',method:'Card',mgr:'KP'},
+    {time:'2:14p', srv:'Maria G.',amt:24.0,reason:'Wrong order',orig:'#2823',method:'Card',mgr:'KP'},
+    {time:'7:02p', srv:'Devon W.',amt:0.0,reason:'Re-issue gift card', orig:'GC-1041',method:'Gift card',mgr:'KP'}
+  ],
+  discountReasons:{'Loyalty 20%':108,'Happy Hour':236,'First visit 10%':22,'Birthday':25,'Manager comp':31},
+  compReasons:{'Birthday':10,'Long wait':12,'Recovery':9},
+  voidReasons:{'Wrong drink rung':15,'Sent back':38,'Re-fire':0,'Duplicate':0},
+  auditLog:[
+    {time:'12:24p',type:'void',by:'Priya S.',mgr:'KP',item:'Caesar Salad',amt:11,note:'Wrong order'},
+    {time:'1:08p', type:'comp',by:'Devon W.',mgr:'KP',item:'Tiramisu',amt:10,note:'Birthday'},
+    {time:'2:14p', type:'refund',by:'Maria G.',mgr:'KP',item:'#2823',amt:24,note:'Wrong order'},
+    {time:'7:42p', type:'void',by:'Maria G.',mgr:'KP',item:'12oz Ribeye',amt:38,note:'Overcooked, re-fired'},
+    {time:'8:15p', type:'comp',by:'Luca R.',mgr:'KP',item:'Tiramisu',amt:10,note:'Birthday'},
+    {time:'8:48p', type:'disc',by:'Devon W.',mgr:'KP',item:'#2841',amt:24,note:'Loyalty 20%'},
+    {time:'9:03p', type:'void',by:'Priya S.',mgr:'KP',item:'Old Fashioned',amt:15,note:'Wrong drink'},
+    {time:'9:30p', type:'comp',by:'Maria G.',mgr:'KP',item:'House Red',amt:12,note:'Long wait'},
+    {time:'10:48p',type:'cash',by:'Maria G.',mgr:'KP',item:'Drawer 1',amt:-9,note:'Short — counted vs expected'}
+  ],
+  dowHeatmap:{
+    rows:['11a','12p','1p','2p','3p','4p','5p','6p','7p','8p','9p','10p','11p'],
+    cols:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    /* values: sales density 0–100 */
+    grid:[
+      [10,12, 9,14,28,72,52],
+      [42,46,38,48,64,86,71],
+      [62,68,56,66,78,92,82],
+      [48,44,38,52,70,88,76],
+      [22,24,18,28,34,52,46],
+      [18,22,20,30,46,68,40],
+      [28,34,30,38,58,78,58],
+      [54,58,56,66,82,94,82],
+      [78,82,76,86,96,98,92],
+      [86,90,88,92,98,100,96],
+      [62,68,72,80,92,96,84],
+      [38,42,46,58,72,80,66],
+      [18,22,24,32,44,52,30]
+    ]
+  },
+  tipDecl:[
+    {n:'Maria G.',role:'Server',sales:2640,card:286,cash:42,decl:328,fica:14},
+    {n:'Devon W.',role:'Server',sales:2180,card:241,cash:36,decl:277,fica:12},
+    {n:'Priya S.',role:'Server',sales:1990,card:198,cash:28,decl:226,fica:10},
+    {n:'Luca R.', role:'Bartender',sales:1602.5,card:312,cash:46,decl:358,fica:16}
+  ],
+  giftCards:{issued:740,redeemed:380,outstanding:2410,issuedToday:6,redeemedToday:142,liability:18420},
+  giftCardActivity:[
+    {time:'1:18p',type:'Issued',code:'GC-1042',amt:50,by:'Devon W.'},
+    {time:'2:08p',type:'Redeemed',code:'GC-0918',amt:25,by:'Maria G.'},
+    {time:'5:24p',type:'Issued',code:'GC-1043',amt:100,by:'Priya S.'},
+    {time:'7:40p',type:'Redeemed',code:'GC-0904',amt:80,by:'Luca R.'},
+    {time:'9:11p',type:'Issued',code:'GC-1044',amt:25,by:'Maria G.'}
+  ],
+  channels:{
+    'Dine-in':5980,
+    'Takeout (web)':820,
+    'Takeout (phone)':320,
+    'Online (Uber Eats)':280,
+    'Online (DoorDash)':210,
+    'Bar':322.5,
+    'Catering':470
+  },
+  channelFees:{
+    'Dine-in':0,'Takeout (web)':0,'Takeout (phone)':0,
+    'Online (Uber Eats)':0.30,'Online (DoorDash)':0.30,'Bar':0,'Catering':0
+  },
+  stationStats:[
+    {n:'Grill',  items:118,avg:9.4, target:9,  longest:18.3,under:.86,covers:214,thpt:55.1},
+    {n:'Sauté',  items:96, avg:11.1,target:10, longest:21.0,under:.78,covers:214,thpt:44.9},
+    {n:'Cold',   items:74, avg:4.2, target:5,  longest:8.1, under:.97,covers:214,thpt:34.6},
+    {n:'Bar',    items:142,avg:3.1, target:4,  longest:6.4, under:.99,covers:214,thpt:66.4},
+    {n:'Pastry', items:43, avg:2.8, target:3,  longest:5.0, under:.99,covers:214,thpt:20.1}
+  ],
+  openTickets:[
+    {id:'#2902',table:'7', guests:2,server:'Priya S.',opened:'9:14p',age:18,items:3,subtotal:64.50},
+    {id:'#2903',table:'11',guests:4,server:'Maria G.',opened:'9:22p',age:10,items:6,subtotal:158.0},
+    {id:'#2904',table:'B3',guests:1,server:'Luca R.',opened:'9:24p',age:8,items:2,subtotal:28.50}
+  ],
+  customerCohort:{
+    new:62, returning:152,
+    visits:{'1':62,'2-3':74,'4-5':38,'6-10':28,'11+':12},
+    avgFirst:42.10,avgRepeat:56.80,churnRisk:18
+  },
+  upsellEng:[
+    {srv:'Maria G.',drinkAttach:.91,dessertAttach:.42,appAttach:.61,modUpcharge:184},
+    {srv:'Devon W.',drinkAttach:.84,dessertAttach:.38,appAttach:.55,modUpcharge:142},
+    {srv:'Priya S.',drinkAttach:.78,dessertAttach:.30,appAttach:.48,modUpcharge:118},
+    {srv:'Luca R.', drinkAttach:.95,dessertAttach:.22,appAttach:.40,modUpcharge:96}
+  ],
+  zReport:{
+    opening:300, sales:8412.5, tax:652.6, tips:1037, refundsTotal:42, paidOut:120, paidIn:50,
+    expectedCash:870, countedCash:861, variance:-9,
+    deposits:8520, ccBatch:6890, ccBatchFees:179.14,
+    overshort:-9, closedAt:'11:12p', closedBy:'KP'
+  },
+  weather:{day:'Mon',temp:'72°F',sky:'Sunny',patio:.78,sentiment:'+0.42 (NPS proxy)'},
+  alerts:[
+    {sev:'warn',msg:'Salmon fillet stock is at 11 vs par 30',cat:'inventory'},
+    {sev:'info',msg:'Maria G. exceeded target attach rate (drink 91%)',cat:'staff'},
+    {sev:'warn',msg:'Sauté station avg 11.1 min over target 10',cat:'kitchen'},
+    {sev:'info',msg:'Loyalty redemption rate up 22% vs last week',cat:'crm'}
+  ]
+});
+
+state.activeReport='dashboard';
+
+/* seed a couple of live KDS tickets so kitchen isn't empty */
+function seedTickets(){
+  const now=Date.now();
+  state.tickets.push(mkTicket({table:'9',guests:2,server:'Devon W.',type:'Dine-in',startedAgo:7.5*60,
+    items:[
+      {id:'ribeye',nm:'12oz Ribeye',st:'grill',mods:[{t:'temp',v:'Medium-rare'},{t:'add',v:'Peppercorn'},{t:'mod',v:'Mashed potato'},{t:'mod',v:'Truffle fries'}]},
+      {id:'caesar',nm:'Caesar Salad',st:'cold',mods:[{t:'add',v:'Grilled chicken'},{t:'rm',v:'No croutons'}]}
+    ]}));
+  state.tickets.push(mkTicket({table:'12',guests:4,server:'Maria G.',type:'Dine-in',startedAgo:11.2*60,
+    items:[
+      {id:'byo',nm:'BYO Burger',st:'grill',mods:[{t:'mod',v:'Double patty'},{t:'temp',v:'Medium'},{t:'add',v:'Smoked bacon'},{t:'add',v:'Aged cheddar'},{t:'rm',v:'No onion'},{t:'mod',v:'Sweet-potato fries'}]},
+      {id:'salmon',nm:'Grilled Salmon',st:'saute',mods:[{t:'temp',v:'Medium'},{t:'mod',v:'Wild rice'}]},
+      {id:'oldf',nm:'Old Fashioned',st:'bar',mods:[{t:'mod',v:'Woodford'},{t:'add',v:'Big rock ice'}]}
+    ]}));
+  state.tickets.push(mkTicket({table:'TO',guests:1,server:'Priya S.',type:'Takeout',startedAgo:2.4*60,
+    items:[
+      {id:'wings',nm:'Crispy Wings',st:'grill',mods:[{t:'mod',v:'Buffalo'},{t:'mod',v:'Hot'},{t:'add',v:'Ranch'}]},
+      {id:'ipa',nm:'Local IPA',st:'bar',mods:[]}
+    ]}));
+}
+function mkTicket(o){
+  return {id:++state.orderSeq,table:o.table,guests:o.guests,server:o.server,type:o.type,
+    start:Date.now()-(o.startedAgo*1000),items:o.items.map(it=>({...it,done:false})),bumped:false};
+}
+
+/* =========================================================
+   ORDER VIEW
+   ========================================================= */
+const catsEl=document.getElementById('cats'),itemsEl=document.getElementById('items');
+let activeCat=Object.keys(MENU)[0];
+function renderCats(){
+  catsEl.innerHTML='';
+  Object.keys(MENU).forEach(c=>{
+    const b=document.createElement('button');b.className='cat'+(c===activeCat?' on':'');b.textContent=c;
+    b.onclick=()=>{activeCat=c;renderCats();renderItems()};catsEl.appendChild(b);
+  });
+}
+function renderItems(){
+  itemsEl.innerHTML='';
+  MENU[activeCat].forEach(it=>{
+    const customizable=it.groups&&it.groups.length;
+    const b=document.createElement('button');b.className='item';
+    b.innerHTML=`<div class="st">${STATIONS[it.st]}</div><div class="nm">${it.nm}</div>
+      <div class="ds">${it.ds}</div><div class="pr mono">$${it.base.toFixed(2)}</div>
+      ${customizable?`<div class="cz">${it.groups.length} option group${it.groups.length>1?'s':''} →</div>`:'<div class="cz">tap to add</div>'}`;
+    b.onclick=()=>openSheet(it);
+    itemsEl.appendChild(b);
+  });
+}
+renderCats();renderItems();
+
+/* guest / table / type */
+document.getElementById('gPlus').onclick=()=>{state.guests++;document.getElementById('gVal').textContent=state.guests};
+document.getElementById('gMinus').onclick=()=>{if(state.guests>1){state.guests--;document.getElementById('gVal').textContent=state.guests}};
+document.getElementById('tblIn').oninput=e=>state.table=e.target.value;
+document.getElementById('ctype').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+  state.orderType=b.dataset.t;[...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===b))};
+
+/* ---- modifier sheet ---- */
+let sheetItem=null,sheetSel={},sheetQty=1,sheetNotes='';
+const sheetBg=document.getElementById('sheetBg');
+function openSheet(it){
+  sheetItem=it;sheetSel={};sheetQty=1;sheetNotes='';
+  document.getElementById('shStation').textContent=STATIONS[it.st];
+  document.getElementById('shStation').style.color=STATION_COLORS[it.st];
+  document.getElementById('shStation').style.background=STATION_COLORS[it.st]+'22';
+  document.getElementById('shName').textContent=it.nm;
+  document.getElementById('shDesc').textContent=it.ds;
+  document.getElementById('qVal').textContent='1';
+  const body=document.getElementById('shBody');body.innerHTML='';
+  (it.groups||[]).forEach((g,gi)=>{
+    sheetSel[gi]=[];
+    const wrap=document.createElement('div');wrap.className='mgroup';
+    const tag=g.req?'<span class="tag req">Required'+(g.min>1?` · pick ${g.min}`:'')+'</span>':`<span class="tag opt">Optional${g.max>1?` · up to ${g.max}`:''}</span>`;
+    wrap.innerHTML=`<div class="gh"><span class="gn">${g.n}</span>${tag}</div>`;
+    const opts=document.createElement('div');opts.className='opts';
+    g.opts.forEach((o,oi)=>{
+      const [nm,,price]=o;
+      const el=document.createElement('div');el.className='opt';
+      el.innerHTML=`<span class="on">${nm}</span><span>${price>0?`<span class="up">+$${price.toFixed(2)}</span>`:''} <span class="check">✓</span></span>`;
+      el.onclick=()=>toggleOpt(gi,oi,g,el,opts);
+      opts.appendChild(el);
+    });
+    wrap.appendChild(opts);body.appendChild(wrap);
+  });
+  if(it.notes){
+    const w=document.createElement('div');w.className='mgroup';
+    w.innerHTML=`<div class="gh"><span class="gn">Special instructions</span></div>`;
+    const ta=document.createElement('textarea');ta.className='notes';ta.placeholder='e.g. allergy: nut-free, sauce on the side…';
+    ta.oninput=e=>sheetNotes=e.target.value;w.appendChild(ta);body.appendChild(w);
+  }
+  updateSheetState();
+  sheetBg.classList.add('show');
+}
+function toggleOpt(gi,oi,g,el,optsEl){
+  const sel=sheetSel[gi];const idx=sel.indexOf(oi);
+  if(idx>-1){sel.splice(idx,1);el.classList.remove('sel')}
+  else{
+    if(g.max===1){sel.length=0;[...optsEl.children].forEach(c=>c.classList.remove('sel'))}
+    if(sel.length>=g.max){toast('warn',`Max ${g.max} for ${g.n}`);return}
+    sel.push(oi);el.classList.add('sel');
+  }
+  updateSheetState();
+}
+function sheetPrice(){
+  let p=sheetItem.base;
+  (sheetItem.groups||[]).forEach((g,gi)=>sheetSel[gi].forEach(oi=>p+=g.opts[oi][2]));
+  return p*sheetQty;
+}
+function sheetValid(){
+  return (sheetItem.groups||[]).every((g,gi)=>!g.req||sheetSel[gi].length>=g.min);
+}
+function updateSheetState(){
+  document.getElementById('addPrice').textContent='$'+sheetPrice().toFixed(2);
+  document.getElementById('addBtn').disabled=!sheetValid();
+}
+document.getElementById('qPlus').onclick=()=>{sheetQty++;document.getElementById('qVal').textContent=sheetQty;updateSheetState()};
+document.getElementById('qMinus').onclick=()=>{if(sheetQty>1){sheetQty--;document.getElementById('qVal').textContent=sheetQty;updateSheetState()}};
+document.getElementById('shClose').onclick=()=>sheetBg.classList.remove('show');
+sheetBg.onclick=e=>{if(e.target===sheetBg)sheetBg.classList.remove('show')};
+document.getElementById('addBtn').onclick=()=>{
+  const mods=[];
+  (sheetItem.groups||[]).forEach((g,gi)=>sheetSel[gi].forEach(oi=>{
+    const [nm,,price]=g.opts[oi];
+    mods.push({t:g.kind||'mod',v:nm,p:price});
+  }));
+  state.check.push({id:sheetItem.id,nm:sheetItem.nm,st:sheetItem.st,base:sheetItem.base,qty:sheetQty,mods,notes:sheetNotes,unit:sheetPrice()/sheetQty});
+  sheetBg.classList.remove('show');
+  renderCheck();
+  toast('fire',`Added <b>${sheetQty}× ${sheetItem.nm}</b> to check`);
+};
+
+/* ---- check ---- */
+function renderCheck(){
+  const el=document.getElementById('lines');
+  if(!state.check.length){el.innerHTML='<div class="empty">No items yet.<br>Tap the menu to start a check →</div>'}
+  else{
+    el.innerHTML='';
+    state.check.forEach((l,i)=>{
+      const line=document.createElement('div');line.className='line';
+      const modsHtml=l.mods.map(m=>{
+        const cls=m.t==='remove'||m.t==='rm'?'m rm':'m';
+        const pr=m.p>0?`<span class="mp">+$${m.p.toFixed(2)}</span>`:'';
+        return `<div class="${cls}"><span>${m.t==='remove'||m.t==='rm'?'✕ ':''}${m.t==='temp'?'🌡 ':''}${m.v}</span>${pr}</div>`;
+      }).join('');
+      line.innerHTML=`<div class="lh"><div class="nm"><span class="q mono">×${l.qty}</span>${l.nm}</div>
+        <div class="p mono">$${(l.unit*l.qty).toFixed(2)}</div></div>
+        ${l.mods.length?`<div class="mods">${modsHtml}</div>`:''}
+        ${l.notes?`<div class="mods"><div class="m" style="font-style:italic">📝 ${l.notes}</div></div>`:''}
+        <div class="lact"><button data-i="${i}" class="rmLine">remove</button></div>`;
+      el.appendChild(line);
+    });
+    el.querySelectorAll('.rmLine').forEach(b=>b.onclick=()=>{state.check.splice(+b.dataset.i,1);renderCheck()});
+  }
+  const sub=state.check.reduce((a,l)=>a+l.unit*l.qty,0);
+  const tax=sub*.0825,tot=sub+tax;
+  document.getElementById('subT').textContent='$'+sub.toFixed(2);
+  document.getElementById('taxT').textContent='$'+tax.toFixed(2);
+  document.getElementById('totT').textContent='$'+tot.toFixed(2);
+  const has=state.check.length>0;
+  ['fireBtn','payBtn','splitB','voidB'].forEach(id=>document.getElementById(id).disabled=!has);
+  state._tot=tot;state._sub=sub;
+}
+document.getElementById('voidB').onclick=()=>{state.check=[];renderCheck()};
+document.getElementById('splitB').onclick=()=>toast('fire',`Check split ${state.guests} ways → $${(state._tot/state.guests).toFixed(2)} each`);
+
+document.getElementById('fireBtn').onclick=()=>fireToKitchen(false);
+document.getElementById('payBtn').onclick=()=>{ if(!state.check.find(l=>l._fired)) fireToKitchen(true); payAndClose(); };
+
+function fireToKitchen(silent){
+  const t=mkTicket({table:state.table,guests:state.guests,server:'You (demo)',type:state.orderType,startedAgo:0,
+    items:state.check.flatMap(l=>Array.from({length:l.qty},()=>({id:l.id,nm:l.nm,st:l.st,
+      mods:l.mods.map(m=>({t:(m.t==='remove')?'rm':m.t,v:m.v})).concat(l.notes?[{t:'note',v:l.notes}]:[])})))});
+  state.tickets.unshift(t);
+  state.check.forEach(l=>l._fired=true);
+  updateKdsBadge();renderKDS();
+  const stns=[...new Set(t.items.map(i=>STATIONS[i.st]))].join(', ');
+  if(!silent) toast('fire',`Order <b>#${t.id}</b> fired → ${stns}`);
+}
+function payAndClose(){
+  const sub=state._sub,tot=state._tot;
+  // book to reporting
+  state.rep.netSales+=sub;
+  state.rep.covers+=state.guests;
+  state.rep.checks+=1;
+  // payment mix (assume card)
+  state.rep.payMix.Card+=tot;
+  // service type
+  state.rep.svcMix[state.orderType]=(state.rep.svcMix[state.orderType]||0)+sub;
+  // hour
+  const h=new Date().getHours();const idx=Math.min(12,Math.max(0,h-11));state.rep.hourly[idx]+=sub;
+  // menu mix
+  state.check.forEach(l=>{state.rep.mix[l.id]=state.rep.mix[l.id]||{q:0};state.rep.mix[l.id].q+=l.qty});
+  document.getElementById('rcAmt').textContent='Paid $'+tot.toFixed(2);
+  document.getElementById('rcSub').textContent=`Table ${state.table} closed · ${state.guests} covers · reporting updated`;
+  document.getElementById('receipt').classList.add('show');
+  toast('pay',`Closed <b>$${tot.toFixed(2)}</b> · Reporting updated`);
+  renderReports();
+}
+document.getElementById('rcNew').onclick=()=>{
+  state.check=[];renderCheck();document.getElementById('receipt').classList.remove('show');
+};
+
+/* =========================================================
+   KDS VIEW
+   ========================================================= */
+let kStation='all',allDayOn=false;
+function renderStationFilter(){
+  const el=document.getElementById('stationFilter');
+  const counts={all:0};Object.keys(STATIONS).forEach(s=>counts[s]=0);
+  state.tickets.filter(t=>!t.bumped).forEach(t=>t.items.forEach(i=>{counts.all++;counts[i.st]++}));
+  el.innerHTML='';
+  const make=(key,label)=>{
+    const b=document.createElement('button');b.className='kstation'+(kStation===key?' on':'');
+    b.innerHTML=`${label} <span class="ct">${counts[key]||0}</span>`;
+    b.onclick=()=>{kStation=key;renderStationFilter();renderKDS()};el.appendChild(b);
+  };
+  make('all','All');
+  Object.entries(STATIONS).forEach(([k,v])=>make(k,v));
+}
+function tColor(mins){return mins<6?'g':mins<10?'y':'r'}
+function tClass(mins){return mins<6?'':mins<10?'warn':'late'}
+function renderKDS(){
+  renderStationFilter();
+  if(allDayOn){renderAllDay();return}
+  const board=document.getElementById('kdsBoard');
+  const active=state.tickets.filter(t=>!t.bumped).filter(t=>kStation==='all'||t.items.some(i=>i.st===kStation));
+  if(!active.length){board.innerHTML='<div class="kds-empty">No active tickets on this station.<br>Fire an order from the <b>Order</b> screen and it appears here instantly.</div>';return}
+  board.innerHTML='';
+  active.forEach(t=>{
+    const mins=(Date.now()-t.start)/60000;
+    const card=document.createElement('div');card.className='ticket '+tClass(mins);
+    const items=t.items.filter(i=>kStation==='all'||i.st===kStation);
+    const itemsHtml=items.map((it,ii)=>{
+      const realIdx=t.items.indexOf(it);
+      const mods=it.mods.map(m=>{
+        if(m.t==='rm')return `<span class="rm">✕ ${m.v}</span>`;
+        if(m.t==='temp')return `<span class="temp">🌡 ${m.v}</span>`;
+        if(m.t==='add')return `<span class="add">+ ${m.v}</span>`;
+        if(m.t==='note')return `<span style="font-style:italic;color:var(--dim-2)">📝 ${m.v}</span>`;
+        return `<span>${m.v}</span>`;
+      }).join('');
+      return `<div class="ki ${it.done?'done':''}" data-i="${realIdx}">
+        <div class="kn"><span class="q mono">1×</span>${it.nm}<span class="stn">${STATIONS[it.st]}</span></div>
+        ${it.mods.length?`<div class="km">${mods}</div>`:''}</div>`;
+    }).join('');
+    card.innerHTML=`<div class="tk-h"><div class="r1"><span class="onum">#${t.id}</span>
+        <span class="timer ${tColor(mins)}" data-start="${t.start}">${fmtT(mins)}</span></div>
+        <div class="r2"><span class="chip type">${t.type}</span><span class="chip">Table ${t.table}</span>
+        <span class="chip">${t.guests} guests</span><span class="chip">${t.server}</span></div></div>
+      <div class="tk-body">${itemsHtml}</div>
+      <div class="tk-f"><button class="bump" data-id="${t.id}">✓ Bump</button><button class="rush" data-id="${t.id}">🔔 Rush</button></div>`;
+    board.appendChild(card);
+  });
+  // item toggle done
+  board.querySelectorAll('.ki').forEach(ki=>ki.querySelector('.kn').onclick=()=>{
+    const card=ki.closest('.ticket');const id=+card.querySelector('.bump').dataset.id;
+    const t=state.tickets.find(x=>x.id===id);const it=t.items[+ki.dataset.i];it.done=!it.done;renderKDS();
+  });
+  board.querySelectorAll('.bump').forEach(b=>b.onclick=()=>bump(+b.dataset.id));
+  board.querySelectorAll('.rush').forEach(b=>b.onclick=()=>{toast('fire',`🔔 Ticket #${b.dataset.id} flagged RUSH to all stations`)});
+}
+function fmtT(mins){const m=Math.floor(mins),s=Math.floor((mins-m)*60);return `${m}:${String(s).padStart(2,'0')}`}
+function bump(id){
+  const t=state.tickets.find(x=>x.id===id);if(!t)return;t.bumped=true;state.recallStack.push(id);
+  updateKdsBadge();renderKDS();toast('pay',`Ticket <b>#${id}</b> bumped · fired to expo`);
+}
+document.getElementById('recallBtn').onclick=()=>{
+  const id=state.recallStack.pop();if(id==null){toast('warn','Nothing to recall');return}
+  const t=state.tickets.find(x=>x.id===id);if(t){t.bumped=false;t.start=Date.now()-((6.1)*60000)}
+  updateKdsBadge();renderKDS();toast('fire',`Recalled ticket <b>#${id}</b>`);
+};
+document.getElementById('allDayBtn').onclick=function(){
+  allDayOn=!allDayOn;this.classList.toggle('on',allDayOn);
+  document.getElementById('kdsBoard').style.display=allDayOn?'none':'';
+  document.getElementById('allDay').classList.toggle('show',allDayOn);
+  if(allDayOn)renderAllDay();
+};
+function renderAllDay(){
+  const counts={};
+  state.tickets.filter(t=>!t.bumped).forEach(t=>t.items.forEach(i=>{
+    counts[i.nm]=counts[i.nm]||{q:0,st:i.st};counts[i.nm].q++;
+  }));
+  const grid=document.getElementById('adGrid');
+  const entries=Object.entries(counts).sort((a,b)=>b[1].q-a[1].q);
+  grid.innerHTML=entries.length?entries.map(([nm,d])=>`<div class="ad-card">
+     <div class="big">${d.q}</div><div class="info"><div class="n">${nm}</div><div class="s">${STATIONS[d.st]} station</div></div></div>`).join('')
+     :'<div class="kds-empty">No items working right now.</div>';
+}
+function updateKdsBadge(){
+  const n=state.tickets.filter(t=>!t.bumped).length;
+  const b=document.getElementById('kdsBadge');b.style.display=n?'inline-block':'none';b.textContent=n;
+}
+
+/* timers tick */
+setInterval(()=>{
+  if(document.getElementById('kds').classList.contains('active')&&!allDayOn){
+    document.querySelectorAll('.timer').forEach(el=>{
+      const mins=(Date.now()-(+el.dataset.start))/60000;
+      el.textContent=fmtT(mins);el.className='timer '+tColor(mins);
+      const card=el.closest('.ticket');if(card)card.className='ticket '+tClass(mins);
+    });
+  }
+},1000);
+
+/* =========================================================
+   REPORTS VIEW
+   ========================================================= */
+function money(n){return '$'+Math.round(n).toLocaleString('en-US')}
+function money2(n){return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function catOf(id){for(const[c,arr]of Object.entries(MENU))if(arr.find(x=>x.id===id))return c;return '—'}
+const PALETTE=['#FF9500','#34C759','#0A84FF','#BF5AF2','#FFD60A','#FF6B00','#FF453A'];
+
+/* ---- reusable render helpers (return HTML strings) ---- */
+function kpiGrid(items){
+  return `<div class="kpis">`+items.map(k=>{
+    const hasD=k.d!=null;const up=k.d>=0;const good=k.invert?(k.d<0):(k.d>=0);
+    const cls=hasD?(good?'up':'down'):'';
+    return `<div class="kpi"><div class="glow"></div><div class="lab">${k.l}</div>
+      <div class="val"><span class="mono">${k.v}</span></div>
+      ${hasD?`<div class="delta ${cls}">${up?'▲':'▼'} ${Math.abs(k.d).toFixed(1)}% <span class="sub">${k.sub||''}</span></div>`
+            :`<div class="delta"><span class="sub">${k.sub||''}</span></div>`}</div>`;
+  }).join('')+`</div>`;
+}
+function bars(values,labels,opts={}){
+  const cmp=opts.cmp;const fmt=opts.fmt||money;const max=Math.max(...values,...(cmp||[0]))||1;
+  return `<div class="hbars">`+values.map((v,i)=>`
+    <div class="col"><div class="bar" style="height:${v/max*100}%;background:${opts.color||'var(--grad)'}">
+      <span class="tip">${labels[i]}: ${fmt(v)}${cmp?`<br>prev: ${fmt(cmp[i])}`:''}</span></div>
+      <div class="lbl">${labels[i]}</div></div>`).join('')+`</div>`;
+}
+function tbl(headers,rows){
+  return `<table class="rtable"><thead><tr>`+headers.map(h=>`<th class="${h.num?'num':''}">${h.t}</th>`).join('')+
+    `</tr></thead><tbody>`+rows.map(r=>`<tr class="${r._cls||''}">`+r.cells.map((c,i)=>
+      `<td class="${headers[i].num?'num':''}">${c}</td>`).join('')+`</tr>`).join('')+`</tbody></table>`;
+}
+function panel(title,sub,body,tag){
+  return `<div class="panel"><h3>${title}${tag?` <span class="tag">${tag}</span>`:''}</h3>${sub?`<div class="ph-sub">${sub}</div>`:''}${body}</div>`;
+}
+function donutWrap(data,colors){
+  const entries=Object.entries(data);const total=entries.reduce((a,[,v])=>a+v,0)||1;
+  const rr=52,c=2*Math.PI*rr;let off=0;let svg=`<svg width="130" height="130" viewBox="0 0 130 130">`;
+  entries.forEach(([,v],i)=>{const len=v/total*c;
+    svg+=`<circle cx="65" cy="65" r="${rr}" fill="none" stroke="${colors[i%colors.length]}" stroke-width="16" stroke-dasharray="${len} ${c-len}" stroke-dashoffset="${-off}" transform="rotate(-90 65 65)"></circle>`;off+=len;});
+  svg+=`<text x="65" y="60" text-anchor="middle" fill="#fff" font-size="17" font-weight="800" font-family="JetBrains Mono">${money(total)}</text><text x="65" y="78" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="9" font-family="JetBrains Mono">TOTAL</text></svg>`;
+  const legend=entries.map(([k,v],i)=>`<div class="li"><span class="sw" style="background:${colors[i%colors.length]}"></span><span class="nm">${k}</span><span class="vl">${money(v)} · ${Math.round(v/total*100)}%</span></div>`).join('');
+  return `<div class="donut-wrap"><div class="donut">${svg}</div><div class="legend">${legend}</div></div>`;
+}
+function gauge(label,pct,target,colorGood){
+  const over=pct>target;const col=colorGood?(over?'var(--error)':'var(--success)'):'var(--primary)';
+  return `<div class="gtitle"><span>${label}</span><span class="vv" style="color:${col}">${pct.toFixed(1)}%</span></div>
+    <div class="gauge"><i style="width:${Math.min(100,pct)}%;background:${col}"></i></div>
+    <div style="font-size:11px;color:var(--dim-2);font-family:'JetBrains Mono'">target ${target}%</div>`;
+}
+const HRS=['11a','12p','1p','2p','3p','4p','5p','6p','7p','8p','9p','10p','11p'];
+function mixArr(){
+  return Object.entries(state.rep.mix).map(([id,d])=>{
+    const it=ALL_ITEMS[id]||{nm:id,base:0};return {id,nm:it.nm,cat:catOf(id),q:d.q,price:it.base||0,rev:d.q*(it.base||0)};
+  }).sort((a,b)=>b.rev-a.rev);
+}
+
+/* =========================================================
+   REPORT CATALOG — everything an owner can see
+   ========================================================= */
+const REPORTS=[
+ {group:'Insights',items:[
+   {id:'alerts',ic:'⚠',name:'AI Watchlist',desc:'Auto-detected anomalies across the day',fn:repAlerts}
+ ]},
+ {group:'Overview',items:[
+   {id:'dashboard',ic:'🏠',name:'Dashboard',desc:'Today at a glance · live',fn:repDashboard}
+ ]},
+ {group:'Sales',items:[
+   {id:'sales_summary',ic:'💰',name:'Sales Summary',desc:'Gross → net → collected',fn:repSalesSummary},
+   {id:'hourly',ic:'⏱',name:'Sales by Hour',desc:'Hourly trend vs last week',fn:repHourly},
+   {id:'daypart',ic:'🌅',name:'Sales by Daypart',desc:'Lunch / happy hr / dinner / late',fn:repDaypart},
+   {id:'category',ic:'🗂',name:'Sales by Category',desc:'Revenue by menu category',fn:repCategory},
+   {id:'service_type',ic:'🛎',name:'Service Type',desc:'Dine-in / takeout / delivery / bar',fn:repService},
+   {id:'payment',ic:'💳',name:'Payment Mix',desc:'Tender breakdown & est. fees',fn:repPayment},
+   {id:'tax',ic:'🧾',name:'Tax Report',desc:'Taxable, exempt, collected',fn:repTax},
+   {id:'refunds',ic:'↩️',name:'Refunds',desc:'Detail with reason, server, manager',fn:repRefunds},
+   {id:'channels',ic:'🌐',name:'Channels',desc:'Dine-in vs takeout vs delivery — net of fees',fn:repChannels}
+ ]},
+ {group:'Menu',items:[
+   {id:'menu_mix',ic:'📊',name:'Menu / Product Mix',desc:'Every item by units & revenue',fn:repMenuMix},
+   {id:'modifiers',ic:'➕',name:'Modifier Sales',desc:'Upsell add-ons & upcharge revenue',fn:repModifiers},
+   {id:'menu_eng',ic:'⭐',name:'Menu Engineering',desc:'Stars · plowhorses · puzzles · dogs',fn:repMenuEng}
+ ]},
+ {group:'Labor',items:[
+   {id:'labor_summary',ic:'👷',name:'Labor Summary',desc:'Labor %, hours, by role',fn:repLabor},
+   {id:'time_clock',ic:'🕐',name:'Time Clock / Punches',desc:'Shifts, breaks, OT, tips',fn:repTimeclock},
+   {id:'sales_vs_labor',ic:'⚖️',name:'Sales vs Labor',desc:'Hourly labor % against sales',fn:repSalesVsLabor},
+   {id:'tips',ic:'💵',name:'Tips & Tipouts',desc:'Tip %, pooling, distribution',fn:repTips},
+   {id:'tip_decl',ic:'📝',name:'Tip Declaration',desc:'Server-by-server · IRS Form 8027',fn:repTipDecl}
+ ]},
+ {group:'Staff',items:[
+   {id:'server_perf',ic:'🏅',name:'Server Performance',desc:'Sales, checks, average, exceptions',fn:repServers},
+   {id:'exceptions',ic:'🚩',name:'Sales Exceptions',desc:'Voids, comps & discounts — audit',fn:repExceptions},
+   {id:'disc_reasons',ic:'🎟',name:'Discount / Comp Reasons',desc:'Where promo & comp dollars go',fn:repDiscountReasons},
+   {id:'audit',ic:'🛡',name:'Audit Log',desc:'Chronological — who, when, what, why',fn:repAuditLog}
+ ]},
+ {group:'Guests',items:[
+   {id:'loyalty',ic:'❤️',name:'Loyalty & CRM',desc:'Members, visits, redemptions',fn:repLoyalty},
+   {id:'promos',ic:'🎯',name:'Promotion Effectiveness',desc:'Redemptions, revenue & ROI',fn:repPromos},
+   {id:'cohort',ic:'👥',name:'Guest Cohort',desc:'New vs returning · avg check · churn',fn:repCohort},
+   {id:'gift_cards',ic:'🎁',name:'Gift Cards',desc:'Issue, redeem, outstanding liability',fn:repGiftCards}
+ ]},
+ {group:'Operations',items:[
+   {id:'cash',ic:'🧰',name:'Cash Drawer Summary',desc:'Reconciliation & variance',fn:repCash},
+   {id:'ticket_times',ic:'🔥',name:'Speed of Service',desc:'Ticket times by station & daypart',fn:repTicketTimes},
+   {id:'stations',ic:'🍳',name:'Station Throughput',desc:'Items out · throughput per station',fn:repStations},
+   {id:'open_tickets',ic:'🔔',name:'Open Tickets',desc:'Live floor — checks open right now',fn:repOpen},
+   {id:'heatmap',ic:'📈',name:'Sales Heatmap',desc:'Hour × day-of-week · last 90 days',fn:repHeatmap},
+   {id:'zreport',ic:'🧾',name:'End-of-Day (Z-Report)',desc:'Close-out · deposit · variance',fn:repZ}
+ ]},
+ {group:'Inventory',items:[
+   {id:'inventory',ic:'📦',name:'Inventory On-Hand',desc:'Stock vs par · low-stock alerts',fn:repInventory},
+   {id:'cogs',ic:'📉',name:'Cost of Goods / Prime',desc:'Food %, bev %, prime cost',fn:repCOGS}
+ ]},
+ {group:'Multi-Unit',items:[
+   {id:'locations',ic:'🏢',name:'Location Comparison',desc:'Compare all your restaurants',fn:repLocations}
+ ]}
+];
+const REPORT_INDEX={};REPORTS.forEach(g=>g.items.forEach(it=>REPORT_INDEX[it.id]=it));
+
+/* ---- individual reports ---- */
+function repDashboard(){
+  const r=state.rep,avg=r.netSales/r.checks,laborPct=r.laborCost/r.netSales*100;
+  const lwTotal=r.hourlyLW.reduce((a,b)=>a+b,0);const salesDelta=(r.netSales-lwTotal)/lwTotal*100;
+  return kpiGrid([
+    {l:'Net Sales',v:money(r.netSales),d:salesDelta,sub:'vs last wk'},
+    {l:'Covers',v:r.covers,d:6.4,sub:'vs last wk'},
+    {l:'Avg Check',v:money2(avg),d:3.1,sub:'vs last wk'},
+    {l:'Labor %',v:laborPct.toFixed(1)+'%',d:-1.8,invert:true,sub:'target 25–30%'},
+    {l:'Comps+Voids',v:money(r.voidAmt+r.compAmt),d:-12,invert:true,sub:`${r.voids}v · ${r.comps}c`},
+    {l:'Checks',v:r.checks,d:5.2,sub:'closed'}
+  ])+
+  `<div class="rep-grid">`+
+    panel('Net Sales by Hour','Today vs same day last week · hover for detail',bars(r.hourly,HRS,{cmp:r.hourlyLW}),'● live')+
+    panel('Payment Mix','Share of tendered volume',donutWrap(r.payMix,PALETTE))+
+  `</div>`+
+  `<div class="rep-grid">`+
+    panel('Top Sellers','Live product mix',miniMixTable(6))+
+    panel('Service Type','Revenue center split',donutWrap(r.svcMix,['#FF6B00','#FFD60A','#0A84FF','#34C759']))+
+  `</div>`;
+}
+function miniMixTable(n){
+  const arr=mixArr().slice(0,n);const mx=Math.max(...arr.map(m=>m.rev))||1;
+  return tbl([{t:'Item'},{t:'Cat'},{t:'Units',num:1},{t:'Net rev',num:1}],
+    arr.map((m,i)=>({cells:[`<span class="rank ${i===0?'top':''}">${i+1}</span>${m.nm}`,`<span class="reason">${m.cat}</span>`,m.q,
+      `${money(m.rev)}<div class="mixbar"><i style="width:${m.rev/mx*100}%"></i></div>`]})));
+}
+function repSalesSummary(){
+  const r=state.rep;const net=r.netSales,collected=net+r.taxCollected+r.tips;
+  return kpiGrid([
+    {l:'Gross Sales',v:money(r.grossSales),sub:'before adjustments'},
+    {l:'Net Sales',v:money(net),d:7.4,sub:'vs last wk'},
+    {l:'Tax Collected',v:money(r.taxCollected),sub:`${r.taxRate}% rate`},
+    {l:'Tips',v:money(r.tips),sub:`${(r.tips/net*100).toFixed(1)}% of net`},
+    {l:'Total Collected',v:money(collected),sub:'incl. tax + tips'},
+    {l:'Net / Cover',v:money2(net/r.covers),d:2.1,sub:'per guest'}
+  ])+
+  `<div class="rep-grid eq">`+
+  panel('Sales Build-Up','From gross to total collected',
+    tbl([{t:'Line'},{t:'Amount',num:1}],[
+      {cells:['Gross sales',money2(r.grossSales)]},
+      {cells:['− Discounts',`<span style="color:var(--blue)">−${money2(r.discAmt)}</span>`]},
+      {cells:['− Comps',`<span style="color:var(--warn)">−${money2(r.compAmt)}</span>`]},
+      {cells:['− Voids',`<span style="color:var(--error)">−${money2(r.voidAmt)}</span>`]},
+      {cells:['− Refunds',`<span style="color:var(--error)">−${money2(r.refunds)}</span>`]},
+      {cells:['<b>Net sales</b>',`<b>${money2(r.netSales)}</b>`],_cls:''},
+      {cells:['+ Tax',money2(r.taxCollected)]},
+      {cells:['+ Tips',money2(r.tips)]},
+      {cells:['<b>Total collected</b>',`<b>${money2(collected)}</b>`]}
+    ]))+
+  panel('Category Split','Net sales by menu category',donutWrap(r.catSales,PALETTE))+
+  `</div>`;
+}
+function repHourly(){
+  const r=state.rep;const tot=r.hourly.reduce((a,b)=>a+b,0);const peak=Math.max(...r.hourly);const peakHr=HRS[r.hourly.indexOf(peak)];
+  return kpiGrid([
+    {l:'Net Sales',v:money(r.netSales),d:7.4,sub:'vs last wk'},
+    {l:'Peak Hour',v:peakHr,sub:money(peak)+' in that hour'},
+    {l:'Avg / Hour',v:money(tot/r.hourly.length),sub:'across service'}
+  ])+panel('Net Sales by Hour — Today vs Last Week','Hover any bar for the exact figures',bars(r.hourly,HRS,{cmp:r.hourlyLW}),'● live')+
+  panel('Hourly Detail','',tbl([{t:'Hour'},{t:'Net sales',num:1},{t:'Last week',num:1},{t:'Δ',num:1}],
+    r.hourly.map((v,i)=>{const d=v-r.hourlyLW[i];return {cells:[HRS[i],money(v),money(r.hourlyLW[i]),
+      `<span style="color:${d>=0?'var(--success)':'var(--error)'}">${d>=0?'+':''}${money(d)}</span>`]};})));
+}
+function repDaypart(){
+  const r=state.rep;
+  return panel('Sales by Daypart','Revenue distribution across the day',donutWrap(r.daypart,['#FFD60A','#FF9500','#FF6B00','#BF5AF2']))+
+  panel('Daypart Detail','',tbl([{t:'Daypart'},{t:'Net sales',num:1},{t:'% of day',num:1}],
+    (()=>{const tot=Object.values(r.daypart).reduce((a,b)=>a+b,0);return Object.entries(r.daypart).map(([k,v])=>({cells:[k,money(v),(v/tot*100).toFixed(1)+'%']}));})()));
+}
+function repCategory(){
+  const r=state.rep;const labels=Object.keys(r.catSales),vals=Object.values(r.catSales);const tot=vals.reduce((a,b)=>a+b,0);
+  return panel('Net Sales by Category','',bars(vals,labels,{}))+
+  panel('Category Detail','',tbl([{t:'Category'},{t:'Net sales',num:1},{t:'% mix',num:1}],
+    labels.map((k,i)=>({cells:[k,money(vals[i]),(vals[i]/tot*100).toFixed(1)+'%']}))));
+}
+function repService(){
+  const r=state.rep;const tot=Object.values(r.svcMix).reduce((a,b)=>a+b,0);
+  return panel('Sales by Service Type','Revenue center split',donutWrap(r.svcMix,['#FF6B00','#FFD60A','#0A84FF','#34C759']))+
+  panel('Detail','',tbl([{t:'Service type'},{t:'Net sales',num:1},{t:'% mix',num:1}],
+    Object.entries(r.svcMix).map(([k,v])=>({cells:[k,money(v),(v/tot*100).toFixed(1)+'%']}))));
+}
+function repPayment(){
+  const r=state.rep;const tot=Object.values(r.payMix).reduce((a,b)=>a+b,0);
+  const feeRate={Card:0.026,Cash:0,Mobile:0.026,'Gift card':0};
+  return kpiGrid([
+    {l:'Total Tendered',v:money(tot),sub:'all methods'},
+    {l:'Card Volume',v:money(r.payMix.Card),sub:`${(r.payMix.Card/tot*100).toFixed(0)}% of tender`},
+    {l:'Est. Processing Fees',v:money(r.payMix.Card*0.026+r.payMix.Mobile*0.026),sub:'~2.6% card-present'}
+  ])+
+  `<div class="rep-grid">`+
+  panel('Payment Mix','',donutWrap(r.payMix,PALETTE))+
+  panel('Tender Detail','',tbl([{t:'Method'},{t:'Volume',num:1},{t:'Share',num:1},{t:'Est. fee',num:1}],
+    Object.entries(r.payMix).map(([k,v])=>({cells:[k,money(v),(v/tot*100).toFixed(1)+'%',money(v*(feeRate[k]||0))]}))))+
+  `</div>`;
+}
+function repTax(){
+  const r=state.rep;
+  return kpiGrid([
+    {l:'Tax Rate',v:r.taxRate+'%',sub:'state + local'},
+    {l:'Taxable Sales',v:money(r.taxable),sub:'subject to tax'},
+    {l:'Tax-Exempt',v:money(r.exempt),sub:'comps, exempt orgs'},
+    {l:'Tax Collected',v:money(r.taxCollected),sub:'to remit'}
+  ])+panel('Tax Breakdown','',tbl([{t:'Bucket'},{t:'Amount',num:1}],[
+    {cells:['Taxable sales',money2(r.taxable)]},
+    {cells:['Tax-exempt sales',money2(r.exempt)]},
+    {cells:[`Tax @ ${r.taxRate}%`,money2(r.taxCollected)]},
+    {cells:['<b>Total to remit</b>',`<b>${money2(r.taxCollected)}</b>`]}
+  ]));
+}
+function repMenuMix(){
+  const arr=mixArr();const mx=Math.max(...arr.map(m=>m.rev))||1;const totRev=arr.reduce((a,m)=>a+m.rev,0);
+  return kpiGrid([
+    {l:'Items Sold',v:arr.reduce((a,m)=>a+m.q,0),sub:'total units'},
+    {l:'Unique Items',v:arr.length,sub:'on the menu'},
+    {l:'Top Item',v:arr[0]?arr[0].nm:'—',sub:arr[0]?money(arr[0].rev)+' net':''}
+  ])+panel('Full Product Mix','Every item — units, net revenue, share',
+    tbl([{t:'#'},{t:'Item'},{t:'Category'},{t:'Price',num:1},{t:'Units',num:1},{t:'Net rev',num:1},{t:'% sales',num:1}],
+      arr.map((m,i)=>({cells:[`<span class="rank ${i===0?'top':''}">${i+1}</span>`,m.nm,`<span class="reason">${m.cat}</span>`,
+        money2(m.price),m.q,`${money(m.rev)}<div class="mixbar"><i style="width:${m.rev/mx*100}%"></i></div>`,
+        (m.rev/totRev*100).toFixed(1)+'%']}))),'live');
+}
+function repModifiers(){
+  const r=state.rep;const mx=Math.max(...r.modifiers.map(m=>m.q))||1;
+  return kpiGrid([
+    {l:'Modifier Attach',v:r.modifiers.reduce((a,m)=>a+m.q,0),sub:'add-ons rung'},
+    {l:'Upcharge Revenue',v:money(r.modifiers.reduce((a,m)=>a+m.rev,0)),sub:'pure margin'},
+    {l:'Top Upsell',v:r.modifiers.slice().sort((a,b)=>b.rev-a.rev)[0].n,sub:'by revenue'}
+  ])+panel('Modifier Sales','How often each add-on/option is chosen and the upcharge revenue it drives',
+    tbl([{t:'Modifier'},{t:'Group'},{t:'Times chosen',num:1},{t:'Upcharge rev',num:1}],
+      r.modifiers.map(m=>({cells:[m.n,`<span class="reason">${m.g}</span>`,
+        `${m.q}<div class="mixbar"><i style="width:${m.q/mx*100}%"></i></div>`,
+        m.rev>0?money2(m.rev):'<span class="reason">free</span>']}))));
+}
+function repMenuEng(){
+  const arr=mixArr();const medQ=arr.map(m=>m.q).sort((a,b)=>a-b)[Math.floor(arr.length/2)];
+  const margins=arr.map(m=>m.q*m.price*0.68);const medM=margins.slice().sort((a,b)=>a-b)[Math.floor(arr.length/2)];
+  const cls=(m,i)=>{const pop=m.q>=medQ,prof=margins[i]>=medM;
+    return pop&&prof?['star','Star']:!pop&&prof?['puzzle','Puzzle']:pop&&!prof?['plow','Plowhorse']:['dog','Dog'];};
+  return `<div class="ph-sub" style="margin-bottom:18px">Classic menu-engineering matrix: popularity × profitability. <b style="color:var(--success)">Stars</b> = promote · <b style="color:var(--primary)">Plowhorses</b> = popular, low margin (re-cost) · <b style="color:var(--blue)">Puzzles</b> = high margin, push harder · <b style="color:var(--error)">Dogs</b> = consider cutting.</div>`+
+    panel('Menu Engineering','Profit (est. 68% gross margin) vs popularity',
+    tbl([{t:'Item'},{t:'Category'},{t:'Units',num:1},{t:'Est. profit',num:1},{t:'Class'}],
+      arr.map((m,i)=>{const[c,l]=cls(m,i);return {cells:[m.nm,`<span class="reason">${m.cat}</span>`,m.q,money(margins[i]),
+        `<span class="exc-tag ${c}">${l}</span>`]};})));
+}
+function repLabor(){
+  const r=state.rep;const laborPct=r.laborCost/r.netSales*100;const ot=r.timeclock.reduce((a,t)=>a+t.ot,0);
+  return kpiGrid([
+    {l:'Labor Cost',v:money(r.laborCost),d:-3.2,invert:true,sub:'vs last wk'},
+    {l:'Labor %',v:laborPct.toFixed(1)+'%',d:-1.8,invert:true,sub:'target 25–30%'},
+    {l:'Hours Worked',v:r.laborHours,sub:'all roles'},
+    {l:'Overtime',v:ot.toFixed(1)+'h',sub:'flagged'},
+    {l:'Sales / Labor Hr',v:money2(r.netSales/r.laborHours),d:7.3,sub:'productivity'}
+  ])+
+  panel('Labor % by Hour','Watch where labor outpaces sales',bars(r.laborPctByHour,HRS,{fmt:v=>v+'%',color:'linear-gradient(135deg,#0A84FF,#0050d6)'}))+
+  panel('Labor by Role','',tbl([{t:'Role'},{t:'Employees',num:1},{t:'Hours',num:1},{t:'Cost',num:1},{t:'% labor',num:1}],
+    r.laborByRole.map(x=>({cells:[x.role,x.emp,x.hrs.toFixed(1),money(x.cost),(x.cost/r.laborCost*100).toFixed(0)+'%']}))));
+}
+function repTimeclock(){
+  const r=state.rep;const totH=r.timeclock.reduce((a,t)=>a+t.reg+t.ot,0);const totT=r.timeclock.reduce((a,t)=>a+t.tips,0);
+  return kpiGrid([
+    {l:'Punches',v:r.timeclock.length,sub:'today'},
+    {l:'Total Hours',v:totH.toFixed(1),sub:'reg + OT'},
+    {l:'OT Hours',v:r.timeclock.reduce((a,t)=>a+t.ot,0).toFixed(1),sub:'over 8h/day'},
+    {l:'Tips Reported',v:money(totT),sub:'for payroll'}
+  ])+panel('Time Clock — Punches','Shifts by employee with breaks, overtime & reported tips',
+    tbl([{t:'Employee'},{t:'Role'},{t:'In'},{t:'Out'},{t:'Reg',num:1},{t:'OT',num:1},{t:'Break',num:1},{t:'Tips',num:1}],
+      r.timeclock.map(t=>({cells:[t.n,`<span class="reason">${t.role}</span>`,`<span class="mono">${t.in}</span>`,`<span class="mono">${t.out}</span>`,
+        t.reg.toFixed(2),t.ot>0?`<span style="color:var(--warn)">${t.ot.toFixed(2)}</span>`:'0',t.brk.toFixed(1),t.tips?money(t.tips):'—']}))));
+}
+function repSalesVsLabor(){
+  const r=state.rep;
+  return panel('Sales by Hour','',bars(r.hourly,HRS,{}))+
+    panel('Labor % by Hour','Where each dollar of labor lines up against sales',bars(r.laborPctByHour,HRS,{fmt:v=>v+'%',color:'linear-gradient(135deg,#0A84FF,#0050d6)'}))+
+    panel('Hour-by-Hour','',tbl([{t:'Hour'},{t:'Net sales',num:1},{t:'Labor $',num:1},{t:'Labor %',num:1}],
+      r.hourly.map((v,i)=>{const lp=r.laborPctByHour[i];return {cells:[HRS[i],money(v),money(v*lp/100),
+        `<span style="color:${lp>30?'var(--error)':'var(--success)'}">${lp}%</span>`]};})));
+}
+function repTips(){
+  const r=state.rep;const totTips=r.servers.reduce((a,s)=>a+s.s*0.18,0);
+  return kpiGrid([
+    {l:'Total Tips',v:money(r.tips),sub:'all staff'},
+    {l:'Avg Tip %',v:'18.4%',d:0.6,sub:'of net sales'},
+    {l:'Tipout Pool',v:money(r.tips*0.25),sub:'to support staff'}
+  ])+panel('Tips by Server','Suggested tipout = 25% to bar/bus/runners',
+    tbl([{t:'Server'},{t:'Sales',num:1},{t:'Tips',num:1},{t:'Tip %',num:1},{t:'Tipout',num:1},{t:'Net tips',num:1}],
+      r.servers.map(s=>{const tips=s.s*0.184,tipout=tips*0.25;return {cells:[s.n,money(s.s),money(tips),'18.4%',
+        `<span style="color:var(--warn)">−${money(tipout)}</span>`,money(tips-tipout)]};})));
+}
+function repServers(){
+  const r=state.rep;
+  return panel('Server Performance','Sales, checks, average check & exceptions per server',
+    tbl([{t:'#'},{t:'Server'},{t:'Sales',num:1},{t:'Checks',num:1},{t:'Avg check',num:1},{t:'Voids',num:1},{t:'Comps',num:1}],
+      r.servers.slice().sort((a,b)=>b.s-a.s).map((s,i)=>({cells:[`<span class="rank ${i===0?'top':''}">${i+1}</span>`,s.n,
+        money(s.s),s.c,money2(s.s/s.c),
+        s.v>0?`<span style="color:var(--error)">${s.v}</span>`:'0',
+        s.cmp>0?`<span style="color:var(--warn)">${s.cmp}</span>`:'0']}))));
+}
+function repExceptions(){
+  const r=state.rep;
+  return kpiGrid([
+    {l:'Voids',v:money(r.voidAmt),d:-12,invert:true,sub:`${r.voids} transactions`},
+    {l:'Comps',v:money(r.compAmt),sub:`${r.comps} given`},
+    {l:'Discounts',v:money(r.discAmt),sub:`${r.discounts} applied`},
+    {l:'Exception Rate',v:((r.voidAmt+r.compAmt+r.discAmt)/r.netSales*100).toFixed(1)+'%',invert:true,d:-2,sub:'of net sales'}
+  ])+panel('Exception Log','Audit trail — every void, comp & discount by server and reason',
+    tbl([{t:'Type'},{t:'Item / Check'},{t:'Server'},{t:'Amount',num:1},{t:'Reason'},{t:'Time'}],
+    r.exc.map(e=>({cells:[`<span class="exc-tag ${e.t}">${e.t}</span>`,e.item,`<span class="reason">${e.srv}</span>`,
+      money2(e.amt),`<span class="reason">${e.why}</span>`,`<span class="mono reason">${e.time}</span>`]}))),'audit');
+}
+function repLoyalty(){
+  const r=state.rep;const L=r.loyalty;
+  return kpiGrid([
+    {l:'Members',v:L.members.toLocaleString(),d:1.4,sub:'total enrolled'},
+    {l:'New Today',v:L.newToday,sub:'sign-ups'},
+    {l:'Member Visits',v:L.visitsToday,sub:`${(L.visitsToday/state.rep.checks*100).toFixed(0)}% of checks`},
+    {l:'Redemptions',v:L.redemptions,sub:money(L.redeemValue)+' value'},
+    {l:'Points Issued',v:L.pointsIssued.toLocaleString(),sub:'today'}
+  ])+panel('Top Loyalty Guests','Most valuable repeat customers',
+    tbl([{t:'Guest'},{t:'Visits',num:1},{t:'Points',num:1},{t:'Lifetime spend',num:1}],
+      r.loyaltyTop.map((g,i)=>({cells:[`<span class="rank ${i===0?'top':''}">${i+1}</span>${g.n}`,g.visits,g.pts.toLocaleString(),money(g.spend)]}))));
+}
+function repPromos(){
+  const r=state.rep;
+  return kpiGrid([
+    {l:'Promo Revenue',v:money(r.promos.reduce((a,p)=>a+p.rev,0)),sub:'attributed'},
+    {l:'Discount Given',v:money(r.promos.reduce((a,p)=>a+p.disc,0)),sub:'cost of promos'},
+    {l:'Blended ROI',v:(r.promos.reduce((a,p)=>a+p.rev,0)/r.promos.reduce((a,p)=>a+p.disc,0)).toFixed(1)+'×',sub:'revenue / discount'}
+  ])+panel('Promotion Effectiveness','Which offers actually drive profitable revenue',
+    tbl([{t:'Promotion'},{t:'Redemptions',num:1},{t:'Revenue',num:1},{t:'Discount',num:1},{t:'ROI',num:1}],
+      r.promos.map(p=>({cells:[p.n,p.redeem,money(p.rev),`<span style="color:var(--blue)">${money(p.disc)}</span>`,
+        `<span style="color:var(--success)">${p.roi.toFixed(1)}×</span>`]}))));
+}
+function repCash(){
+  const c=state.rep.cash;
+  return kpiGrid([
+    {l:'Expected in Drawer',v:money(c.expected),sub:'system calculated'},
+    {l:'Counted',v:money(c.counted),sub:'manager count'},
+    {l:'Variance',v:(c.variance<0?'−':'+')+money(Math.abs(c.variance)),invert:true,d:c.variance,sub:c.variance<0?'short':'over'}
+  ])+panel('Cash Drawer Reconciliation','Opening float → expected → counted → variance',
+    `<div class="cashrow"><span>Opening float</span><span class="v">${money2(c.opening)}</span></div>
+     <div class="cashrow"><span>+ Cash sales</span><span class="v">${money2(c.cashSales)}</span></div>
+     <div class="cashrow"><span>+ Paid-in</span><span class="v">${money2(c.paidIn)}</span></div>
+     <div class="cashrow"><span>− Paid-out</span><span class="v">−${money2(c.paidOut)}</span></div>
+     <div class="cashrow tot"><span>Expected</span><span class="v">${money2(c.expected)}</span></div>
+     <div class="cashrow"><span>Counted</span><span class="v">${money2(c.counted)}</span></div>
+     <div class="cashrow var tot"><span>Variance</span><span class="v">${c.variance<0?'−':''}${money2(Math.abs(c.variance))}</span></div>`);
+}
+function repTicketTimes(){
+  const t=state.rep.ticketTimes;
+  return kpiGrid([
+    {l:'Avg Ticket Time',v:t.avg+' min',d:-4,invert:true,sub:`target ${t.target} min`},
+    {l:'Longest Today',v:t.longest+' min',sub:'slowest ticket'},
+    {l:'Within Target',v:(t.under*100).toFixed(0)+'%',d:3,sub:'of tickets'}
+  ])+
+  `<div class="rep-grid eq">`+
+  panel('Avg Time by Station','Minutes from fire to bump',bars(Object.values(t.byStation),Object.keys(t.byStation),{fmt:v=>v+'m',color:'linear-gradient(135deg,#FF6B00,#FF453A)'}))+
+  panel('Avg Time by Daypart','',tbl([{t:'Daypart'},{t:'Avg time',num:1}],Object.entries(t.byDaypart).map(([k,v])=>({cells:[k,v+' min']}))))+
+  `</div>`;
+}
+function repInventory(){
+  const inv=state.rep.inventory;const totVal=inv.reduce((a,x)=>a+x.onHand*x.cost,0);const low=inv.filter(x=>x.low).length;
+  return kpiGrid([
+    {l:'Inventory Value',v:money(totVal),sub:'on hand at cost'},
+    {l:'Items Below Par',v:low,invert:true,sub:'reorder needed'},
+    {l:'SKUs Tracked',v:inv.length,sub:'live counts'}
+  ])+panel('Inventory On-Hand','Stock vs par level · low-stock flagged red',
+    tbl([{t:'Item'},{t:'Category'},{t:'On hand',num:1},{t:'Par',num:1},{t:'Used today',num:1},{t:'Unit cost',num:1},{t:'Value',num:1}],
+      inv.map(x=>({_cls:x.low?'row-low':'',cells:[(x.low?'⚠ ':'')+x.item,`<span class="reason">${x.cat}</span>`,
+        `${x.onHand} ${x.unit}`,`${x.par} ${x.unit}`,x.used,money2(x.cost),money(x.onHand*x.cost)]}))));
+}
+function repCOGS(){
+  const r=state.rep;const laborPct=r.laborCost/r.netSales*100;const prime=r.cogs.food+laborPct;
+  return kpiGrid([
+    {l:'Food Cost %',v:r.cogs.food+'%',invert:true,d:-1.1,sub:`target ${r.cogs.foodTarget}%`},
+    {l:'Beverage Cost %',v:r.cogs.bev+'%',invert:true,d:-0.4,sub:`target ${r.cogs.bevTarget}%`},
+    {l:'Labor %',v:laborPct.toFixed(1)+'%',invert:true,d:-1.8,sub:'target 25–30%'},
+    {l:'Prime Cost',v:prime.toFixed(1)+'%',invert:true,d:-2.4,sub:'food + labor · target <60%'}
+  ])+panel('Cost Ratios','Lower is better · green within target',
+    gauge('Food cost',r.cogs.food,r.cogs.foodTarget,true)+
+    gauge('Beverage cost',r.cogs.bev,r.cogs.bevTarget,true)+
+    gauge('Labor',laborPct,30,true)+
+    `<div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">`+
+    gauge('Prime cost (food + labor)',prime,60,true)+`</div>`);
+}
+function repLocations(){
+  const L=state.rep.locations;const tot=L.reduce((a,x)=>a+x.sales,0);const mx=Math.max(...L.map(x=>x.sales));
+  return kpiGrid([
+    {l:'Group Net Sales',v:money(tot),d:5.8,sub:'all locations'},
+    {l:'Locations',v:L.length,sub:'reporting'},
+    {l:'Best Labor %',v:Math.min(...L.map(x=>x.labor)).toFixed(1)+'%',sub:'Airport'},
+    {l:'Group Avg Check',v:money2(L.reduce((a,x)=>a+x.avg,0)/L.length),sub:'blended'}
+  ])+panel('Location Comparison','Compare every restaurant in your group side by side',
+    tbl([{t:'Location'},{t:'Net sales',num:1},{t:'Covers',num:1},{t:'Avg check',num:1},{t:'Labor %',num:1}],
+      L.slice().sort((a,b)=>b.sales-a.sales).map((x,i)=>({cells:[`<span class="rank ${i===0?'top':''}">${i+1}</span>${x.n}`,
+        `${money(x.sales)}<div class="mixbar"><i style="width:${x.sales/mx*100}%"></i></div>`,x.covers,money2(x.avg),
+        `<span style="color:${x.labor>28?'var(--warn)':'var(--success)'}">${x.labor.toFixed(1)}%</span>`]}))));
+}
+
+/* ============================================================
+   NEW REPORTS (Heartland-equivalent breadth)
+   ============================================================ */
+function repRefunds(){
+  const r=state.rep,refs=r.refundsList||[];const tot=refs.reduce((a,x)=>a+x.amt,0);
+  return kpiGrid([
+    {l:'Refunds Today',v:refs.length,sub:'count'},
+    {l:'Refund Amount',v:money(tot),sub:`${(tot/r.netSales*100).toFixed(2)}% of net`},
+    {l:'Avg Refund',v:money2(refs.length?tot/refs.length:0),sub:'per transaction'},
+    {l:'Mgr Override',v:'100%',sub:'manager-approved'}
+  ])+panel('Refund Detail','Every refund issued today with manager approval',
+    tbl([{t:'Time'},{t:'Server'},{t:'Original'},{t:'Method'},{t:'Reason'},{t:'Amount',num:1},{t:'Mgr'}],
+      refs.map(x=>({cells:[x.time,x.srv,x.orig,x.method,x.reason,money2(x.amt),x.mgr]}))));
+}
+function repDiscountReasons(){
+  const r=state.rep,dr=r.discountReasons||{},cr=r.compReasons||{},vr=r.voidReasons||{};
+  const sum=o=>Object.values(o).reduce((a,b)=>a+b,0);
+  const D=sum(dr),C=sum(cr),V=sum(vr);
+  return kpiGrid([
+    {l:'Discounts',v:money(D),sub:Object.keys(dr).length+' reasons'},
+    {l:'Comps',v:money(C),sub:Object.keys(cr).length+' reasons'},
+    {l:'Voids',v:money(V),sub:Object.keys(vr).length+' reasons'},
+    {l:'Total Adjustments',v:money(D+C+V),sub:`${((D+C+V)/state.rep.netSales*100).toFixed(2)}% of net`}
+  ])+
+  `<div class="rep-grid eq">`+
+  panel('Discounts by Reason','Where promo dollars are flowing',
+    tbl([{t:'Reason'},{t:'Amount',num:1},{t:'% of disc',num:1}],
+      Object.entries(dr).map(([k,v])=>({cells:[k,money(v),(v/D*100).toFixed(1)+'%']}))))+
+  panel('Comps by Reason','Manager-approved comps',
+    tbl([{t:'Reason'},{t:'Amount',num:1},{t:'% of comp',num:1}],
+      Object.entries(cr).map(([k,v])=>({cells:[k,money(v),(v/C*100).toFixed(1)+'%']}))))+
+  `</div>`+
+  panel('Voids by Reason','Audit trail',
+    tbl([{t:'Reason'},{t:'Amount',num:1},{t:'% of void',num:1}],
+      Object.entries(vr).map(([k,v])=>({cells:[k,money(v),(V?(v/V*100).toFixed(1):'0.0')+'%']}))));
+}
+function repAuditLog(){
+  const r=state.rep,log=r.auditLog||[];const cnt=t=>log.filter(x=>x.type===t).length;
+  const lab={void:'Void',comp:'Comp',disc:'Discount',refund:'Refund',cash:'Cash variance'};
+  return kpiGrid([
+    {l:'Audit Events',v:log.length,sub:'today'},
+    {l:'Voids',v:cnt('void'),sub:'manager-approved'},
+    {l:'Comps',v:cnt('comp'),sub:'manager-approved'},
+    {l:'Refunds',v:cnt('refund'),sub:'manager-approved'},
+    {l:'Cash Variances',v:cnt('cash'),sub:'drawer reconciliation'}
+  ])+panel('Chronological Audit Trail','Read-only · who, when, what, why',
+    tbl([{t:'Time'},{t:'Event'},{t:'By'},{t:'Mgr'},{t:'Item / Ref'},{t:'Amount',num:1},{t:'Note'}],
+      log.map(x=>({cells:[x.time,
+        `<span class="tag ${x.type}">${lab[x.type]||x.type}</span>`,
+        x.by,x.mgr,x.item,(x.amt<0?'<span style="color:var(--error)">':'')+money2(x.amt)+(x.amt<0?'</span>':''),x.note]}))));
+}
+function repHeatmap(){
+  const h=state.rep.dowHeatmap;
+  const cellColor=v=>{
+    if(v>=90) return '#FF6B00';
+    if(v>=70) return '#FF9500';
+    if(v>=50) return '#FFB340';
+    if(v>=30) return '#FFD60A';
+    if(v>=10) return 'rgba(255,255,255,.18)';
+    return 'rgba(255,255,255,.06)';
+  };
+  let html=`<div class="heatmap"><div class="hm-row hm-head"><div class="hm-c hm-blank"></div>`+
+    h.cols.map(c=>`<div class="hm-c hm-head-c">${c}</div>`).join('')+`</div>`;
+  h.grid.forEach((row,i)=>{
+    html+=`<div class="hm-row"><div class="hm-c hm-row-h">${h.rows[i]}</div>`+
+      row.map(v=>`<div class="hm-c hm-cell" style="background:${cellColor(v)};color:${v>=50?'#160a00':'#fff'}">${v}</div>`).join('')+`</div>`;
+  });
+  html+=`</div>`;
+  return panel('Sales Heatmap — Hour × Day of Week',
+    'Last 90 days · density 0–100 · darker orange = peak. Hover any cell on the live build for raw dollars.',
+    html);
+}
+function repTipDecl(){
+  const r=state.rep,td=r.tipDecl||[];const sumDecl=td.reduce((a,x)=>a+x.decl,0);
+  const sumSales=td.reduce((a,x)=>a+x.sales,0);
+  return kpiGrid([
+    {l:'Tips Declared',v:money(sumDecl),sub:'IRS-reportable'},
+    {l:'Avg Tip %',v:(sumDecl/sumSales*100).toFixed(1)+'%',sub:'across tipped staff'},
+    {l:'FICA Tip Credit',v:money(td.reduce((a,x)=>a+x.fica,0)),sub:'eligible (Form 8027)'}
+  ])+panel('Tip Declaration · Servers & Bartenders','Card tips auto-aggregated · cash declared at clock-out',
+    tbl([{t:'Employee'},{t:'Role'},{t:'Net sales',num:1},{t:'Card tips',num:1},{t:'Cash decl.',num:1},{t:'Total',num:1},{t:'Tip %',num:1},{t:'FICA credit',num:1}],
+      td.map(x=>({cells:[x.n,x.role,money(x.sales),money(x.card),money(x.cash),money(x.decl),(x.decl/x.sales*100).toFixed(1)+'%',money2(x.fica)]}))));
+}
+function repGiftCards(){
+  const g=state.rep.giftCards||{},act=state.rep.giftCardActivity||[];
+  return kpiGrid([
+    {l:'Cards Issued Today',v:g.issuedToday,sub:'new sales'},
+    {l:'Redeemed Today',v:money(g.redeemedToday),sub:'used as tender'},
+    {l:'Outstanding Liability',v:money(g.liability),sub:'unredeemed balance'},
+    {l:'Active Cards',v:g.outstanding,sub:'with non-zero balance'}
+  ])+panel('Gift Card Activity · Today','Issue · redeem · adjust',
+    tbl([{t:'Time'},{t:'Action'},{t:'Code'},{t:'Amount',num:1},{t:'By'}],
+      act.map(x=>({cells:[x.time,x.type,x.code,money2(x.amt),x.by]}))));
+}
+function repChannels(){
+  const r=state.rep,c=r.channels||{},f=r.channelFees||{};
+  const tot=Object.values(c).reduce((a,b)=>a+b,0);
+  return kpiGrid([
+    {l:'In-house',v:money(c['Dine-in']+c['Bar']),sub:`${((c['Dine-in']+c['Bar'])/tot*100).toFixed(0)}% of revenue`},
+    {l:'Online & Delivery',v:money(c['Online (Uber Eats)']+c['Online (DoorDash)']),sub:'3rd-party marketplaces'},
+    {l:'Catering',v:money(c['Catering']),sub:'large orders'},
+    {l:'3P Fees Today',v:money(Object.entries(c).reduce((a,[k,v])=>a+v*(f[k]||0),0)),sub:'~30% per delivery order'}
+  ])+
+  `<div class="rep-grid eq">`+
+  panel('Revenue by Channel',donutWrap(c,PALETTE))+
+  panel('Channel Profitability','Net to restaurant after marketplace fees',
+    tbl([{t:'Channel'},{t:'Volume',num:1},{t:'Fee %',num:1},{t:'Net to you',num:1}],
+      Object.entries(c).map(([k,v])=>({cells:[k,money(v),((f[k]||0)*100).toFixed(0)+'%',money(v*(1-(f[k]||0)))]}))))+
+  `</div>`;
+}
+function repStations(){
+  const s=state.rep.stationStats||[];
+  return kpiGrid([
+    {l:'Items Out',v:s.reduce((a,x)=>a+x.items,0),sub:'across stations'},
+    {l:'Slowest Station',v:(s.slice().sort((a,b)=>b.avg-a.avg)[0]||{}).n,sub:'longest avg ticket time'},
+    {l:'Fastest Station',v:(s.slice().sort((a,b)=>a.avg-b.avg)[0]||{}).n,sub:'shortest avg ticket time'},
+    {l:'Throughput',v:s.reduce((a,x)=>a+x.thpt,0).toFixed(0)+'/hr',sub:'items per hour, all stations'}
+  ])+panel('Kitchen Throughput by Station','Items out · avg time · % under target · longest ticket',
+    tbl([{t:'Station'},{t:'Items',num:1},{t:'Avg time',num:1},{t:'Target',num:1},{t:'Longest',num:1},{t:'Under target',num:1},{t:'Items / hr',num:1}],
+      s.map(x=>({cells:[x.n,x.items,x.avg.toFixed(1)+'m',x.target+'m',x.longest.toFixed(1)+'m',
+        `<span style="color:${x.under>=.9?'var(--success)':x.under>=.8?'var(--warn)':'var(--error)'}">${(x.under*100).toFixed(0)}%</span>`,
+        x.thpt.toFixed(1)]}))));
+}
+function repOpen(){
+  const o=state.rep.openTickets||[];const tot=o.reduce((a,x)=>a+x.subtotal,0);
+  return kpiGrid([
+    {l:'Open Checks',v:o.length,sub:'live'},
+    {l:'Open Total',v:money(tot),sub:'pre-tax · pre-tip'},
+    {l:'Avg Open',v:money2(o.length?tot/o.length:0),sub:'per check'},
+    {l:'Oldest',v:Math.max(...o.map(x=>x.age),0)+'m',sub:'minutes since opened'}
+  ])+panel('Open Tickets · Floor Right Now','Tap a ticket on a real terminal to re-fire, transfer or close',
+    tbl([{t:'Ticket'},{t:'Table'},{t:'Guests',num:1},{t:'Server'},{t:'Opened'},{t:'Age',num:1},{t:'Items',num:1},{t:'Subtotal',num:1}],
+      o.map(x=>({cells:[x.id,x.table,x.guests,x.server,x.opened,
+        `<span style="color:${x.age>=15?'var(--error)':x.age>=10?'var(--warn)':'var(--success)'}">${x.age}m</span>`,
+        x.items,money2(x.subtotal)]}))));
+}
+function repCohort(){
+  const c=state.rep.customerCohort||{visits:{}};const tot=c.new+c.returning;
+  return kpiGrid([
+    {l:'Guests Today',v:tot,sub:'covers today'},
+    {l:'New',v:c.new,sub:(c.new/tot*100).toFixed(0)+'% first-time'},
+    {l:'Returning',v:c.returning,sub:(c.returning/tot*100).toFixed(0)+'% repeat'},
+    {l:'Avg Check — New',v:money2(c.avgFirst),sub:'first visit'},
+    {l:'Avg Check — Repeat',v:money2(c.avgRepeat),sub:'returning guest'},
+    {l:'Churn Risk',v:c.churnRisk,sub:'identified members'}
+  ])+
+  panel('Visit Frequency Distribution','Members by lifetime visits (loyalty pool)',
+    bars(Object.values(c.visits),Object.keys(c.visits),{fmt:v=>v+' guests'}));
+}
+function repZ(){
+  const z=state.rep.zReport||{};
+  return kpiGrid([
+    {l:'Net Sales',v:money(z.sales),sub:'today'},
+    {l:'Tax Collected',v:money(z.tax),sub:'to remit'},
+    {l:'Tips',v:money(z.tips),sub:'card + declared cash'},
+    {l:'Refunds',v:money(z.refundsTotal),sub:'today'},
+    {l:'Card Batch',v:money(z.ccBatch),sub:'~'+money(z.ccBatchFees)+' est. fees'},
+    {l:'Cash Variance',v:money2(z.variance),sub:'counted − expected',invert:false}
+  ])+panel('End-of-Day · Z-Report','Closing snapshot · what gets deposited and remitted',
+    tbl([{t:'Line'},{t:'Amount',num:1}],[
+      {cells:['Opening drawer',money2(z.opening)]},
+      {cells:['Net sales',money2(z.sales)]},
+      {cells:['+ Tax',money2(z.tax)]},
+      {cells:['+ Tips',money2(z.tips)]},
+      {cells:['− Refunds',`<span style="color:var(--error)">−${money2(z.refundsTotal)}</span>`]},
+      {cells:['− Paid out',`<span style="color:var(--warn)">−${money2(z.paidOut)}</span>`]},
+      {cells:['+ Paid in',money2(z.paidIn)]},
+      {cells:['<b>Expected cash</b>',`<b>${money2(z.expectedCash)}</b>`]},
+      {cells:['Counted cash',money2(z.countedCash)]},
+      {cells:['<b>Variance</b>',`<span style="color:${z.variance>=0?'var(--success)':'var(--error)'}"><b>${money2(z.variance)}</b></span>`]},
+      {cells:['Card batch',money2(z.ccBatch)]},
+      {cells:['Est. card fees',`<span style="color:var(--dim)">${money2(z.ccBatchFees)}</span>`]},
+      {cells:['<b>Total deposits</b>',`<b>${money2(z.deposits)}</b>`]},
+      {cells:['Closed at',z.closedAt+' by '+z.closedBy]}
+    ]));
+}
+function repAlerts(){
+  const a=state.rep.alerts||[];const cnt=s=>a.filter(x=>x.sev===s).length;
+  const ic=s=>s==='warn'?'⚠':'ℹ';const col=s=>s==='warn'?'var(--warn)':'var(--blue)';
+  return kpiGrid([
+    {l:'Open Alerts',v:a.length,sub:'today'},
+    {l:'Warnings',v:cnt('warn'),sub:'attention needed'},
+    {l:'Info',v:cnt('info'),sub:'noteworthy'}
+  ])+panel('AI Watchlist · Today','Auto-detected anomalies across sales, kitchen, inventory, staff',
+    tbl([{t:'Severity'},{t:'Category'},{t:'Message'}],
+      a.map(x=>({cells:[`<span style="color:${col(x.sev)};font-weight:600">${ic(x.sev)} ${x.sev}</span>`,x.cat,x.msg]}))));
+}
+
+/* ---- sidebar + dispatch ---- */
+function setupReportsSidebar(){
+  const side=document.getElementById('repSide');
+  side.innerHTML=REPORTS.map(g=>`<div class="grp"><div class="gl">${g.group}</div>`+
+    g.items.map(it=>`<a data-r="${it.id}" class="${it.id===state.activeReport?'on':''}"><span class="ic">${it.ic}</span><span>${it.name}</span></a>`).join('')+
+    `</div>`).join('');
+  side.querySelectorAll('a').forEach(a=>a.onclick=()=>{state.activeReport=a.dataset.r;
+    side.querySelectorAll('a').forEach(x=>x.classList.toggle('on',x===a));renderReports();});
+  document.getElementById('exportBtn').onclick=()=>toast('pay',`Exported <b>${REPORT_INDEX[state.activeReport].name}</b> to CSV`);
+}
+function renderReports(){
+  const rep=REPORT_INDEX[state.activeReport]||REPORT_INDEX['dashboard'];
+  document.getElementById('repTitle').textContent=rep.name;
+  document.getElementById('repDesc').textContent=rep.desc;
+  document.getElementById('repContent').innerHTML=rep.fn();
+}
+
+/* =========================================================
+   NAV + helpers
+   ========================================================= */
+document.getElementById('seg').onclick=e=>{
+  const b=e.target.closest('button');if(!b)return;const v=b.dataset.v;
+  [...document.getElementById('seg').children].forEach(x=>x.classList.toggle('active',x===b));
+  document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===v));
+  if(v==='kds')renderKDS();
+  if(v==='reports')renderReports();
+};
+function toast(type,html){
+  const t=document.createElement('div');t.className='toast '+type;
+  const ic=type==='pay'?'✓':type==='fire'?'🔥':'!';
+  t.innerHTML=`<span class="ic">${ic}</span><span>${html}</span>`;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(()=>{t.style.transition='.3s';t.style.opacity='0';t.style.transform='translateY(10px)';setTimeout(()=>t.remove(),300)},3200);
+}
+function tickClock(){const d=new Date();document.getElementById('clock').textContent=d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}
+setInterval(tickClock,1000);tickClock();
+
+/* init */
+seedTickets();renderCheck();updateKdsBadge();setupReportsSidebar();renderReports();
+
+
+/* >>> ICON-SYSTEM-JS >>> */
+/* Lucide icon replacer — swaps known emoji glyphs for inline SVG <use> refs.
+   Browser-only; guarded so the Node test harness (scripts/test.js) ignores it. */
+(function(){
+  if (typeof document === 'undefined') return;
+  if (typeof MutationObserver === 'undefined') return;
+  if (typeof document.createTreeWalker !== 'function') return;
+  const M = {"📱":"smartphone","📲":"tablet","📷":"camera","🖥":"monitor","💳":"credit-card","💲":"dollar-sign","💵":"banknote","📊":"chart-column","📈":"trending-up","🛡":"shield-check","⚙":"settings","🌐":"globe","🍳":"utensils-crossed","🍽":"utensils","🎁":"gift","👥":"users","💬":"message-square","🔁":"repeat-2","🔮":"sparkles","🗓":"calendar","🚗":"car","🛣":"route","🧾":"receipt","🪑":"armchair","📦":"package","⚠":"triangle-alert","🔥":"flame","🕐":"clock","🌅":"sunrise","🎯":"target","🏅":"award","🏠":"house","🏢":"building-2","👷":"hard-hat","📉":"trending-down","📝":"file-text","🔔":"bell","🗂":"folder-tree","🚩":"flag","🛎":"concierge-bell","🧰":"wrench","⚖":"scale","✓":"check","✕":"x","❤":"heart","➕":"plus","🌡":"thermometer","💰":"wallet","⏱":"timer"};
+  const keys = Object.keys(M);
+  const re = new RegExp(keys.map(c=>c.split('').map(ch=>'\\u'+('0000'+ch.charCodeAt(0).toString(16)).slice(-4)).join('')).join('|'),'gu');
+  function svgFor(name){ return '<svg class="ic" aria-hidden="true"><use href="#i-'+name+'"/></svg>'; }
+  function ize(root){
+    if(!root||root.nodeType!==1) return;
+    if(root.tagName==='SCRIPT'||root.tagName==='STYLE') return;
+    let tw;
+    try {
+      tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode: n => {
+          const p = n.parentElement;
+          if(!p) return NodeFilter.FILTER_REJECT;
+          if(p.tagName==='SCRIPT'||p.tagName==='STYLE') return NodeFilter.FILTER_REJECT;
+          if(p.closest && p.closest('.no-ic')) return NodeFilter.FILTER_REJECT;
+          return re.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        }
+      });
+    } catch(e) { return; }
+    const todo = []; let n;
+    while ((n = tw.nextNode())) todo.push(n);
+    for (const t of todo){
+      const html = t.nodeValue.replace(re, c => M[c] ? svgFor(M[c]) : c);
+      const span = document.createElement('span');
+      span.className='ic-wrap';
+      span.style.display='inline';
+      span.innerHTML = html;
+      t.parentNode.replaceChild(span, t);
+    }
+  }
+  function init(){
+    if (!document.body) return;
+    ize(document.body);
+    try {
+      const mo = new MutationObserver(muts => {
+        for (const m of muts){
+          for (const n of m.addedNodes){
+            if (n.nodeType === 1) ize(n);
+            else if (n.nodeType === 3 && n.parentElement) ize(n.parentElement);
+          }
+        }
+      });
+      mo.observe(document.body, { childList: true, subtree: true });
+    } catch(e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+/* <<< ICON-SYSTEM-JS <<< */
+</script>
+
+</body>
+</html>

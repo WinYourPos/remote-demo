@@ -1,0 +1,3664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Spark POS — The white-label restaurant platform you can call your own</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#000000;
+    --surface:#0f0f10;
+    --surface-2:#161618;
+    --surface-3:#1d1d20;
+    --border:rgba(255,255,255,0.08);
+    --border-2:rgba(255,255,255,0.14);
+    --text:#ffffff;
+    --dim:rgba(255,255,255,0.62);
+    --dim-2:rgba(255,255,255,0.40);
+    --primary:#FF9500;
+    --primary-2:#FF6B00;
+    --grad:linear-gradient(135deg,#FF9500,#FF6B00);
+    --success:#34C759;
+    --error:#FF453A;
+    --r-card:20px;
+    --r-input:14px;
+    --maxw:1180px;
+    --accent:#FF9500; /* live-swappable by white-label demo */
+    --accent-2:#FF6B00;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Sora',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  .mono{font-family:'JetBrains Mono',monospace}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  a{color:inherit;text-decoration:none}
+  .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--primary);
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--primary);display:inline-block}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    font-family:'Sora';font-weight:600;font-size:15px;cursor:pointer;
+    border:none;border-radius:999px;padding:14px 26px;transition:transform .18s ease,box-shadow .18s ease,background .18s;
+  }
+  .btn-primary{background:var(--grad);color:#160a00;box-shadow:0 8px 30px rgba(255,107,0,.35)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(255,107,0,.5)}
+  .btn-ghost{background:rgba(255,255,255,.06);color:#fff;border:1px solid var(--border-2)}
+  .btn-ghost:hover{background:rgba(255,255,255,.12);transform:translateY(-2px)}
+  section{position:relative}
+  .pad{padding:110px 0}
+  .pad-sm{padding:72px 0}
+  h2.section-title{font-size:clamp(30px,4.4vw,52px);font-weight:800;letter-spacing:-.025em;line-height:1.04;margin:18px 0 16px}
+  .section-sub{color:var(--dim);font-size:clamp(16px,1.6vw,19px);max-width:620px;line-height:1.6}
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    background:rgba(0,0,0,.55);border-bottom:1px solid transparent;transition:border-color .3s,background .3s;
+  }
+  nav.scrolled{border-bottom-color:var(--border);background:rgba(0,0,0,.8)}
+  .nav-inner{max-width:var(--maxw);margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:-.02em}
+  .logo .spark{width:26px;height:26px;border-radius:8px;background:var(--grad);display:grid;place-items:center;box-shadow:0 4px 14px rgba(255,107,0,.45)}
+  .logo .spark svg{width:15px;height:15px}
+  .nav-links{display:flex;align-items:center;gap:30px}
+  .nav-links a{font-size:14px;color:var(--dim);transition:color .2s}
+  .nav-links a:hover{color:#fff}
+  @media(max-width:860px){.nav-links a:not(.btn){display:none}}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:150px 0 70px;position:relative;overflow:hidden}
+  .hero-glow{position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:700px;
+    background:radial-gradient(ellipse at center,rgba(255,107,0,.22),transparent 62%);pointer-events:none;z-index:0}
+  .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:54px 54px;mask-image:radial-gradient(ellipse at 50% 0%,#000 30%,transparent 75%);pointer-events:none;z-index:0}
+  .hero-inner{position:relative;z-index:2;text-align:center}
+  .hero h1{font-size:clamp(40px,6.4vw,76px);font-weight:800;letter-spacing:-.035em;line-height:1.02;margin:26px auto 22px;max-width:14ch}
+  .hero p.lead{color:var(--dim);font-size:clamp(17px,1.9vw,21px);max-width:620px;margin:0 auto 36px;line-height:1.6}
+  .hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:999px;padding:7px 15px;font-size:13px;color:var(--dim)}
+  .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success)}
+  .trust-strip{margin-top:48px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .trust-strip .pill{font-family:'JetBrains Mono';font-size:11.5px;letter-spacing:.02em}
+
+  /* device marquee */
+  .marquee{margin-top:60px;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);position:relative;z-index:2}
+  .marquee-track{display:flex;gap:14px;width:max-content;animation:scroll 34s linear infinite}
+  .marquee:hover .marquee-track{animation-play-state:paused}
+  @keyframes scroll{to{transform:translateX(-50%)}}
+  .surface-chip{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 18px;white-space:nowrap;font-size:14px;font-weight:500}
+  .surface-chip .ic{width:30px;height:30px;border-radius:8px;background:rgba(255,149,0,.12);display:grid;place-items:center;color:var(--primary);font-size:15px}
+
+  /* ---------- WHITE LABEL DEMO ---------- */
+  .wl{background:linear-gradient(180deg,var(--bg),var(--surface) 60%,var(--bg))}
+  .wl-stage{display:grid;grid-template-columns:1fr 1.25fr;gap:48px;align-items:center;margin-top:48px}
+  @media(max-width:900px){.wl-stage{grid-template-columns:1fr;gap:32px}}
+  .wl-controls h3{font-size:22px;font-weight:700;margin-bottom:6px}
+  .wl-controls p{color:var(--dim);font-size:15px;margin-bottom:24px}
+  .brand-picker{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
+  .brand-btn{cursor:pointer;border:1px solid var(--border);background:var(--surface-2);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;transition:.2s;font-size:14px;font-weight:600}
+  .brand-btn:hover{border-color:var(--border-2)}
+  .brand-btn.active{border-color:var(--swatch);box-shadow:0 0 0 1px var(--swatch)}
+  .brand-btn .sw{width:18px;height:18px;border-radius:6px;background:var(--swatch)}
+  .wl-note{font-family:'JetBrains Mono';font-size:12.5px;color:var(--dim-2);line-height:1.7}
+  .wl-note b{color:var(--primary)}
+  /* mock browser */
+  .browser{background:var(--surface-2);border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  .browser-bar{display:flex;align-items:center;gap:8px;padding:13px 16px;background:var(--surface-3);border-bottom:1px solid var(--border)}
+  .browser-bar .dots{display:flex;gap:6px}
+  .browser-bar .dots i{width:11px;height:11px;border-radius:50%;display:block}
+  .browser-bar .url{flex:1;background:#000;border-radius:8px;padding:6px 12px;font-family:'JetBrains Mono';font-size:12px;color:var(--dim);text-align:center;border:1px solid var(--border)}
+  .browser-bar .url b{color:#fff;transition:color .3s}
+  .app-mock{height:300px;background:#08080a;display:flex}
+  .app-side{width:64px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:14px}
+  .app-side .mark{width:34px;height:34px;border-radius:10px;background:var(--accent-live,var(--grad));display:grid;place-items:center;font-weight:800;color:#160a00;transition:.4s;font-size:15px}
+  .app-side .nav-ic{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.06)}
+  .app-side .nav-ic.on{background:var(--accent-soft,rgba(255,149,0,.16))}
+  .app-main{flex:1;padding:22px}
+  .app-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .app-h .ttl{font-weight:700;font-size:16px;transition:.3s}
+  .app-h .badge{font-family:'JetBrains Mono';font-size:11px;padding:5px 11px;border-radius:999px;background:var(--accent-soft,rgba(255,149,0,.16));color:var(--accent-live-solid,var(--primary));transition:.4s}
+  .app-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .app-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;height:92px;position:relative}
+  .app-card .k{font-family:'JetBrains Mono';font-size:10px;color:var(--dim-2)}
+  .app-card .v{font-size:22px;font-weight:800;margin-top:6px}
+  .app-card .bar{position:absolute;left:14px;right:14px;bottom:14px;height:6px;border-radius:6px;background:rgba(255,255,255,.07);overflow:hidden}
+  .app-card .bar i{display:block;height:100%;background:var(--accent-live-solid,var(--primary));transition:.4s;border-radius:6px}
+
+  /* ---------- DEVICE SURFACES ---------- */
+  .surfaces-grid{display:grid;grid-template-columns:340px 1fr;gap:34px;margin-top:48px}
+  @media(max-width:880px){.surfaces-grid{grid-template-columns:1fr}}
+  .surface-list{display:flex;flex-direction:column;gap:8px;max-height:520px;overflow:auto;padding-right:6px}
+  .surface-list::-webkit-scrollbar{width:6px}
+  .surface-list::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:6px}
+  .s-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;border:1px solid transparent;cursor:pointer;transition:.18s}
+  .s-item:hover{background:var(--surface)}
+  .s-item.active{background:var(--surface-2);border-color:var(--border-2)}
+  .s-item .ic{width:38px;height:38px;border-radius:11px;background:rgba(255,149,0,.12);display:grid;place-items:center;color:var(--primary);flex-shrink:0;font-size:18px}
+  .s-item.active .ic{background:var(--grad);color:#160a00}
+  .s-item .nm{font-weight:600;font-size:15px}
+  .s-item .ds{font-size:12.5px;color:var(--dim-2)}
+  .surface-view{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:30px;min-height:420px;position:relative;overflow:hidden}
+  .surface-view .glow{position:absolute;top:-120px;right:-80px;width:380px;height:380px;background:radial-gradient(circle,rgba(255,107,0,.14),transparent 65%)}
+  .sv-tag{font-family:'JetBrains Mono';font-size:11px;color:var(--primary);letter-spacing:.14em;text-transform:uppercase}
+  .sv-title{font-size:27px;font-weight:800;margin:12px 0 12px;letter-spacing:-.02em}
+  .sv-desc{color:var(--dim);font-size:15.5px;line-height:1.65;max-width:50ch}
+  .sv-feats{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+  .sv-feats span{font-size:13px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:999px;padding:7px 13px;color:var(--dim)}
+
+  /* ---------- POS TEST DRIVE ---------- */
+  .demo{background:linear-gradient(180deg,var(--bg),#0a0a0c)}
+  .pos{display:grid;grid-template-columns:1.4fr 1fr;gap:0;border:1px solid var(--border);border-radius:22px;overflow:hidden;margin-top:46px;box-shadow:0 30px 90px rgba(0,0,0,.6);background:var(--surface)}
+  @media(max-width:820px){.pos{grid-template-columns:1fr}}
+  .pos-menu{padding:26px;background:#0b0b0d}
+  .pos-menu .mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .pos-menu .mh .t{font-weight:700;font-size:17px}
+  .pos-cats{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+  .pos-cat{font-size:13px;padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--border);cursor:pointer;color:var(--dim);transition:.15s}
+  .pos-cat.on{background:var(--grad);color:#160a00;border-color:transparent;font-weight:600}
+  .menu-items{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media(max-width:520px){.menu-items{grid-template-columns:repeat(2,1fr)}}
+  .mi{background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:14px 12px;cursor:pointer;transition:.15s;text-align:left}
+  .mi:hover{border-color:var(--primary);transform:translateY(-2px)}
+  .mi:active{transform:scale(.97)}
+  .mi .nm{font-weight:600;font-size:13.5px;line-height:1.25}
+  .mi .pr{font-family:'JetBrains Mono';font-size:12.5px;color:var(--primary);margin-top:7px}
+  .pos-check{background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column}
+  .check-head{padding:20px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .check-head .tbl{font-weight:700;font-size:15px}
+  .check-head .gs{font-size:12px;color:var(--dim-2);font-family:'JetBrains Mono'}
+  .check-lines{flex:1;padding:10px 22px;overflow:auto;min-height:170px;max-height:230px}
+  .empty{color:var(--dim-2);font-size:14px;text-align:center;padding:46px 0}
+  .cl{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);animation:pop .25s ease}
+  @keyframes pop{from{opacity:0;transform:translateY(-6px)}to{opacity:1}}
+  .cl .l{display:flex;align-items:center;gap:10px}
+  .cl .q{font-family:'JetBrains Mono';font-size:12px;background:rgba(255,149,0,.14);color:var(--primary);border-radius:7px;padding:3px 8px;min-width:30px;text-align:center}
+  .cl .nm{font-size:13.5px}
+  .cl .p{font-family:'JetBrains Mono';font-size:13px;color:var(--dim)}
+  .check-foot{padding:18px 22px;border-top:1px solid var(--border);background:#0b0b0d}
+  .ck-row{display:flex;justify-content:space-between;font-size:13px;color:var(--dim);margin-bottom:7px}
+  .ck-row.total{font-size:20px;font-weight:800;color:#fff;margin:10px 0 16px;font-family:'Sora'}
+  .ck-row.total .mono{font-family:'JetBrains Mono'}
+  .ck-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .ck-actions button{padding:13px;border-radius:12px;font-weight:600;font-size:14px;cursor:pointer;border:1px solid var(--border-2);background:rgba(255,255,255,.05);color:#fff;transition:.15s;font-family:'Sora'}
+  .ck-actions button:hover{background:rgba(255,255,255,.1)}
+  .ck-actions button.pay{grid-column:1/-1;background:var(--grad);color:#160a00;border:none;box-shadow:0 8px 24px rgba(255,107,0,.35)}
+  .ck-actions button:disabled{opacity:.4;cursor:not-allowed}
+  .split-note{font-family:'JetBrains Mono';font-size:11.5px;color:var(--success);text-align:center;margin-top:10px;min-height:14px}
+  .receipt-flash{position:absolute;inset:0;background:rgba(0,0,0,.85);display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:5;border-radius:22px}
+  .receipt-flash.show{display:flex;animation:fade .3s}
+  @keyframes fade{from{opacity:0}}
+  .receipt-flash .ok{width:70px;height:70px;border-radius:50%;background:var(--success);display:grid;place-items:center;margin-bottom:18px;animation:pop .4s}
+  .pos-wrap{position:relative}
+
+  /* ---------- AI GRID ---------- */
+  .ai-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:46px}
+  @media(max-width:880px){.ai-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.ai-grid{grid-template-columns:1fr}}
+  .ai-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;transition:.22s;position:relative;overflow:hidden}
+  .ai-card:hover{border-color:var(--border-2);transform:translateY(-3px);background:var(--surface-2)}
+  .ai-card .ic{width:42px;height:42px;border-radius:12px;background:rgba(255,149,0,.12);display:grid;place-items:center;font-size:20px;margin-bottom:16px;color:var(--primary)}
+  .ai-card h4{font-size:16px;font-weight:700;margin-bottom:7px}
+  .ai-card p{font-size:13.5px;color:var(--dim);line-height:1.55}
+  .ai-card .metric{font-family:'JetBrains Mono';font-size:12px;color:var(--success);margin-top:12px;display:inline-block}
+  .ai-banner{margin-top:28px;background:linear-gradient(135deg,rgba(255,149,0,.1),rgba(255,107,0,.04));border:1px solid rgba(255,149,0,.2);border-radius:16px;padding:24px 28px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:space-between}
+  .ai-banner p{font-size:15px;max-width:60ch}.ai-banner b{color:var(--primary)}
+
+  /* ---------- PIPELINE ---------- */
+  .pipe{background:linear-gradient(180deg,#0a0a0c,var(--bg))}
+  .pipe-track{margin-top:54px;position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
+  @media(max-width:980px){.pipe-track{grid-template-columns:1fr;gap:14px}}
+  .pipe-line{position:absolute;top:30px;left:8%;right:8%;height:2px;background:linear-gradient(90deg,var(--primary),rgba(255,107,0,.15));z-index:0}
+  @media(max-width:980px){.pipe-line{display:none}}
+  .pstep{position:relative;z-index:1;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 20px;transition:.25s}
+  .pstep:hover{border-color:var(--primary);transform:translateY(-4px)}
+  .pstep .num{width:42px;height:42px;border-radius:13px;background:var(--surface-2);border:1px solid var(--border-2);display:grid;place-items:center;font-family:'JetBrains Mono';font-weight:700;color:var(--primary);margin-bottom:18px}
+  .pstep.lit .num{background:var(--grad);color:#160a00;border-color:transparent;box-shadow:0 6px 20px rgba(255,107,0,.4)}
+  .pstep h4{font-size:16px;font-weight:700;margin-bottom:8px}
+  .pstep p{font-size:13px;color:var(--dim);line-height:1.55}
+  .pstep .when{font-family:'JetBrains Mono';font-size:11px;color:var(--dim-2);margin-top:14px;display:flex;align-items:center;gap:6px}
+  .pstep .when b{color:var(--success)}
+  .pstep .who{display:inline-block;font-family:'JetBrains Mono';font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px;margin-top:12px}
+  .who.you{background:rgba(255,149,0,.14);color:var(--primary)}
+  .who.us{background:rgba(52,199,89,.14);color:var(--success)}
+  .pipe-badges{display:flex;gap:14px;justify-content:center;margin-top:40px;flex-wrap:wrap}
+  .pbadge{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 20px}
+  .pbadge .big{font-size:24px;font-weight:800}
+  .pbadge .lbl{font-size:12.5px;color:var(--dim);line-height:1.3}
+
+  /* ---------- ROI CALCULATOR ---------- */
+  .roi{background:linear-gradient(180deg,var(--bg),#0c0805)}
+  .roi-card{margin-top:46px;background:var(--surface);border:1px solid var(--border);border-radius:24px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr}
+  @media(max-width:900px){.roi-card{grid-template-columns:1fr}}
+  .roi-inputs{padding:38px}
+  .roi-out{padding:38px;background:linear-gradient(160deg,rgba(255,149,0,.08),rgba(255,107,0,.02));border-left:1px solid var(--border);display:flex;flex-direction:column;justify-content:center}
+  @media(max-width:900px){.roi-out{border-left:none;border-top:1px solid var(--border)}}
+  .field{margin-bottom:26px}
+  .field .lab{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+  .field .lab .l{font-size:14px;font-weight:500}
+  .field .lab .val{font-family:'JetBrains Mono';font-size:16px;font-weight:700;color:var(--primary)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:6px;background:var(--surface-3);outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--grad);cursor:pointer;box-shadow:0 3px 10px rgba(255,107,0,.5);border:3px solid #0f0f10}
+  input[type=range]::-moz-range-thumb{width:22px;height:22px;border:3px solid #0f0f10;border-radius:50%;background:#FF8400;cursor:pointer}
+  .roi-out .ro-lab{font-family:'JetBrains Mono';font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim-2)}
+  .roi-out .annual{font-size:clamp(40px,6vw,62px);font-weight:800;letter-spacing:-.03em;line-height:1;margin:8px 0 4px}
+  .roi-out .annual .mono{font-family:'JetBrains Mono'}
+  .ro-split{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:28px 0}
+  .ro-split .box{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:14px;padding:16px}
+  .ro-split .box .k{font-size:12px;color:var(--dim)}
+  .ro-split .box .v{font-family:'JetBrains Mono';font-size:22px;font-weight:700;margin-top:6px}
+  .ro-bars{display:flex;align-items:flex-end;gap:8px;height:80px;margin-top:6px}
+  .ro-bars .b{flex:1;background:var(--grad);border-radius:6px 6px 0 0;transition:height .5s cubic-bezier(.2,.7,.2,1);min-height:6px;opacity:.85}
+  .ro-disclaim{font-family:'JetBrains Mono';font-size:10.5px;color:var(--dim-2);margin-top:22px;line-height:1.6}
+
+  /* ---------- COMPARISON ---------- */
+  .cmp-wrap{margin-top:46px;overflow-x:auto;border:1px solid var(--border);border-radius:20px}
+  table.cmp{width:100%;border-collapse:collapse;min-width:680px}
+  table.cmp th,table.cmp td{padding:18px 20px;text-align:left;border-bottom:1px solid var(--border);font-size:14.5px}
+  table.cmp thead th{font-size:13px;font-family:'JetBrains Mono';text-transform:uppercase;letter-spacing:.06em;color:var(--dim);background:var(--surface-2);font-weight:600}
+  table.cmp thead th.spark{color:#160a00;background:var(--grad);font-weight:700;border-radius:0}
+  table.cmp td.feat{color:var(--dim);font-weight:500}
+  table.cmp tbody tr:hover{background:rgba(255,255,255,.02)}
+  table.cmp td.spark{background:rgba(255,149,0,.06);font-weight:600}
+  .yes{color:var(--success);font-weight:700}
+  .no{color:var(--error)}
+  .mid{color:var(--dim)}
+  .cmp-foot{font-family:'JetBrains Mono';font-size:11px;color:var(--dim-2);margin-top:14px;line-height:1.6}
+
+  /* ---------- PARTNER STRIP ---------- */
+  .partner{background:linear-gradient(180deg,#0c0805,var(--bg))}
+  .partner-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:46px}
+  @media(max-width:820px){.partner-tiles{grid-template-columns:1fr}}
+  .ptile{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px}
+  .ptile .ic{width:46px;height:46px;border-radius:13px;background:var(--grad);display:grid;place-items:center;font-size:21px;margin-bottom:18px;color:#160a00}
+  .ptile h4{font-size:18px;font-weight:700;margin-bottom:10px}
+  .ptile p{font-size:14px;color:var(--dim);line-height:1.6}
+
+  /* ---------- TECH ---------- */
+  .tech{background:var(--surface)}
+  .tech-inner{border:1px solid var(--border);border-radius:24px;padding:42px;background:#0a0a0c;display:grid;grid-template-columns:1fr 1fr;gap:42px;align-items:center}
+  @media(max-width:820px){.tech-inner{grid-template-columns:1fr;gap:28px}}
+  .tech-stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+  .tech-stack span{font-family:'JetBrains Mono';font-size:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--dim)}
+  .tech-nums{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .tnum{background:var(--surface-2);border:1px solid var(--border);border-radius:16px;padding:22px}
+  .tnum .n{font-size:34px;font-weight:800;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .tnum .l{font-size:13px;color:var(--dim);margin-top:4px}
+  .status-line{display:inline-flex;align-items:center;gap:9px;font-family:'JetBrains Mono';font-size:12.5px;color:var(--dim);background:rgba(52,199,89,.08);border:1px solid rgba(52,199,89,.2);border-radius:999px;padding:8px 15px;margin-top:24px}
+  .status-line .d{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 10px var(--success)}
+
+  /* ---------- FAQ ---------- */
+  .faq-list{margin-top:42px;max-width:820px}
+  .faq-item{border-bottom:1px solid var(--border)}
+  .faq-q{width:100%;background:none;border:none;color:#fff;text-align:left;padding:24px 0;font-size:17px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:20px;font-family:'Sora'}
+  .faq-q .plus{font-size:24px;color:var(--primary);transition:transform .3s;flex-shrink:0}
+  .faq-item.open .plus{transform:rotate(45deg)}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease;color:var(--dim);font-size:15px;line-height:1.7}
+  .faq-a div{padding:0 0 24px}
+
+  /* ---------- FINAL CTA ---------- */
+  .final{padding:120px 0;text-align:center;position:relative;overflow:hidden}
+  .final-glow{position:absolute;bottom:-300px;left:50%;transform:translateX(-50%);width:900px;height:700px;background:radial-gradient(ellipse,rgba(255,107,0,.2),transparent 65%);pointer-events:none}
+  .final h2{font-size:clamp(32px,5vw,58px);font-weight:800;letter-spacing:-.03em;line-height:1.05;max-width:16ch;margin:0 auto 20px;position:relative}
+  .final p{color:var(--dim);font-size:18px;max-width:520px;margin:0 auto 34px;position:relative}
+  .cta-form{display:flex;gap:10px;max-width:520px;margin:0 auto;flex-wrap:wrap;justify-content:center;position:relative}
+  .cta-form input{flex:1;min-width:200px;background:var(--surface-2);border:1px solid var(--border-2);border-radius:14px;padding:15px 18px;color:#fff;font-size:15px;font-family:'Sora'}
+  .cta-form input:focus{outline:none;border-color:var(--primary)}
+  .cta-mini{font-family:'JetBrains Mono';font-size:11.5px;color:var(--dim-2);margin-top:18px;position:relative}
+
+  footer{border-top:1px solid var(--border);padding:40px 0;text-align:center;color:var(--dim-2);font-size:13px}
+  footer .logo{justify-content:center;margin-bottom:14px;opacity:.8}
+
+
+
+/* >>> ICON-SYSTEM-CSS >>> */
+.ic{display:inline-block;width:1em;height:1em;vertical-align:-.15em;stroke-width:2;stroke:currentColor;fill:none;flex-shrink:0;line-height:1}
+.ic.lg{width:1.4em;height:1.4em;vertical-align:-.3em}
+/* <<< ICON-SYSTEM-CSS <<< */
+
+/* >>> MOCK-CSS >>> */
+.mock{position:relative;width:100%;max-width:460px;margin:18px auto 12px;border-radius:18px;border:1px solid var(--border-2);background:#0a0a0c;overflow:hidden;box-shadow:0 22px 60px rgba(0,0,0,.55),0 0 0 .5px rgba(255,255,255,.04) inset}
+.mock.phone{max-width:260px;border-radius:26px}
+.mock.terminal{max-width:230px;border-radius:14px}
+.mock.wide{max-width:560px}
+.mock-h{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.025);font-family:'JetBrains Mono';font-size:10.5px;color:var(--dim-2);letter-spacing:.05em;text-transform:uppercase}
+.mock-h .dot{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success);flex-shrink:0}
+.mock-h .grow{flex:1}
+.mock-h .badge{padding:2px 9px;border-radius:999px;background:rgba(255,149,0,.16);color:var(--primary);font-weight:700;font-size:10px;letter-spacing:.05em}
+.mock-body{padding:14px}
+.m-cat{display:inline-flex;padding:4px 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border);font-size:10.5px;font-weight:600;color:var(--dim);margin-right:4px;margin-bottom:4px;letter-spacing:.01em}
+.m-cat.on{background:var(--grad);color:#160a00;border-color:transparent}
+.m-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed var(--border);font-size:13px}
+.m-row:last-child{border-bottom:none}
+.m-pri{color:var(--primary);font-family:'JetBrains Mono';font-weight:600}
+.m-pri-2{color:#fff;font-family:'JetBrains Mono';font-weight:700}
+.m-meta{font-size:10.5px;color:var(--dim-2);margin-top:2px;line-height:1.45}
+.m-meta.add{color:var(--success)}
+.m-meta.rm{color:var(--error)}
+.m-meta.temp{color:var(--primary)}
+.m-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px}
+.m-tkt{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:12.5px}
+.m-tkt .tkt-h{display:flex;justify-content:space-between;font-family:'JetBrains Mono';font-size:10.5px;margin-bottom:6px;color:var(--dim)}
+.m-tkt .tkt-h .age{font-weight:700}
+.m-tkt.warn{border-color:rgba(255,214,10,.5)}
+.m-tkt.warn .age{color:var(--warn)}
+.m-tkt.late{border-color:rgba(255,69,58,.55);box-shadow:0 0 0 1px rgba(255,69,58,.18)}
+.m-tkt.late .age{color:var(--error)}
+.m-tkt .it{font-weight:600;margin-top:6px}
+.m-kpi{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.m-kpi .k{background:var(--surface);border:1px solid var(--border);padding:10px;border-radius:10px}
+.m-kpi .k .l{font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim-2);font-family:'JetBrains Mono'}
+.m-kpi .k .v{font-size:18px;font-weight:700;color:#fff;margin-top:3px;font-family:'JetBrains Mono'}
+.m-kpi .k .d{font-size:10px;color:var(--success);margin-top:2px;font-family:'JetBrains Mono'}
+.m-bars{display:flex;align-items:flex-end;gap:6px;height:64px;margin-top:8px}
+.m-bars .b{flex:1;background:var(--grad);border-radius:4px 4px 0 0;min-height:6px}
+.m-pay{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.m-pay button{padding:10px 8px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;color:#fff;font-weight:600;font-size:11.5px}
+.m-pay button.on{background:var(--grad);border-color:transparent;color:#160a00}
+.m-cta{width:100%;padding:12px;background:var(--grad);border:none;border-radius:12px;color:#160a00;font-weight:700;font-size:13px;margin-top:10px}
+.m-floor{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:6px}
+.m-floor .t{aspect-ratio:1;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'JetBrains Mono';font-size:10px;color:var(--dim)}
+.m-floor .t.occ{background:rgba(255,149,0,.12);border-color:var(--primary);color:var(--primary)}
+.m-floor .t.dirty{background:rgba(255,69,58,.10);border-color:rgba(255,69,58,.45);color:var(--error)}
+.m-floor .t b{color:#fff;font-size:13px}
+.m-driver{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;font-size:12px}
+.m-driver .av{width:26px;height:26px;border-radius:50%;background:var(--grad);color:#160a00;display:grid;place-items:center;font-weight:800;font-size:11px}
+.m-driver .nm{flex:1;font-weight:600}
+.m-driver .st{font-family:'JetBrains Mono';font-size:10px;padding:2px 8px;border-radius:999px;background:rgba(52,199,89,.16);color:var(--success)}
+.m-driver .st.idle{background:rgba(255,255,255,.08);color:var(--dim)}
+.m-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.m-pad button{padding:12px 0;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:#fff;font-weight:700;font-size:15px;font-family:'JetBrains Mono'}
+.m-nav{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.m-nav .n{padding:5px 10px;font-size:10.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:var(--dim);font-weight:600}
+.m-nav .n.on{background:var(--grad);color:#160a00;border-color:transparent}
+.m-screen{font-size:42px;font-weight:800;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.02em;line-height:1.05}
+.m-line{height:1px;background:var(--border-2);margin:8px 0}
+.m-points{display:flex;align-items:center;gap:8px}
+.m-points .ring{width:62px;height:62px;border-radius:50%;border:4px solid var(--surface-2);border-top-color:var(--primary);border-right-color:var(--primary);display:grid;place-items:center;font-family:'JetBrains Mono';font-weight:700;font-size:13px;transform:rotate(45deg)}
+.m-points .ring span{transform:rotate(-45deg)}
+.m-qr{width:74px;height:74px;background:#fff;border-radius:10px;display:grid;place-items:center;color:#000;font-family:'JetBrains Mono';font-size:9px;font-weight:700;letter-spacing:.05em}
+/* <<< MOCK-CSS <<< */
+
+/* >>> QR-CSS >>> */
+.qr-ic{display:inline-flex;margin-left:6px;font-size:14px;line-height:1}
+.qr-mask{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;z-index:9999;animation:qrFade .18s ease-out}
+.qr-mask.show{display:flex}
+@keyframes qrFade{from{opacity:0}to{opacity:1}}
+.qr-modal{width:min(440px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--border-2);border-radius:24px;padding:28px;box-shadow:0 24px 80px rgba(0,0,0,.7),0 0 0 .5px rgba(255,255,255,.04) inset;position:relative}
+.qr-close{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);font-size:18px;cursor:pointer;display:grid;place-items:center;transition:.15s}
+.qr-close:hover{background:var(--surface-3);border-color:var(--border-2)}
+.qr-head{text-align:center}
+.qr-eyebrow{font-family:'JetBrains Mono';font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--primary);font-weight:700}
+.qr-title{font-size:22px;font-weight:700;letter-spacing:-.02em;margin-top:6px;color:var(--text)}
+.qr-sub{font-size:13px;color:var(--dim);margin-top:6px;line-height:1.5}
+.qr-frame{margin:22px auto 16px;width:260px;height:260px;background:#fff;border-radius:18px;padding:14px;display:grid;place-items:center;box-shadow:0 12px 32px rgba(255,107,0,.18),0 0 0 .5px rgba(255,255,255,.06) inset}
+.qr-frame svg{display:block;width:100%;height:100%}
+.qr-frame img{display:block;width:100%;height:100%}
+.qr-url{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;font-family:'JetBrains Mono';font-size:12px;color:var(--dim);overflow:hidden}
+.qr-url .u{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qr-copy{background:var(--grad);color:#160a00;border:none;padding:7px 12px;border-radius:8px;font-weight:700;font-size:11px;cursor:pointer;font-family:'JetBrains Mono';letter-spacing:.02em;flex-shrink:0}
+.qr-copy.ok{background:var(--success);color:#06250f}
+.qr-hint{display:flex;align-items:flex-start;gap:8px;font-size:11.5px;color:var(--dim-2);margin-top:12px;line-height:1.5;font-family:'JetBrains Mono';padding:8px 10px;background:rgba(255,149,0,.06);border:1px solid rgba(255,149,0,.18);border-radius:10px}
+.qr-hint b{color:var(--primary);font-weight:700}
+/* <<< QR-CSS <<< */
+</style>
+</head>
+<body>
+<!-- >>> ICON-SYSTEM-SPRITE >>> -->
+<!-- ============================================================
+     Lucide icon sprite + emoji-to-icon replacer
+     (Inlined; no external icon dependency. Lucide ISC license.)
+     ============================================================ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<defs>
+<symbol id="i-smartphone" viewBox="0 0 24 24"><rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+  <path d="M12 18h.01" /></symbol>
+<symbol id="i-tablet" viewBox="0 0 24 24"><rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
+  <line x1="12" x2="12.01" y1="18" y2="18" /></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z" />
+  <circle cx="12" cy="13" r="3" /></symbol>
+<symbol id="i-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2" />
+  <line x1="8" x2="16" y1="21" y2="21" />
+  <line x1="12" x2="12" y1="17" y2="21" /></symbol>
+<symbol id="i-credit-card" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2" />
+  <line x1="2" x2="22" y1="10" y2="10" /></symbol>
+<symbol id="i-dollar-sign" viewBox="0 0 24 24"><line x1="12" x2="12" y1="2" y2="22" />
+  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></symbol>
+<symbol id="i-banknote" viewBox="0 0 24 24"><rect width="20" height="12" x="2" y="6" rx="2" />
+  <circle cx="12" cy="12" r="2" />
+  <path d="M6 12h.01M18 12h.01" /></symbol>
+<symbol id="i-chart-column" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16" />
+  <path d="M18 17V9" />
+  <path d="M13 17V5" />
+  <path d="M8 17v-3" /></symbol>
+<symbol id="i-trending-up" viewBox="0 0 24 24"><path d="M16 7h6v6" />
+  <path d="m22 7-8.5 8.5-5-5L2 17" /></symbol>
+<symbol id="i-shield-check" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+  <path d="m9 12 2 2 4-4" /></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+  <circle cx="12" cy="12" r="3" /></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" />
+  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+  <path d="M2 12h20" /></symbol>
+<symbol id="i-utensils-crossed" viewBox="0 0 24 24"><path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8" />
+  <path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7" />
+  <path d="m2.1 21.8 6.4-6.3" />
+  <path d="m19 5-7 7" /></symbol>
+<symbol id="i-utensils" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+  <path d="M7 2v20" />
+  <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" /></symbol>
+<symbol id="i-gift" viewBox="0 0 24 24"><path d="M12 7v14" />
+  <path d="M20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8" />
+  <path d="M7.5 7a1 1 0 0 1 0-5A4.8 8 0 0 1 12 7a4.8 8 0 0 1 4.5-5 1 1 0 0 1 0 5" />
+  <rect x="3" y="7" width="18" height="4" rx="1" /></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+  <path d="M16 3.128a4 4 0 0 1 0 7.744" />
+  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+  <circle cx="9" cy="7" r="4" /></symbol>
+<symbol id="i-message-square" viewBox="0 0 24 24"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" /></symbol>
+<symbol id="i-repeat-2" viewBox="0 0 24 24"><path d="m2 9 3-3 3 3" />
+  <path d="M13 18H7a2 2 0 0 1-2-2V6" />
+  <path d="m22 15-3 3-3-3" />
+  <path d="M11 6h6a2 2 0 0 1 2 2v10" /></symbol>
+<symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" />
+  <path d="M20 2v4" />
+  <path d="M22 4h-4" />
+  <circle cx="4" cy="20" r="2" /></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><path d="M8 2v4" />
+  <path d="M16 2v4" />
+  <rect width="18" height="18" x="3" y="4" rx="2" />
+  <path d="M3 10h18" /></symbol>
+<symbol id="i-car" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
+  <circle cx="7" cy="17" r="2" />
+  <path d="M9 17h6" />
+  <circle cx="17" cy="17" r="2" /></symbol>
+<symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="3" />
+  <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" />
+  <circle cx="18" cy="5" r="3" /></symbol>
+<symbol id="i-receipt" viewBox="0 0 24 24"><path d="M12 17V7" />
+  <path d="M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8" />
+  <path d="M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z" /></symbol>
+<symbol id="i-armchair" viewBox="0 0 24 24"><path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3" />
+  <path d="M3 16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V11a2 2 0 0 0-4 0z" />
+  <path d="M5 18v2" />
+  <path d="M19 18v2" /></symbol>
+<symbol id="i-package" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" /></symbol>
+<symbol id="i-triangle-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" /></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4" /></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" />
+  <path d="M12 6v6l4 2" /></symbol>
+<symbol id="i-sunrise" viewBox="0 0 24 24"><path d="M12 2v8" />
+  <path d="m4.93 10.93 1.41 1.41" />
+  <path d="M2 18h2" />
+  <path d="M20 18h2" />
+  <path d="m19.07 10.93-1.41 1.41" />
+  <path d="M22 22H2" />
+  <path d="m8 6 4-4 4 4" />
+  <path d="M16 18a4 4 0 0 0-8 0" /></symbol>
+<symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" />
+  <circle cx="12" cy="12" r="6" />
+  <circle cx="12" cy="12" r="2" /></symbol>
+<symbol id="i-award" viewBox="0 0 24 24"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526" />
+  <circle cx="12" cy="8" r="6" /></symbol>
+<symbol id="i-house" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></symbol>
+<symbol id="i-building-2" viewBox="0 0 24 24"><path d="M10 12h4" />
+  <path d="M10 8h4" />
+  <path d="M14 21v-3a2 2 0 0 0-4 0v3" />
+  <path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2" />
+  <path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16" /></symbol>
+<symbol id="i-hard-hat" viewBox="0 0 24 24"><path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5" />
+  <path d="M14 6a6 6 0 0 1 6 6v3" />
+  <path d="M4 15v-3a6 6 0 0 1 6-6" />
+  <rect x="2" y="15" width="20" height="4" rx="1" /></symbol>
+<symbol id="i-trending-down" viewBox="0 0 24 24"><path d="M16 17h6v-6" />
+  <path d="m22 17-8.5-8.5-5 5L2 7" /></symbol>
+<symbol id="i-file-text" viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+  <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+  <path d="M10 9H8" />
+  <path d="M16 13H8" />
+  <path d="M16 17H8" /></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M10.268 21a2 2 0 0 0 3.464 0" />
+  <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" /></symbol>
+<symbol id="i-folder-tree" viewBox="0 0 24 24"><path d="M20 10a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2.5a1 1 0 0 1-.8-.4l-.9-1.2A1 1 0 0 0 15 3h-2a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z" />
+  <path d="M20 21a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-2.9a1 1 0 0 1-.88-.55l-.42-.85a1 1 0 0 0-.92-.6H13a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z" />
+  <path d="M3 5a2 2 0 0 0 2 2h3" />
+  <path d="M3 3v13a2 2 0 0 0 2 2h3" /></symbol>
+<symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528" /></symbol>
+<symbol id="i-concierge-bell" viewBox="0 0 24 24"><path d="M3 20a1 1 0 0 1-1-1v-1a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1Z" />
+  <path d="M20 16a8 8 0 1 0-16 0" />
+  <path d="M12 4v4" />
+  <path d="M10 4h4" /></symbol>
+<symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" /></symbol>
+<symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18" />
+  <path d="m19 8 3 8a5 5 0 0 1-6 0zV7" />
+  <path d="M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1" />
+  <path d="m5 8 3 8a5 5 0 0 1-6 0zV7" />
+  <path d="M7 21h10" /></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18" />
+  <path d="m6 6 12 12" /></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" /></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14" />
+  <path d="M12 5v14" /></symbol>
+<symbol id="i-thermometer" viewBox="0 0 24 24"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z" /></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
+  <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" /></symbol>
+<symbol id="i-timer" viewBox="0 0 24 24"><line x1="10" x2="14" y1="2" y2="2" />
+  <line x1="12" x2="15" y1="14" y2="11" />
+  <circle cx="12" cy="14" r="8" /></symbol>
+</defs>
+</svg>
+<!-- <<< ICON-SYSTEM-SPRITE <<< -->
+
+
+
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-inner">
+    <div class="logo">
+      <span class="spark"><svg viewBox="0 0 24 24" fill="none"><path d="M13 2L4.5 13.5H11L9 22l9-12h-6.5L13 2z" fill="#160a00"/></svg></span>
+      Spark<span style="font-weight:400;opacity:.55">POS</span>
+    </div>
+    <div class="nav-links">
+      <a href="#surfaces">Platform</a>
+      <a href="#ai">AI</a>
+      <a href="#partner">Partner</a>
+      <a href="#contact" class="btn btn-primary" style="padding:11px 20px;font-size:14px">Become a partner</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-grid"></div>
+  <div class="wrap hero-inner">
+    <span class="pill"><span class="dot"></span> Production-ready · waiting for backend integration</span>
+    <h1>Run every shift, every channel, every restaurant — on one platform.</h1>
+    <p class="lead">Spark POS is a complete, AI-native restaurant operating system. Fully white-label, processor-agnostic, and ready to launch under <em>your</em> brand.</p>
+    <div class="hero-ctas">
+      <a href="spark-system.html" target="_blank" rel="noopener" class="btn btn-primary">Test-drive the POS ↗</a>
+      <button type="button" class="btn btn-ghost" id="qrBtn">Try it yourself <span class="qr-ic" aria-hidden="true">📱</span></button>
+      <a href="#partner" class="btn btn-ghost">See the partner economics</a>
+    </div>
+    <div class="trust-strip">
+      <span class="pill">100% white-label</span>
+      <span class="pill">Bring your own processor</span>
+      <span class="pill">iPad · Android · PAX A920 / A35</span>
+      <span class="pill">13 device surfaces</span>
+      <span class="pill">13 AI services included</span>
+    </div>
+  </div>
+
+  <div class="marquee">
+    <div class="marquee-track" id="marquee"></div>
+  </div>
+</header>
+
+<!-- WHITE LABEL -->
+<section class="wl pad" id="whitelabel">
+  <div class="wrap">
+    <span class="eyebrow reveal">Your brand, not ours</span>
+    <h2 class="section-title reveal">A POS you can actually call your own.</h2>
+    <p class="section-sub reveal">Heartland and Toast keep the customer, the contract, and the brand. Spark hands them all to you. Pick a brand below and watch the entire platform re-skin — logo, color, and domain — in real time.</p>
+
+    <div class="wl-stage">
+      <div class="wl-controls reveal">
+        <h3>Switch the brand. Keep the product.</h3>
+        <p>Same engine. Same 100+ pages. Re-themed top to bottom in seconds — login screen, admin console, receipts, mobile apps.</p>
+        <div class="brand-picker" id="brandPicker"></div>
+        <p class="wl-note">Every touchpoint is yours: <b>custom domain</b>, <b>logo</b>, <b>color system</b>, <b>back office</b>, and <b>customer-facing apps</b> — not a co-branded skin on someone else's product.</p>
+      </div>
+
+      <div class="browser reveal">
+        <div class="browser-bar">
+          <div class="dots"><i style="background:#FF5F57"></i><i style="background:#FEBC2E"></i><i style="background:#28C840"></i></div>
+          <div class="url">https://pos.<b id="wlDomain">yourbrand</b>.com/admin</div>
+        </div>
+        <div class="app-mock">
+          <div class="app-side">
+            <div class="mark" id="wlMark">Y</div>
+            <div class="nav-ic on"></div><div class="nav-ic"></div><div class="nav-ic"></div><div class="nav-ic"></div>
+          </div>
+          <div class="app-main">
+            <div class="app-h">
+              <div class="ttl" id="wlTitle">YourBrand · Today</div>
+              <div class="badge" id="wlBadge">LIVE</div>
+            </div>
+            <div class="app-cards">
+              <div class="app-card"><div class="k">NET SALES</div><div class="v">$8.4k</div><div class="bar"><i style="width:72%"></i></div></div>
+              <div class="app-card"><div class="k">COVERS</div><div class="v">214</div><div class="bar"><i style="width:54%"></i></div></div>
+              <div class="app-card"><div class="k">AVG CHECK</div><div class="v">$39</div><div class="bar"><i style="width:61%"></i></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEVICE SURFACES -->
+<section class="pad" id="surfaces">
+  <div class="wrap">
+    <span class="eyebrow reveal">One platform · 13 surfaces</span>
+    <h2 class="section-title reveal">The whole restaurant. One system.</h2>
+    <p class="section-sub reveal">From the line to the curb to the couch. Every surface your clients' guests touch, built in — no third-party patches, no integration tax.</p>
+
+    <div class="surfaces-grid">
+      <div class="surface-list reveal" id="surfaceList"></div>
+      <div class="surface-view reveal" id="surfaceView">
+        <div class="glow"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POS TEST DRIVE -->
+
+<!-- AI -->
+<section class="pad" id="ai">
+  <div class="wrap">
+    <span class="eyebrow reveal">13 AI services · included</span>
+    <h2 class="section-title reveal">AI that ships with the product — not a $200/mo add-on.</h2>
+    <p class="section-sub reveal">Toast and Heartland charge $75–$200 a month, each, for marketing, loyalty and analytics. Spark's intelligence layer is built in from day one.</p>
+
+    <div class="ai-grid" id="aiGrid"></div>
+
+    <div class="ai-banner reveal">
+      <p>Your clients switch, get the analytics and forecasting incumbents bolt on for hundreds a month — and <b>you set the price</b>.</p>
+      <a href="#partner" class="btn btn-primary" style="white-space:nowrap">What's in it for me? →</a>
+    </div>
+  </div>
+</section>
+
+<!-- PIPELINE -->
+<section class="pipe pad" id="pipeline">
+  <div class="wrap">
+    <span class="eyebrow reveal">Your activation journey</span>
+    <h2 class="section-title reveal">Sign Monday. Earning by month one.</h2>
+    <p class="section-sub reveal">This isn't how a restaurant goes live — it's how <em>you</em> turn a partnership into recurring revenue. We carry the build; you carry the relationship.</p>
+
+    <div class="pipe-track" id="pipeTrack">
+      <div class="pipe-line"></div>
+    </div>
+
+    <div class="pipe-badges reveal">
+      <div class="pbadge"><div class="big grad-text">48h</div><div class="lbl">to your branded<br>sandbox</div></div>
+      <div class="pbadge"><div class="big grad-text">14 days</div><div class="lbl">first restaurant<br>live, typical</div></div>
+      <div class="pbadge"><div class="big grad-text">100%</div><div class="lbl">of your processor<br>residual kept</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ROI -->
+<section class="roi pad" id="roi">
+  <div class="wrap">
+    <span class="eyebrow reveal">Run your numbers</span>
+    <h2 class="section-title reveal">What your portfolio could earn.</h2>
+    <p class="section-sub reveal">Two stacked revenue lines from one customer: the SaaS margin you set, plus the payment residual you already keep. Move the sliders.</p>
+
+    <div class="roi-card reveal">
+      <div class="roi-inputs">
+        <div class="field">
+          <div class="lab"><span class="l">Restaurants you service</span><span class="val mono" id="vMerch">25</span></div>
+          <input type="range" id="rMerch" min="5" max="200" value="25" step="5">
+        </div>
+        <div class="field">
+          <div class="lab"><span class="l">Avg monthly card volume / restaurant</span><span class="val mono" id="vVol">$50k</span></div>
+          <input type="range" id="rVol" min="10" max="200" value="50" step="5">
+        </div>
+        <div class="field">
+          <div class="lab"><span class="l">Your processing margin</span><span class="val mono" id="vMargin">0.35%</span></div>
+          <input type="range" id="rMargin" min="10" max="100" value="35" step="5">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <div class="lab"><span class="l">Your monthly SaaS markup / restaurant</span><span class="val mono" id="vSaas">$99</span></div>
+          <input type="range" id="rSaas" min="29" max="299" value="99" step="10">
+        </div>
+      </div>
+      <div class="roi-out">
+        <div class="ro-lab">Estimated annual portfolio value</div>
+        <div class="annual"><span class="mono" id="annual">$48,300</span></div>
+        <div class="ro-split">
+          <div class="box"><div class="k">SaaS margin / yr</div><div class="v grad-text" id="saasYr">$29,700</div></div>
+          <div class="box"><div class="k">Residual / yr</div><div class="v grad-text" id="resYr">$18,600</div></div>
+        </div>
+        <div class="ro-bars" id="roBars"></div>
+        <div class="ro-disclaim">Illustrative example using mid-market assumptions. Not a guarantee of earnings. Actual residuals and margins vary by processor agreement, pricing, and merchant mix. Industry benchmark: ~$3,000–$8,000/mo residual at 100 active merchants.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="pad" id="compare">
+  <div class="wrap">
+    <span class="eyebrow reveal">Compare what you sell today</span>
+    <h2 class="section-title reveal">The only "yes" across the top.</h2>
+    <p class="section-sub reveal">The lines that matter to a reseller — not a restaurant.</p>
+
+    <div class="cmp-wrap reveal">
+      <table class="cmp">
+        <thead><tr>
+          <th>What a reseller cares about</th>
+          <th class="spark">Spark POS</th>
+          <th>Toast</th>
+          <th>Heartland / Genius</th>
+          <th>Square</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="feat">True white-label (brand, domain, apps)</td><td class="spark"><span class="yes">Yes</span></td><td><span class="no">No</span></td><td><span class="mid">Co-brand only</span></td><td><span class="no">No</span></td></tr>
+          <tr><td class="feat">Bring your own processor</td><td class="spark"><span class="yes">Yes</span></td><td><span class="no">Toast only</span></td><td><span class="no">Heartland only</span></td><td><span class="no">Square only</span></td></tr>
+          <tr><td class="feat">You own the customer & contract</td><td class="spark"><span class="yes">Yes</span></td><td><span class="no">No</span></td><td><span class="no">No</span></td><td><span class="no">No</span></td></tr>
+          <tr><td class="feat">You set the retail price</td><td class="spark"><span class="yes">Yes</span></td><td><span class="no">No</span></td><td><span class="mid">Limited</span></td><td><span class="no">No</span></td></tr>
+          <tr><td class="feat">AI suite included</td><td class="spark"><span class="yes">13 services</span></td><td><span class="mid">Paid add-ons</span></td><td><span class="mid">Paid add-ons</span></td><td><span class="mid">Limited</span></td></tr>
+          <tr><td class="feat">Hardware flexibility</td><td class="spark"><span class="yes">iPad/Android/PAX</span></td><td><span class="no">Proprietary</span></td><td><span class="mid">Restricted</span></td><td><span class="mid">Square only</span></td></tr>
+          <tr><td class="feat">Device surfaces</td><td class="spark"><span class="yes">13</span></td><td><span class="mid">~8</span></td><td><span class="mid">~9</span></td><td><span class="mid">~5</span></td></tr>
+          <tr><td class="feat">Partner economics</td><td class="spark"><span class="yes">SaaS margin + residual</span></td><td><span class="mid">One-time bounty</span></td><td><span class="mid">Captive residual</span></td><td><span class="mid">Referral share</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cmp-foot">Competitor details are industry-reported and current as of early 2026; programs change. Heartland Restaurant is now marketed as "Genius." Comparison reflects standard published terms, not negotiated deals.</p>
+  </div>
+</section>
+
+<!-- PARTNER -->
+<section class="partner pad" id="partner">
+  <div class="wrap">
+    <span class="eyebrow reveal">For you, the partner</span>
+    <h2 class="section-title reveal">Three revenue lines from every restaurant.</h2>
+    <p class="section-sub reveal">You already have the relationships. Spark turns each one into stacked, compounding, recurring revenue you control.</p>
+
+    <div class="partner-tiles">
+      <div class="ptile reveal">
+        <div class="ic">💵</div>
+        <h4>Recurring SaaS margin</h4>
+        <p>Set your own monthly price. Keep the spread. We invoice you at a flat wholesale rate and never touch your customer.</p>
+      </div>
+      <div class="ptile reveal">
+        <div class="ic">🔁</div>
+        <h4>Payment residuals stay yours</h4>
+        <p>Spark is processor-agnostic. Bring your existing ISO relationship — your residual never crosses our balance sheet.</p>
+      </div>
+      <div class="ptile reveal">
+        <div class="ic">📦</div>
+        <h4>Hardware & services markup</h4>
+        <p>Resell PAX terminals, iPads, install, training and support under your brand, at your price, on your terms.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH -->
+<section class="tech pad-sm">
+  <div class="wrap">
+    <div class="tech-inner reveal">
+      <div>
+        <span class="eyebrow">Built, not promised</span>
+        <h2 class="section-title" style="font-size:32px;margin-top:14px">Production-ready. Waiting for backend integration.</h2>
+        <p class="section-sub" style="font-size:16px">The hard part — 100+ POS pages, 50+ admin pages, the full design system — is done. The integration is the partnership: connect the platform to your processor and stack, and go.</p>
+        <div class="tech-stack">
+          <span>Angular 21</span><span>TypeScript strict</span><span>Tailwind v4</span><span>Signals · zoneless</span><span>Multi-tenant</span><span>Granular RBAC</span><span>Audit log</span><span>Open API</span><span>EN / EL i18n</span><span>No PAN storage</span>
+        </div>
+        <div class="status-line"><span class="d"></span> Frontend complete · auth, guards & interceptor ready · BFF pending</div>
+      </div>
+      <div class="tech-nums">
+        <div class="tnum"><div class="n">100+</div><div class="l">POS pages</div></div>
+        <div class="tnum"><div class="n">50+</div><div class="l">admin console pages</div></div>
+        <div class="tnum"><div class="n">13</div><div class="l">device surfaces</div></div>
+        <div class="tnum"><div class="n">13</div><div class="l">AI services</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="pad" id="faq">
+  <div class="wrap">
+    <span class="eyebrow reveal">Partner FAQ</span>
+    <h2 class="section-title reveal">The questions a reseller actually asks.</h2>
+    <div class="faq-list reveal" id="faqList"></div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final" id="contact">
+  <div class="final-glow"></div>
+  <div class="wrap">
+    <h2>Get a branded sandbox in 48 hours.</h2>
+    <p>Tell us how many restaurants you service. We'll spin up Spark under your brand so you can pitch your own clients — before you commit to anything.</p>
+    <div class="cta-form">
+      <input type="text" placeholder="Your name" aria-label="Your name">
+      <input type="text" placeholder="Company" aria-label="Company">
+      <input type="text" placeholder="# restaurants you service" aria-label="Number of restaurants">
+      <a href="#" class="btn btn-primary" onclick="event.preventDefault()">Request my sandbox →</a>
+    </div>
+    <p class="cta-mini">No card. No contract. A real branded environment to put in front of your clients.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="logo">
+      <span class="spark"><svg viewBox="0 0 24 24" fill="none"><path d="M13 2L4.5 13.5H11L9 22l9-12h-6.5L13 2z" fill="#160a00"/></svg></span>
+      Spark<span style="font-weight:400;opacity:.55">POS</span>
+    </div>
+    Spark POS — the white-label restaurant operating system. © 2026. Built for partners.
+  </div>
+</footer>
+
+<script>
+/* ---------- NAV scroll ---------- */
+const nav=document.getElementById('nav');
+addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>20));
+
+/* ---------- reveal on scroll ---------- */
+const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ---------- surfaces data ---------- */
+const SURFACES=[
+  {ic:'🧾',nm:'POS Terminal',ds:'Front-of-house core',tag:'Front of house',desc:'Fire by course, split checks up to 9 ways with one touch, transfer tables, void with reasons, manager-PIN override, attached cash drawer and tip adjustment — the engine every shift runs on.',mock:`<div class="mock wide">
+ <div class="mock-h"><span class="dot"></span> Spark POS · Table 14 <span class="grow"></span><span class="badge">DINE-IN · 4 GUESTS · #2904</span></div>
+ <div class="mock-body" style="display:grid;grid-template-columns:1.05fr 1fr;gap:14px">
+  <div>
+   <div><span class="m-cat on">Burgers</span><span class="m-cat">Mains</span><span class="m-cat">Pasta</span><span class="m-cat">Bar</span></div>
+   <div class="m-row"><span>BYO Burger</span><span class="m-pri">$14</span></div>
+   <div class="m-row"><span>Double Smash</span><span class="m-pri">$13</span></div>
+   <div class="m-row"><span>Wild Mushroom</span><span class="m-pri">$17</span></div>
+   <div class="m-row"><span>Beyond Plant</span><span class="m-pri">$16</span></div>
+  </div>
+  <div class="m-card">
+   <div style="font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;font-family:'JetBrains Mono';margin-bottom:4px">Check</div>
+   <div class="m-row"><span>×1 BYO Burger</span><span class="m-pri-2">$19.50</span></div>
+   <div class="m-meta">+ Bacon · 🌡 Med-rare · Truffle fries</div>
+   <div class="m-row"><span>×2 Margherita</span><span class="m-pri-2">$32.00</span></div>
+   <div class="m-row"><span>×1 Old Fashioned</span><span class="m-pri-2">$19.00</span></div>
+   <div class="m-line"></div>
+   <div class="m-row"><span style="color:var(--dim)">Subtotal</span><span class="m-pri-2">$70.50</span></div>
+   <div class="m-row"><span style="color:var(--dim)">Tax 8.25%</span><span class="m-pri-2">$5.82</span></div>
+   <div class="m-row" style="font-size:14px"><b>Total</b><b class="m-screen" style="font-size:18px">$76.32</b></div>
+  </div>
+ </div>
+</div>`,feats:['Split 9 ways','Coursing & fire','Table transfer','Manager PIN','Cash drawer','Tip adjust']},
+  {ic:'🍳',nm:'Kitchen Display (KDS)',ds:'Grill · Sauté · Expo',tag:'Back of house',desc:'Color-coded time alerts across grill, sauté and expo stations. Bump, recall the last ten tickets, and an all-day summary so the line never loses the rhythm.',mock:`<div class="mock wide">
+ <div class="mock-h"><span class="dot"></span> KDS · GRILL <span class="grow"></span><span class="badge">3 ACTIVE · ALL-DAY 12</span></div>
+ <div class="mock-body" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+  <div class="m-tkt">
+   <div class="tkt-h"><span>#2902</span><span class="age">3:42</span></div>
+   <div class="it">1× 12oz Ribeye</div>
+   <div class="m-meta temp">🌡 Med-rare · + Peppercorn</div>
+   <div class="m-meta add">+ Truffle fries</div>
+   <div class="it" style="margin-top:8px">1× Caesar</div>
+   <div class="m-meta rm">✕ No croutons</div>
+  </div>
+  <div class="m-tkt warn">
+   <div class="tkt-h"><span>#2901</span><span class="age">8:14</span></div>
+   <div class="it">1× BYO Burger</div>
+   <div class="m-meta temp">🌡 Med · Double patty</div>
+   <div class="m-meta add">+ Bacon · + Cheddar</div>
+   <div class="it" style="margin-top:8px">1× Salmon</div>
+   <div class="m-meta temp">🌡 Medium</div>
+  </div>
+  <div class="m-tkt late">
+   <div class="tkt-h"><span>#2898</span><span class="age">11:30</span></div>
+   <div class="it">1× Short Rib</div>
+   <div class="m-meta add">+ Bone marrow</div>
+   <div class="it" style="margin-top:8px">2× Margherita 16"</div>
+   <div class="m-meta add">+ Prosciutto</div>
+  </div>
+ </div>
+</div>`,feats:['Color time alerts','Bump & recall','All-day view','Station routing']},
+  {ic:'📱',nm:'Self-Order Kiosk',ds:'Skip the line',desc:'Guest-driven ordering with full modifiers and payment at the kiosk — fewer lines, higher average check, less labor at the counter.',tag:'Off-premise',mock:`<div class="mock phone">
+ <div class="mock-h" style="justify-content:center;font-size:9.5px">Skip the line · Tap to start</div>
+ <div class="mock-body" style="text-align:center">
+  <div style="font-size:15px;font-weight:700">Build Your Burger</div>
+  <div style="font-size:10px;color:var(--dim);margin-top:1px">Patty · cheese · toppings</div>
+  <div class="m-pay" style="margin-top:14px">
+   <button class="on">Single<br>$14.00</button>
+   <button>Double<br>+$5</button>
+   <button>Plant<br>+$2</button>
+  </div>
+  <div class="m-row" style="margin-top:14px;padding:10px;background:var(--surface);border-radius:10px;border:1px solid var(--border);border-bottom-style:solid">
+   <span style="font-size:11px;color:var(--dim);font-family:'JetBrains Mono'">Running total</span>
+   <span class="m-pri-2">$19.50</span>
+  </div>
+  <button class="m-cta">Pay at kiosk →</button>
+ </div>
+</div>`,feats:['Full modifiers','Pay at kiosk','Upsell prompts']},
+  {ic:'🖥️',nm:'Customer-Facing Display',ds:'Order + tips',desc:'A live, branded order display facing the guest with itemized totals and on-screen tipping.',tag:'Front of house',mock:`<div class="mock wide">
+ <div class="mock-h"><span class="dot"></span> CFD · TABLE 14 <span class="grow"></span><span class="badge">YOUR BRAND</span></div>
+ <div class="mock-body" style="text-align:center;padding:24px">
+  <div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.12em;font-family:'JetBrains Mono'">Your order</div>
+  <div class="m-screen" style="margin:6px 0">$76.32</div>
+  <div style="font-size:11px;color:var(--dim);font-family:'JetBrains Mono'">3 ITEMS · 4 GUESTS</div>
+  <div style="font-size:10px;color:var(--dim-2);text-transform:uppercase;letter-spacing:.1em;font-family:'JetBrains Mono';margin-top:14px">Add a tip?</div>
+  <div class="m-pay" style="grid-template-columns:repeat(4,1fr);margin-top:8px;max-width:340px;margin-left:auto;margin-right:auto">
+   <button>15%</button><button class="on">20% ★</button><button>25%</button><button>Custom</button>
+  </div>
+ </div>
+</div>`,feats:['Live order','On-screen tip','Branded']},
+  {ic:'🌐',nm:'Online Ordering',ds:'Branded storefront',desc:'A built-in, branded storefront and checkout — no third-party patches, no per-order tax skimming your margin.',tag:'Off-premise',mock:`<div class="mock">
+ <div class="mock-h"><span class="dot"></span> bistro.brand/order <span class="grow"></span><span class="badge">YOUR DOMAIN</span></div>
+ <div class="mock-body">
+  <div style="font-size:15px;font-weight:700;margin-bottom:2px">Bistro · Downtown</div>
+  <div style="font-size:11px;color:var(--dim);margin-bottom:10px">25–35 min · Free pickup · Branded checkout</div>
+  <div><span class="m-cat on">Most ordered</span><span class="m-cat">Burgers</span><span class="m-cat">Pasta</span></div>
+  <div class="m-row"><span>BYO Burger</span><span class="m-pri">$14</span></div>
+  <div class="m-row"><span>Truffle Tagliatelle</span><span class="m-pri">$22</span></div>
+  <div class="m-row"><span>Margherita Pizza</span><span class="m-pri">$16</span></div>
+  <div class="m-line"></div>
+  <div class="m-row"><span style="color:var(--dim)">Cart · 3 items</span><span class="m-pri-2">$52.00</span></div>
+  <button class="m-cta">Checkout — no middleman →</button>
+ </div>
+</div>`,feats:['Branded checkout','No middleman','Order balancing']},
+  {ic:'📲',nm:'Guest App',ds:'Scan · pay · earn',desc:'Skip-the-line, scan-to-pay and loyalty in the guest\'s pocket — the relationship layer that keeps them coming back.',tag:'Off-premise',mock:`<div class="mock phone">
+ <div class="mock-h" style="justify-content:center;font-size:9.5px">Welcome back, Jess</div>
+ <div class="mock-body" style="text-align:center">
+  <div class="m-points" style="justify-content:center;margin:6px 0 10px">
+   <div class="ring"><span>1,820</span></div>
+   <div style="text-align:left">
+    <div style="font-size:11px;color:var(--dim);font-family:'JetBrains Mono'">POINTS</div>
+    <div style="font-size:14px;font-weight:700">Gold · 180 to Platinum</div>
+   </div>
+  </div>
+  <div class="m-line"></div>
+  <div class="m-qr" style="margin:8px auto">SCAN TO<br>PAY</div>
+  <div style="font-size:10.5px;color:var(--dim);margin-top:6px">Skip the line · pay & earn</div>
+  <button class="m-cta">Reorder last visit →</button>
+ </div>
+</div>`,feats:['Scan to pay','Loyalty','Skip the line']},
+  {ic:'🚗',nm:'Delivery Dispatch',ds:'Driver assignment',desc:'Dispatch board with driver assignment and live status — own your delivery instead of renting it.',tag:'Off-premise',mock:`<div class="mock">
+ <div class="mock-h"><span class="dot"></span> DISPATCH · LIVE <span class="grow"></span><span class="badge">4 DRIVERS · 7 ORDERS</span></div>
+ <div class="mock-body">
+  <div class="m-driver"><div class="av">M</div><div class="nm">Marcus K.<div style="font-size:10px;color:var(--dim);font-family:'JetBrains Mono'">#2891 → 412 Pine St · 8 min</div></div><div class="st">EN ROUTE</div></div>
+  <div class="m-driver"><div class="av">A</div><div class="nm">Aida P.<div style="font-size:10px;color:var(--dim);font-family:'JetBrains Mono'">#2888 → 27 Oak Ave · delivered</div></div><div class="st">DROPPED</div></div>
+  <div class="m-driver"><div class="av">J</div><div class="nm">Jordan T.<div style="font-size:10px;color:var(--dim);font-family:'JetBrains Mono'">At restaurant — ready for pickup</div></div><div class="st idle">IDLE</div></div>
+  <div class="m-driver"><div class="av">S</div><div class="nm">Sam R.<div style="font-size:10px;color:var(--dim);font-family:'JetBrains Mono'">#2895 → 90 Maple Rd · prepping</div></div><div class="st idle">QUEUED</div></div>
+ </div>
+</div>`,feats:['Driver assign','Live status','3rd-party sync']},
+  {ic:'🛣️',nm:'Drive-Thru',ds:'Order confirmation',desc:'Order confirmation display tuned for speed, accuracy and double-lane throughput.',tag:'Off-premise',mock:`<div class="mock">
+ <div class="mock-h"><span class="dot"></span> DRIVE-THRU · LANE 1 <span class="grow"></span><span class="badge">ORDER #2906</span></div>
+ <div class="mock-body">
+  <div class="m-row" style="font-size:14px"><span>×2 Double Smash</span><span class="m-pri-2">$26.00</span></div>
+  <div class="m-meta temp">🌡 Med · No pickle</div>
+  <div class="m-row" style="font-size:14px"><span>×1 BYO Burger</span><span class="m-pri-2">$19.50</span></div>
+  <div class="m-meta add">+ Bacon · Sweet-potato fries</div>
+  <div class="m-row" style="font-size:14px"><span>×3 Soda</span><span class="m-pri-2">$12.00</span></div>
+  <div class="m-line"></div>
+  <div class="m-row" style="font-size:15px"><b>Total</b><b class="m-screen" style="font-size:20px">$57.50</b></div>
+  <div style="font-size:10px;color:var(--success);font-family:'JetBrains Mono';margin-top:6px">✓ Confirmed · pull forward to window 2</div>
+ </div>
+</div>`,feats:['Confirmation','Double-lane','Speed-of-service']},
+  {ic:'💳',nm:'PAX A920 / A35',ds:'Terminal integration',desc:'Native integration with PAX A920 and A35 terminals — pay at the table, on the floor, or curbside.',tag:'Hardware',mock:`<div class="mock terminal">
+ <div class="mock-h" style="justify-content:center;font-size:9.5px">PAX A920 · CARD READER</div>
+ <div class="mock-body" style="text-align:center">
+  <div style="font-size:9px;color:var(--dim);font-family:'JetBrains Mono';text-transform:uppercase;letter-spacing:.1em">Amount due</div>
+  <div class="m-screen" style="font-size:30px">$76.32</div>
+  <div style="font-size:9px;color:var(--dim);font-family:'JetBrains Mono';text-transform:uppercase;letter-spacing:.1em;margin-top:8px">Enter PIN</div>
+  <div class="m-pad">
+   <button>1</button><button>2</button><button>3</button>
+   <button>4</button><button>5</button><button>6</button>
+   <button>7</button><button>8</button><button>9</button>
+   <button style="background:rgba(255,69,58,.18);color:#FF453A;border-color:rgba(255,69,58,.4)">✕</button>
+   <button>0</button>
+   <button style="background:var(--grad);border-color:transparent;color:#160a00">✓</button>
+  </div>
+ </div>
+</div>`,feats:['A920','A35','Pay at table','EMV']},
+  {ic:'⚙️',nm:'Admin Console',ds:'50+ pages',desc:'Menu, staff & HR with granular permissions, CRM, gift cards, marketing, and a full reporting suite — the back office that runs the business.',tag:'Management',mock:`<div class="mock wide">
+ <div class="mock-h"><span class="dot"></span> ADMIN · MENU · ITEMS <span class="grow"></span><span class="badge">50+ PAGES · ROLE-AWARE</span></div>
+ <div class="mock-body" style="display:grid;grid-template-columns:140px 1fr;gap:12px">
+  <div style="font-size:11.5px">
+   <div class="m-nav" style="flex-direction:column;gap:3px">
+    <div class="n on">Menu</div><div class="n">Staff & HR</div><div class="n">Reports</div><div class="n">Loyalty</div><div class="n">Hardware</div><div class="n">Settings</div>
+   </div>
+  </div>
+  <div>
+   <div style="font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;font-family:'JetBrains Mono';margin-bottom:6px">Items · 72 active</div>
+   <div class="m-row"><span style="font-weight:600">BYO Burger</span><span class="m-pri">$14.00 · 6 mod groups</span></div>
+   <div class="m-row"><span style="font-weight:600">12oz Ribeye</span><span class="m-pri">$38.00 · 3 mod groups</span></div>
+   <div class="m-row"><span style="font-weight:600">Margherita</span><span class="m-pri">$16.00 · sizes + crust</span></div>
+   <div class="m-row"><span style="font-weight:600">Old Fashioned</span><span class="m-pri">$15.00 · spirit picker</span></div>
+   <div class="m-row"><span style="font-weight:600">Truffle Tagliatelle</span><span class="m-pri">$22.00 · proteins</span></div>
+  </div>
+ </div>
+</div>`,feats:['Menu mgmt','HR & permissions','CRM','Reports','Gift cards']},
+  {ic:'📊',nm:'Reports & Audit',ds:'Read-only trail',desc:'Sales, labour, voids, menu mix, payments, tax, payroll and server performance — plus a read-only audit log of every void, refund, discount and cash variance.',tag:'Management',mock:`<div class="mock wide">
+ <div class="mock-h"><span class="dot"></span> REPORTS · TODAY <span class="grow"></span><span class="badge">36 REPORTS · LIVE</span></div>
+ <div class="mock-body">
+  <div class="m-kpi">
+   <div class="k"><div class="l">Net Sales</div><div class="v">$8,412</div><div class="d">▲ 7.4% vs LW</div></div>
+   <div class="k"><div class="l">Covers</div><div class="v">214</div><div class="d">▲ 6.4% vs LW</div></div>
+   <div class="k"><div class="l">Labor %</div><div class="v">25.0%</div><div class="d" style="color:var(--warn)">target 25–30%</div></div>
+   <div class="k"><div class="l">Avg Check</div><div class="v">$118.50</div><div class="d">▲ 3.1% vs LW</div></div>
+  </div>
+  <div class="m-bars">
+   <div class="b" style="height:32%"></div><div class="b" style="height:54%"></div><div class="b" style="height:80%"></div>
+   <div class="b" style="height:48%"></div><div class="b" style="height:62%"></div><div class="b" style="height:92%"></div>
+   <div class="b" style="height:74%"></div><div class="b" style="height:38%"></div><div class="b" style="height:66%"></div>
+   <div class="b" style="height:88%"></div><div class="b" style="height:100%"></div><div class="b" style="height:70%"></div>
+  </div>
+ </div>
+</div>`,feats:['Menu mix','Labour','Cash variance','Server perf']},
+  {ic:'🪑',nm:'Floor Plan & Rooms',ds:'Room layout',desc:'Drag-built floor plans, room types and revenue centers that mirror how the room actually works.',tag:'Front of house',mock:`<div class="mock wide">
+ <div class="mock-h"><span class="dot"></span> FLOOR · MAIN ROOM <span class="grow"></span><span class="badge">12 / 18 OCCUPIED</span></div>
+ <div class="mock-body">
+  <div class="m-floor">
+   <div class="t"><b>1</b>OPEN</div><div class="t occ"><b>2</b>15m</div><div class="t occ"><b>3</b>42m</div><div class="t"><b>4</b>OPEN</div><div class="t occ"><b>5</b>8m</div>
+   <div class="t occ"><b>6</b>21m</div><div class="t dirty"><b>7</b>BUS</div><div class="t occ"><b>8</b>54m</div><div class="t occ"><b>9</b>62m</div><div class="t"><b>10</b>OPEN</div>
+   <div class="t occ"><b>11</b>11m</div><div class="t occ"><b>12</b>33m</div><div class="t occ"><b>13</b>18m</div><div class="t dirty"><b>14</b>BUS</div><div class="t occ"><b>15</b>27m</div>
+  </div>
+  <div style="display:flex;gap:14px;font-size:10px;color:var(--dim);font-family:'JetBrains Mono';margin-top:10px;text-transform:uppercase;letter-spacing:.06em">
+   <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:rgba(255,149,0,.6);margin-right:5px"></span>Seated</span>
+   <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:rgba(255,69,58,.55);margin-right:5px"></span>Needs bus</span>
+   <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.15);margin-right:5px"></span>Open</span>
+  </div>
+ </div>
+</div>`,feats:['Drag layout','Room types','Revenue centers']},
+  {ic:'🎁',nm:'Loyalty & Gift Cards',ds:'At checkout',desc:'Issue, balance and adjust gift cards; redeem loyalty right at checkout. Owned, not outsourced.',tag:'Off-premise',mock:`<div class="mock">
+ <div class="mock-h"><span class="dot"></span> LOYALTY · AT CHECKOUT <span class="grow"></span><span class="badge">REDEEM IN-LINE</span></div>
+ <div class="mock-body">
+  <div style="display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(255,149,0,.18),rgba(255,107,0,.06));border:1px solid rgba(255,149,0,.4);border-radius:14px;padding:14px">
+   <div style="font-size:24px">🎁</div>
+   <div style="flex:1">
+    <div style="font-weight:700;font-size:14px">J. Alvarez · Gold</div>
+    <div style="font-size:11px;color:var(--dim);font-family:'JetBrains Mono'">42 visits · 1,820 pts · $2,140 lifetime</div>
+   </div>
+  </div>
+  <div class="m-row" style="margin-top:10px"><span>Redeem 500 pts → $5 off</span><button style="background:var(--grad);border:none;color:#160a00;padding:5px 12px;border-radius:8px;font-weight:700;font-size:11px">APPLY</button></div>
+  <div class="m-row"><span>Gift card balance</span><span class="m-pri-2">$25.00</span></div>
+  <div class="m-row"><span>Issue gift card</span><span class="m-pri">+ NEW</span></div>
+ </div>
+</div>`,feats:['Issue & redeem','Balance','Loyalty at POS']}
+];
+const sList=document.getElementById('surfaceList'),sView=document.getElementById('surfaceView');
+SURFACES.forEach((s,i)=>{
+  const el=document.createElement('div');el.className='s-item'+(i===0?' active':'');
+  el.innerHTML=`<div class="ic">${s.ic}</div><div><div class="nm">${s.nm}</div><div class="ds">${s.ds}</div></div>`;
+  el.onclick=()=>{document.querySelectorAll('.s-item').forEach(x=>x.classList.remove('active'));el.classList.add('active');renderSurface(s)};
+  sList.appendChild(el);
+});
+function renderSurface(s){
+  sView.innerHTML=`<div class="glow"></div>
+    <div class="sv-tag">${s.tag}</div>
+    <div class="sv-title">${s.nm}</div>
+    <div class="sv-desc">${s.desc}</div>
+    ${s.mock||''}
+    <div class="sv-feats">${s.feats.map(f=>`<span>${f}</span>`).join('')}</div>`;
+}
+renderSurface(SURFACES[0]);
+
+/* ---------- marquee ---------- */
+const mq=document.getElementById('marquee');
+const chips=SURFACES.concat(SURFACES);
+chips.forEach(s=>{const c=document.createElement('div');c.className='surface-chip';c.innerHTML=`<span class="ic">${s.ic}</span>${s.nm}`;mq.appendChild(c)});
+
+/* ---------- white label ---------- */
+const BRANDS=[
+  {n:'Aurora',sw:'#FF6B00',g:'linear-gradient(135deg,#FF9500,#FF6B00)',soft:'rgba(255,149,0,.16)',solid:'#FF9500',d:'aurora'},
+  {n:'Bistro Cloud',sw:'#34C759',g:'linear-gradient(135deg,#34C759,#16934a)',soft:'rgba(52,199,89,.16)',solid:'#34C759',d:'bistrocloud'},
+  {n:'Verve',sw:'#0A84FF',g:'linear-gradient(135deg,#0A84FF,#0050d6)',soft:'rgba(10,132,255,.16)',solid:'#0A84FF',d:'verve'},
+  {n:'Noir',sw:'#BF5AF2',g:'linear-gradient(135deg,#BF5AF2,#8a2be2)',soft:'rgba(191,90,242,.16)',solid:'#BF5AF2',d:'noir'}
+];
+const bp=document.getElementById('brandPicker');
+BRANDS.forEach((b,i)=>{
+  const el=document.createElement('div');el.className='brand-btn'+(i===0?' active':'');el.style.setProperty('--swatch',b.sw);
+  el.innerHTML=`<span class="sw"></span>${b.n}`;
+  el.onclick=()=>{document.querySelectorAll('.brand-btn').forEach(x=>x.classList.remove('active'));el.classList.add('active');applyBrand(b)};
+  bp.appendChild(el);
+});
+function applyBrand(b){
+  document.documentElement.style.setProperty('--accent-live',b.g);
+  document.documentElement.style.setProperty('--accent-soft',b.soft);
+  document.documentElement.style.setProperty('--accent-live-solid',b.solid);
+  document.getElementById('wlMark').textContent=b.n[0];
+  document.getElementById('wlMark').style.background=b.g;
+  document.getElementById('wlDomain').textContent=b.d;
+  document.getElementById('wlTitle').textContent=b.n+' · Today';
+  document.querySelectorAll('.app-card .bar i').forEach(i=>i.style.background=b.solid);
+  document.querySelector('.app-side .nav-ic.on').style.background=b.soft;
+  document.getElementById('wlBadge').style.background=b.soft;
+  document.getElementById('wlBadge').style.color=b.solid;
+}
+applyBrand(BRANDS[0]);
+
+/* ---------- AI grid ---------- */
+const AI=[
+  ['🔮','Demand Forecast','Predict tomorrow\'s covers from weather, events and seasonality.','within 2–5% accuracy'],
+  ['📈','Smart Upsell','Surface the right add-on at the right moment, on every channel.','higher avg check'],
+  ['🛡️','Fraud Detection','Flag void, refund and comp anomalies before close-of-day.','catch it same day'],
+  ['🍽️','Menu AI','Re-rank menu mix by profit, prep time and forecasted demand.','margin-first menu'],
+  ['🗓️','AI Scheduling','Match staffing to forecasted demand, shift by shift.','cut labor 8–12%'],
+  ['💬','Voice Ordering','Take drive-thru and phone orders with conversational AI.','fewer dropped orders'],
+  ['📷','Image AI','Auto-generate menu imagery and tag plates for online ordering.','launch faster'],
+  ['⚠️','KPI Anomaly','Catch the metric that broke before the daily report does.','early warning'],
+  ['🔁','Churn AI','Spot guests drifting away and trigger win-back automatically.','retain regulars'],
+  ['💲','Dynamic Pricing','Suggest price moves by daypart, demand and inventory.','protect margin'],
+  ['🧾','Receipt Intelligence','Parse and reconcile third-party orders automatically.','clean books'],
+  ['👥','Labor Insight','Forecast overtime risk and tip distribution fairness.','fewer surprises'],
+  ['📦','Inventory AI','Predict 86\'d items and reorder points before you run out.','never run dry']
+];
+const aiGrid=document.getElementById('aiGrid');
+AI.forEach(([ic,h,p,m])=>{const el=document.createElement('div');el.className='ai-card reveal';el.innerHTML=`<div class="ic">${ic}</div><h4>${h}</h4><p>${p}</p><span class="metric mono">→ ${m}</span>`;aiGrid.appendChild(el);io.observe(el)});
+
+/* ---------- pipeline ---------- */
+const PIPE=[
+  {n:'01',h:'Sign & brand',p:'Sign the partnership and send us your logo, colors and domain.',w:'YOU',wc:'you',when:'Day 0'},
+  {n:'02',h:'Branded sandbox',p:'We spin up Spark fully re-skinned under your brand for live client demos.',w:'WE BUILD',wc:'us',when:'48 hours'},
+  {n:'03',h:'First restaurant live',p:'Menu import, hardware ship, train, test shift, go-live with on-call backup.',w:'WE BUILD',wc:'us',when:'~14 days'},
+  {n:'04',h:'First revenue',p:'SaaS margin and payment residual start flowing — both recurring, both yours.',w:'YOU EARN',wc:'you',when:'Month 1'},
+  {n:'05',h:'Scale the portfolio',p:'Repeat across your book of clients. AI insights deepen retention as you grow.',w:'YOU SCALE',wc:'you',when:'Ongoing'}
+];
+const pt=document.getElementById('pipeTrack');
+PIPE.forEach((s,i)=>{const el=document.createElement('div');el.className='pstep reveal';el.style.transitionDelay=(i*70)+'ms';
+  el.innerHTML=`<div class="num">${s.n}</div><h4>${s.h}</h4><p>${s.p}</p><span class="who ${s.wc}">${s.w}</span><div class="when">⏱ <b>${s.when}</b></div>`;
+  pt.appendChild(el);io.observe(el);
+  setTimeout(()=>{},0);
+});
+// light up steps progressively when in view
+const litObs=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){document.querySelectorAll('.pstep').forEach((p,idx)=>setTimeout(()=>p.classList.add('lit'),idx*180));litObs.disconnect()}}),{threshold:.3});
+litObs.observe(pt);
+
+/* ---------- ROI calculator ---------- */
+const R={merch:'rMerch',vol:'rVol',margin:'rMargin',saas:'rSaas'};
+const roBars=document.getElementById('roBars');
+for(let i=0;i<12;i++){const b=document.createElement('div');b.className='b';roBars.appendChild(b)}
+function fmt(n){return '$'+Math.round(n).toLocaleString('en-US')}
+function calcROI(){
+  const merch=+document.getElementById('rMerch').value;
+  const vol=+document.getElementById('rVol').value*1000;
+  const margin=+document.getElementById('rMargin').value/100/100; // 35 -> 0.35%
+  const saas=+document.getElementById('rSaas').value;
+  document.getElementById('vMerch').textContent=merch;
+  document.getElementById('vVol').textContent='$'+(vol/1000)+'k';
+  document.getElementById('vMargin').textContent=(+document.getElementById('rMargin').value/100).toFixed(2)+'%';
+  document.getElementById('vSaas').textContent='$'+saas;
+  const saasYr=merch*saas*12;
+  const resYr=merch*vol*margin*12;
+  const annual=saasYr+resYr;
+  document.getElementById('saasYr').textContent=fmt(saasYr);
+  document.getElementById('resYr').textContent=fmt(resYr);
+  document.getElementById('annual').textContent=fmt(annual);
+  // bars: ramp toward annual
+  const bars=roBars.querySelectorAll('.b');
+  bars.forEach((b,i)=>{const h=8+ (i+1)/bars.length*72*(0.6+merch/200*0.7);b.style.height=Math.min(80,h)+'px'});
+}
+Object.values(R).forEach(id=>document.getElementById(id).addEventListener('input',calcROI));
+calcROI();
+
+/* ---------- FAQ ---------- */
+const FAQ=[
+  ['How do partners get paid?','You set the retail price and bill your own customer. Spark invoices you at a flat wholesale rate — we never bill or contact your customer. You keep the spread plus your payment residual. The opposite of the captive model where the vendor bills your client and pays you a slice.'],
+  ['Can I use my own payment processor?','Yes. Spark is processor-agnostic. Bring your existing ISO or processor relationship and keep 100% of the residual you already earn. We don\'t require you to move payments to us.'],
+  ['How "white-label" is it, really?','Top to bottom: your logo, colors, domain, login screen, receipts, admin console and customer-facing apps. Not a co-branded skin on someone else\'s product — the whole environment is yours.'],
+  ['What hardware do my clients need?','Your choice. Spark runs on iPad and Android, and integrates natively with PAX A920 and A35 terminals. No proprietary, non-transferable hardware lock-in.'],
+  ['How long until a restaurant goes live?','A well-prepared single site is typically live in about 14 days — menu import, hardware ship, training, a test shift, then go-live with on-call support. Multi-location rollouts take longer; we scope each one.'],
+  ['Can I migrate my existing restaurant clients?','Yes — menu, customers, loyalty and gift-card balances import during onboarding, so switching a client off their current POS is low-friction.'],
+  ['What does "waiting for backend integration" mean for me?','The entire frontend — 100+ POS pages, 50+ admin pages, 13 surfaces, 13 AI services — is built. The remaining work is wiring it to a backend (auth, API, your processor). That integration is exactly what the partnership defines; we scope and build it with you, not hand you a surprise.'],
+  ['What support do partners get?','Tier-1 platform support, a partner portal, training materials, sandbox tenants for demos, and a dedicated partnership lead. We back your support so it doesn\'t all fall on you.']
+];
+const faqList=document.getElementById('faqList');
+FAQ.forEach(([q,a])=>{
+  const item=document.createElement('div');item.className='faq-item';
+  item.innerHTML=`<button class="faq-q">${q}<span class="plus">+</span></button><div class="faq-a"><div>${a}</div></div>`;
+  const btn=item.querySelector('.faq-q'),ans=item.querySelector('.faq-a');
+  btn.onclick=()=>{const open=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(x=>{x.classList.remove('open');x.querySelector('.faq-a').style.maxHeight=null});if(!open){item.classList.add('open');ans.style.maxHeight=ans.scrollHeight+'px'}};
+  faqList.appendChild(item);
+});
+
+
+/* >>> ICON-SYSTEM-JS >>> */
+/* Lucide icon replacer — swaps known emoji glyphs for inline SVG <use> refs.
+   Browser-only; guarded so the Node test harness (scripts/test.js) ignores it. */
+(function(){
+  if (typeof document === 'undefined') return;
+  if (typeof MutationObserver === 'undefined') return;
+  if (typeof document.createTreeWalker !== 'function') return;
+  const M = {"📱":"smartphone","📲":"tablet","📷":"camera","🖥":"monitor","💳":"credit-card","💲":"dollar-sign","💵":"banknote","📊":"chart-column","📈":"trending-up","🛡":"shield-check","⚙":"settings","🌐":"globe","🍳":"utensils-crossed","🍽":"utensils","🎁":"gift","👥":"users","💬":"message-square","🔁":"repeat-2","🔮":"sparkles","🗓":"calendar","🚗":"car","🛣":"route","🧾":"receipt","🪑":"armchair","📦":"package","⚠":"triangle-alert","🔥":"flame","🕐":"clock","🌅":"sunrise","🎯":"target","🏅":"award","🏠":"house","🏢":"building-2","👷":"hard-hat","📉":"trending-down","📝":"file-text","🔔":"bell","🗂":"folder-tree","🚩":"flag","🛎":"concierge-bell","🧰":"wrench","⚖":"scale","✓":"check","✕":"x","❤":"heart","➕":"plus","🌡":"thermometer","💰":"wallet","⏱":"timer"};
+  const keys = Object.keys(M);
+  const re = new RegExp(keys.map(c=>c.split('').map(ch=>'\\u'+('0000'+ch.charCodeAt(0).toString(16)).slice(-4)).join('')).join('|'),'gu');
+  function svgFor(name){ return '<svg class="ic" aria-hidden="true"><use href="#i-'+name+'"/></svg>'; }
+  function ize(root){
+    if(!root||root.nodeType!==1) return;
+    if(root.tagName==='SCRIPT'||root.tagName==='STYLE') return;
+    let tw;
+    try {
+      tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode: n => {
+          const p = n.parentElement;
+          if(!p) return NodeFilter.FILTER_REJECT;
+          if(p.tagName==='SCRIPT'||p.tagName==='STYLE') return NodeFilter.FILTER_REJECT;
+          if(p.closest && p.closest('.no-ic')) return NodeFilter.FILTER_REJECT;
+          return re.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        }
+      });
+    } catch(e) { return; }
+    const todo = []; let n;
+    while ((n = tw.nextNode())) todo.push(n);
+    for (const t of todo){
+      const html = t.nodeValue.replace(re, c => M[c] ? svgFor(M[c]) : c);
+      const span = document.createElement('span');
+      span.className='ic-wrap';
+      span.style.display='inline';
+      span.innerHTML = html;
+      t.parentNode.replaceChild(span, t);
+    }
+  }
+  function init(){
+    if (!document.body) return;
+    ize(document.body);
+    try {
+      const mo = new MutationObserver(muts => {
+        for (const m of muts){
+          for (const n of m.addedNodes){
+            if (n.nodeType === 1) ize(n);
+            else if (n.nodeType === 3 && n.parentElement) ize(n.parentElement);
+          }
+        }
+      });
+      mo.observe(document.body, { childList: true, subtree: true });
+    } catch(e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+/* <<< ICON-SYSTEM-JS <<< */
+
+/* >>> QR-JS >>> */
+/* qrcode-generator @1.4.4 by Kazuhiko Arase — MIT — inlined below */
+//---------------------------------------------------------------------
+//
+// QR Code Generator for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//  http://www.opensource.org/licenses/mit-license.php
+//
+// The word 'QR Code' is registered trademark of
+// DENSO WAVE INCORPORATED
+//  http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//---------------------------------------------------------------------
+
+var qrcode = function() {
+
+  //---------------------------------------------------------------------
+  // qrcode
+  //---------------------------------------------------------------------
+
+  /**
+   * qrcode
+   * @param typeNumber 1 to 40
+   * @param errorCorrectionLevel 'L','M','Q','H'
+   */
+  var qrcode = function(typeNumber, errorCorrectionLevel) {
+
+    var PAD0 = 0xEC;
+    var PAD1 = 0x11;
+
+    var _typeNumber = typeNumber;
+    var _errorCorrectionLevel = QRErrorCorrectionLevel[errorCorrectionLevel];
+    var _modules = null;
+    var _moduleCount = 0;
+    var _dataCache = null;
+    var _dataList = [];
+
+    var _this = {};
+
+    var makeImpl = function(test, maskPattern) {
+
+      _moduleCount = _typeNumber * 4 + 17;
+      _modules = function(moduleCount) {
+        var modules = new Array(moduleCount);
+        for (var row = 0; row < moduleCount; row += 1) {
+          modules[row] = new Array(moduleCount);
+          for (var col = 0; col < moduleCount; col += 1) {
+            modules[row][col] = null;
+          }
+        }
+        return modules;
+      }(_moduleCount);
+
+      setupPositionProbePattern(0, 0);
+      setupPositionProbePattern(_moduleCount - 7, 0);
+      setupPositionProbePattern(0, _moduleCount - 7);
+      setupPositionAdjustPattern();
+      setupTimingPattern();
+      setupTypeInfo(test, maskPattern);
+
+      if (_typeNumber >= 7) {
+        setupTypeNumber(test);
+      }
+
+      if (_dataCache == null) {
+        _dataCache = createData(_typeNumber, _errorCorrectionLevel, _dataList);
+      }
+
+      mapData(_dataCache, maskPattern);
+    };
+
+    var setupPositionProbePattern = function(row, col) {
+
+      for (var r = -1; r <= 7; r += 1) {
+
+        if (row + r <= -1 || _moduleCount <= row + r) continue;
+
+        for (var c = -1; c <= 7; c += 1) {
+
+          if (col + c <= -1 || _moduleCount <= col + c) continue;
+
+          if ( (0 <= r && r <= 6 && (c == 0 || c == 6) )
+              || (0 <= c && c <= 6 && (r == 0 || r == 6) )
+              || (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+            _modules[row + r][col + c] = true;
+          } else {
+            _modules[row + r][col + c] = false;
+          }
+        }
+      }
+    };
+
+    var getBestMaskPattern = function() {
+
+      var minLostPoint = 0;
+      var pattern = 0;
+
+      for (var i = 0; i < 8; i += 1) {
+
+        makeImpl(true, i);
+
+        var lostPoint = QRUtil.getLostPoint(_this);
+
+        if (i == 0 || minLostPoint > lostPoint) {
+          minLostPoint = lostPoint;
+          pattern = i;
+        }
+      }
+
+      return pattern;
+    };
+
+    var setupTimingPattern = function() {
+
+      for (var r = 8; r < _moduleCount - 8; r += 1) {
+        if (_modules[r][6] != null) {
+          continue;
+        }
+        _modules[r][6] = (r % 2 == 0);
+      }
+
+      for (var c = 8; c < _moduleCount - 8; c += 1) {
+        if (_modules[6][c] != null) {
+          continue;
+        }
+        _modules[6][c] = (c % 2 == 0);
+      }
+    };
+
+    var setupPositionAdjustPattern = function() {
+
+      var pos = QRUtil.getPatternPosition(_typeNumber);
+
+      for (var i = 0; i < pos.length; i += 1) {
+
+        for (var j = 0; j < pos.length; j += 1) {
+
+          var row = pos[i];
+          var col = pos[j];
+
+          if (_modules[row][col] != null) {
+            continue;
+          }
+
+          for (var r = -2; r <= 2; r += 1) {
+
+            for (var c = -2; c <= 2; c += 1) {
+
+              if (r == -2 || r == 2 || c == -2 || c == 2
+                  || (r == 0 && c == 0) ) {
+                _modules[row + r][col + c] = true;
+              } else {
+                _modules[row + r][col + c] = false;
+              }
+            }
+          }
+        }
+      }
+    };
+
+    var setupTypeNumber = function(test) {
+
+      var bits = QRUtil.getBCHTypeNumber(_typeNumber);
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[Math.floor(i / 3)][i % 3 + _moduleCount - 8 - 3] = mod;
+      }
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[i % 3 + _moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
+      }
+    };
+
+    var setupTypeInfo = function(test, maskPattern) {
+
+      var data = (_errorCorrectionLevel << 3) | maskPattern;
+      var bits = QRUtil.getBCHTypeInfo(data);
+
+      // vertical
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 6) {
+          _modules[i][8] = mod;
+        } else if (i < 8) {
+          _modules[i + 1][8] = mod;
+        } else {
+          _modules[_moduleCount - 15 + i][8] = mod;
+        }
+      }
+
+      // horizontal
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 8) {
+          _modules[8][_moduleCount - i - 1] = mod;
+        } else if (i < 9) {
+          _modules[8][15 - i - 1 + 1] = mod;
+        } else {
+          _modules[8][15 - i - 1] = mod;
+        }
+      }
+
+      // fixed module
+      _modules[_moduleCount - 8][8] = (!test);
+    };
+
+    var mapData = function(data, maskPattern) {
+
+      var inc = -1;
+      var row = _moduleCount - 1;
+      var bitIndex = 7;
+      var byteIndex = 0;
+      var maskFunc = QRUtil.getMaskFunction(maskPattern);
+
+      for (var col = _moduleCount - 1; col > 0; col -= 2) {
+
+        if (col == 6) col -= 1;
+
+        while (true) {
+
+          for (var c = 0; c < 2; c += 1) {
+
+            if (_modules[row][col - c] == null) {
+
+              var dark = false;
+
+              if (byteIndex < data.length) {
+                dark = ( ( (data[byteIndex] >>> bitIndex) & 1) == 1);
+              }
+
+              var mask = maskFunc(row, col - c);
+
+              if (mask) {
+                dark = !dark;
+              }
+
+              _modules[row][col - c] = dark;
+              bitIndex -= 1;
+
+              if (bitIndex == -1) {
+                byteIndex += 1;
+                bitIndex = 7;
+              }
+            }
+          }
+
+          row += inc;
+
+          if (row < 0 || _moduleCount <= row) {
+            row -= inc;
+            inc = -inc;
+            break;
+          }
+        }
+      }
+    };
+
+    var createBytes = function(buffer, rsBlocks) {
+
+      var offset = 0;
+
+      var maxDcCount = 0;
+      var maxEcCount = 0;
+
+      var dcdata = new Array(rsBlocks.length);
+      var ecdata = new Array(rsBlocks.length);
+
+      for (var r = 0; r < rsBlocks.length; r += 1) {
+
+        var dcCount = rsBlocks[r].dataCount;
+        var ecCount = rsBlocks[r].totalCount - dcCount;
+
+        maxDcCount = Math.max(maxDcCount, dcCount);
+        maxEcCount = Math.max(maxEcCount, ecCount);
+
+        dcdata[r] = new Array(dcCount);
+
+        for (var i = 0; i < dcdata[r].length; i += 1) {
+          dcdata[r][i] = 0xff & buffer.getBuffer()[i + offset];
+        }
+        offset += dcCount;
+
+        var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+        var rawPoly = qrPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+        var modPoly = rawPoly.mod(rsPoly);
+        ecdata[r] = new Array(rsPoly.getLength() - 1);
+        for (var i = 0; i < ecdata[r].length; i += 1) {
+          var modIndex = i + modPoly.getLength() - ecdata[r].length;
+          ecdata[r][i] = (modIndex >= 0)? modPoly.getAt(modIndex) : 0;
+        }
+      }
+
+      var totalCodeCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalCodeCount += rsBlocks[i].totalCount;
+      }
+
+      var data = new Array(totalCodeCount);
+      var index = 0;
+
+      for (var i = 0; i < maxDcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < dcdata[r].length) {
+            data[index] = dcdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      for (var i = 0; i < maxEcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < ecdata[r].length) {
+            data[index] = ecdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      return data;
+    };
+
+    var createData = function(typeNumber, errorCorrectionLevel, dataList) {
+
+      var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectionLevel);
+
+      var buffer = qrBitBuffer();
+
+      for (var i = 0; i < dataList.length; i += 1) {
+        var data = dataList[i];
+        buffer.put(data.getMode(), 4);
+        buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+        data.write(buffer);
+      }
+
+      // calc num max data.
+      var totalDataCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalDataCount += rsBlocks[i].dataCount;
+      }
+
+      if (buffer.getLengthInBits() > totalDataCount * 8) {
+        throw 'code length overflow. ('
+          + buffer.getLengthInBits()
+          + '>'
+          + totalDataCount * 8
+          + ')';
+      }
+
+      // end code
+      if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+        buffer.put(0, 4);
+      }
+
+      // padding
+      while (buffer.getLengthInBits() % 8 != 0) {
+        buffer.putBit(false);
+      }
+
+      // padding
+      while (true) {
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD0, 8);
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD1, 8);
+      }
+
+      return createBytes(buffer, rsBlocks);
+    };
+
+    _this.addData = function(data, mode) {
+
+      mode = mode || 'Byte';
+
+      var newData = null;
+
+      switch(mode) {
+      case 'Numeric' :
+        newData = qrNumber(data);
+        break;
+      case 'Alphanumeric' :
+        newData = qrAlphaNum(data);
+        break;
+      case 'Byte' :
+        newData = qr8BitByte(data);
+        break;
+      case 'Kanji' :
+        newData = qrKanji(data);
+        break;
+      default :
+        throw 'mode:' + mode;
+      }
+
+      _dataList.push(newData);
+      _dataCache = null;
+    };
+
+    _this.isDark = function(row, col) {
+      if (row < 0 || _moduleCount <= row || col < 0 || _moduleCount <= col) {
+        throw row + ',' + col;
+      }
+      return _modules[row][col];
+    };
+
+    _this.getModuleCount = function() {
+      return _moduleCount;
+    };
+
+    _this.make = function() {
+      if (_typeNumber < 1) {
+        var typeNumber = 1;
+
+        for (; typeNumber < 40; typeNumber++) {
+          var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, _errorCorrectionLevel);
+          var buffer = qrBitBuffer();
+
+          for (var i = 0; i < _dataList.length; i++) {
+            var data = _dataList[i];
+            buffer.put(data.getMode(), 4);
+            buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+            data.write(buffer);
+          }
+
+          var totalDataCount = 0;
+          for (var i = 0; i < rsBlocks.length; i++) {
+            totalDataCount += rsBlocks[i].dataCount;
+          }
+
+          if (buffer.getLengthInBits() <= totalDataCount * 8) {
+            break;
+          }
+        }
+
+        _typeNumber = typeNumber;
+      }
+
+      makeImpl(false, getBestMaskPattern() );
+    };
+
+    _this.createTableTag = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var qrHtml = '';
+
+      qrHtml += '<table style="';
+      qrHtml += ' border-width: 0px; border-style: none;';
+      qrHtml += ' border-collapse: collapse;';
+      qrHtml += ' padding: 0px; margin: ' + margin + 'px;';
+      qrHtml += '">';
+      qrHtml += '<tbody>';
+
+      for (var r = 0; r < _this.getModuleCount(); r += 1) {
+
+        qrHtml += '<tr>';
+
+        for (var c = 0; c < _this.getModuleCount(); c += 1) {
+          qrHtml += '<td style="';
+          qrHtml += ' border-width: 0px; border-style: none;';
+          qrHtml += ' border-collapse: collapse;';
+          qrHtml += ' padding: 0px; margin: 0px;';
+          qrHtml += ' width: ' + cellSize + 'px;';
+          qrHtml += ' height: ' + cellSize + 'px;';
+          qrHtml += ' background-color: ';
+          qrHtml += _this.isDark(r, c)? '#000000' : '#ffffff';
+          qrHtml += ';';
+          qrHtml += '"/>';
+        }
+
+        qrHtml += '</tr>';
+      }
+
+      qrHtml += '</tbody>';
+      qrHtml += '</table>';
+
+      return qrHtml;
+    };
+
+    _this.createSvgTag = function(cellSize, margin, alt, title) {
+
+      var opts = {};
+      if (typeof arguments[0] == 'object') {
+        // Called by options.
+        opts = arguments[0];
+        // overwrite cellSize and margin.
+        cellSize = opts.cellSize;
+        margin = opts.margin;
+        alt = opts.alt;
+        title = opts.title;
+      }
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      // Compose alt property surrogate
+      alt = (typeof alt === 'string') ? {text: alt} : alt || {};
+      alt.text = alt.text || null;
+      alt.id = (alt.text) ? alt.id || 'qrcode-description' : null;
+
+      // Compose title property surrogate
+      title = (typeof title === 'string') ? {text: title} : title || {};
+      title.text = title.text || null;
+      title.id = (title.text) ? title.id || 'qrcode-title' : null;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var c, mc, r, mr, qrSvg='', rect;
+
+      rect = 'l' + cellSize + ',0 0,' + cellSize +
+        ' -' + cellSize + ',0 0,-' + cellSize + 'z ';
+
+      qrSvg += '<svg version="1.1" xmlns="http://www.w3.org/2000/svg"';
+      qrSvg += !opts.scalable ? ' width="' + size + 'px" height="' + size + 'px"' : '';
+      qrSvg += ' viewBox="0 0 ' + size + ' ' + size + '" ';
+      qrSvg += ' preserveAspectRatio="xMinYMin meet"';
+      qrSvg += (title.text || alt.text) ? ' role="img" aria-labelledby="' +
+          escapeXml([title.id, alt.id].join(' ').trim() ) + '"' : '';
+      qrSvg += '>';
+      qrSvg += (title.text) ? '<title id="' + escapeXml(title.id) + '">' +
+          escapeXml(title.text) + '</title>' : '';
+      qrSvg += (alt.text) ? '<description id="' + escapeXml(alt.id) + '">' +
+          escapeXml(alt.text) + '</description>' : '';
+      qrSvg += '<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>';
+      qrSvg += '<path d="';
+
+      for (r = 0; r < _this.getModuleCount(); r += 1) {
+        mr = r * cellSize + margin;
+        for (c = 0; c < _this.getModuleCount(); c += 1) {
+          if (_this.isDark(r, c) ) {
+            mc = c*cellSize+margin;
+            qrSvg += 'M' + mc + ',' + mr + rect;
+          }
+        }
+      }
+
+      qrSvg += '" stroke="transparent" fill="black"/>';
+      qrSvg += '</svg>';
+
+      return qrSvg;
+    };
+
+    _this.createDataURL = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      return createDataURL(size, size, function(x, y) {
+        if (min <= x && x < max && min <= y && y < max) {
+          var c = Math.floor( (x - min) / cellSize);
+          var r = Math.floor( (y - min) / cellSize);
+          return _this.isDark(r, c)? 0 : 1;
+        } else {
+          return 1;
+        }
+      } );
+    };
+
+    _this.createImgTag = function(cellSize, margin, alt) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+
+      var img = '';
+      img += '<img';
+      img += '\u0020src="';
+      img += _this.createDataURL(cellSize, margin);
+      img += '"';
+      img += '\u0020width="';
+      img += size;
+      img += '"';
+      img += '\u0020height="';
+      img += size;
+      img += '"';
+      if (alt) {
+        img += '\u0020alt="';
+        img += escapeXml(alt);
+        img += '"';
+      }
+      img += '/>';
+
+      return img;
+    };
+
+    var escapeXml = function(s) {
+      var escaped = '';
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charAt(i);
+        switch(c) {
+        case '<': escaped += '&lt;'; break;
+        case '>': escaped += '&gt;'; break;
+        case '&': escaped += '&amp;'; break;
+        case '"': escaped += '&quot;'; break;
+        default : escaped += c; break;
+        }
+      }
+      return escaped;
+    };
+
+    var _createHalfASCII = function(margin) {
+      var cellSize = 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r1, r2, p;
+
+      var blocks = {
+        '██': '█',
+        '█ ': '▀',
+        ' █': '▄',
+        '  ': ' '
+      };
+
+      var blocksLastLineNoMargin = {
+        '██': '▀',
+        '█ ': '▀',
+        ' █': ' ',
+        '  ': ' '
+      };
+
+      var ascii = '';
+      for (y = 0; y < size; y += 2) {
+        r1 = Math.floor((y - min) / cellSize);
+        r2 = Math.floor((y + 1 - min) / cellSize);
+        for (x = 0; x < size; x += 1) {
+          p = '█';
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r1, Math.floor((x - min) / cellSize))) {
+            p = ' ';
+          }
+
+          if (min <= x && x < max && min <= y+1 && y+1 < max && _this.isDark(r2, Math.floor((x - min) / cellSize))) {
+            p += ' ';
+          }
+          else {
+            p += '█';
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          ascii += (margin < 1 && y+1 >= max) ? blocksLastLineNoMargin[p] : blocks[p];
+        }
+
+        ascii += '\n';
+      }
+
+      if (size % 2 && margin > 0) {
+        return ascii.substring(0, ascii.length - size - 1) + Array(size+1).join('▀');
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.createASCII = function(cellSize, margin) {
+      cellSize = cellSize || 1;
+
+      if (cellSize < 2) {
+        return _createHalfASCII(margin);
+      }
+
+      cellSize -= 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r, p;
+
+      var white = Array(cellSize+1).join('██');
+      var black = Array(cellSize+1).join('  ');
+
+      var ascii = '';
+      var line = '';
+      for (y = 0; y < size; y += 1) {
+        r = Math.floor( (y - min) / cellSize);
+        line = '';
+        for (x = 0; x < size; x += 1) {
+          p = 1;
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r, Math.floor((x - min) / cellSize))) {
+            p = 0;
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          line += p ? white : black;
+        }
+
+        for (r = 0; r < cellSize; r += 1) {
+          ascii += line + '\n';
+        }
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.renderTo2dContext = function(context, cellSize) {
+      cellSize = cellSize || 2;
+      var length = _this.getModuleCount();
+      for (var row = 0; row < length; row++) {
+        for (var col = 0; col < length; col++) {
+          context.fillStyle = _this.isDark(row, col) ? 'black' : 'white';
+          context.fillRect(row * cellSize, col * cellSize, cellSize, cellSize);
+        }
+      }
+    }
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrcode.stringToBytes
+  //---------------------------------------------------------------------
+
+  qrcode.stringToBytesFuncs = {
+    'default' : function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        bytes.push(c & 0xff);
+      }
+      return bytes;
+    }
+  };
+
+  qrcode.stringToBytes = qrcode.stringToBytesFuncs['default'];
+
+  //---------------------------------------------------------------------
+  // qrcode.createStringToBytes
+  //---------------------------------------------------------------------
+
+  /**
+   * @param unicodeData base64 string of byte array.
+   * [16bit Unicode],[16bit Bytes], ...
+   * @param numChars
+   */
+  qrcode.createStringToBytes = function(unicodeData, numChars) {
+
+    // create conversion map.
+
+    var unicodeMap = function() {
+
+      var bin = base64DecodeInputStream(unicodeData);
+      var read = function() {
+        var b = bin.read();
+        if (b == -1) throw 'eof';
+        return b;
+      };
+
+      var count = 0;
+      var unicodeMap = {};
+      while (true) {
+        var b0 = bin.read();
+        if (b0 == -1) break;
+        var b1 = read();
+        var b2 = read();
+        var b3 = read();
+        var k = String.fromCharCode( (b0 << 8) | b1);
+        var v = (b2 << 8) | b3;
+        unicodeMap[k] = v;
+        count += 1;
+      }
+      if (count != numChars) {
+        throw count + ' != ' + numChars;
+      }
+
+      return unicodeMap;
+    }();
+
+    var unknownChar = '?'.charCodeAt(0);
+
+    return function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        if (c < 128) {
+          bytes.push(c);
+        } else {
+          var b = unicodeMap[s.charAt(i)];
+          if (typeof b == 'number') {
+            if ( (b & 0xff) == b) {
+              // 1byte
+              bytes.push(b);
+            } else {
+              // 2bytes
+              bytes.push(b >>> 8);
+              bytes.push(b & 0xff);
+            }
+          } else {
+            bytes.push(unknownChar);
+          }
+        }
+      }
+      return bytes;
+    };
+  };
+
+  //---------------------------------------------------------------------
+  // QRMode
+  //---------------------------------------------------------------------
+
+  var QRMode = {
+    MODE_NUMBER :    1 << 0,
+    MODE_ALPHA_NUM : 1 << 1,
+    MODE_8BIT_BYTE : 1 << 2,
+    MODE_KANJI :     1 << 3
+  };
+
+  //---------------------------------------------------------------------
+  // QRErrorCorrectionLevel
+  //---------------------------------------------------------------------
+
+  var QRErrorCorrectionLevel = {
+    L : 1,
+    M : 0,
+    Q : 3,
+    H : 2
+  };
+
+  //---------------------------------------------------------------------
+  // QRMaskPattern
+  //---------------------------------------------------------------------
+
+  var QRMaskPattern = {
+    PATTERN000 : 0,
+    PATTERN001 : 1,
+    PATTERN010 : 2,
+    PATTERN011 : 3,
+    PATTERN100 : 4,
+    PATTERN101 : 5,
+    PATTERN110 : 6,
+    PATTERN111 : 7
+  };
+
+  //---------------------------------------------------------------------
+  // QRUtil
+  //---------------------------------------------------------------------
+
+  var QRUtil = function() {
+
+    var PATTERN_POSITION_TABLE = [
+      [],
+      [6, 18],
+      [6, 22],
+      [6, 26],
+      [6, 30],
+      [6, 34],
+      [6, 22, 38],
+      [6, 24, 42],
+      [6, 26, 46],
+      [6, 28, 50],
+      [6, 30, 54],
+      [6, 32, 58],
+      [6, 34, 62],
+      [6, 26, 46, 66],
+      [6, 26, 48, 70],
+      [6, 26, 50, 74],
+      [6, 30, 54, 78],
+      [6, 30, 56, 82],
+      [6, 30, 58, 86],
+      [6, 34, 62, 90],
+      [6, 28, 50, 72, 94],
+      [6, 26, 50, 74, 98],
+      [6, 30, 54, 78, 102],
+      [6, 28, 54, 80, 106],
+      [6, 32, 58, 84, 110],
+      [6, 30, 58, 86, 114],
+      [6, 34, 62, 90, 118],
+      [6, 26, 50, 74, 98, 122],
+      [6, 30, 54, 78, 102, 126],
+      [6, 26, 52, 78, 104, 130],
+      [6, 30, 56, 82, 108, 134],
+      [6, 34, 60, 86, 112, 138],
+      [6, 30, 58, 86, 114, 142],
+      [6, 34, 62, 90, 118, 146],
+      [6, 30, 54, 78, 102, 126, 150],
+      [6, 24, 50, 76, 102, 128, 154],
+      [6, 28, 54, 80, 106, 132, 158],
+      [6, 32, 58, 84, 110, 136, 162],
+      [6, 26, 54, 82, 110, 138, 166],
+      [6, 30, 58, 86, 114, 142, 170]
+    ];
+    var G15 = (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0);
+    var G18 = (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0);
+    var G15_MASK = (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1);
+
+    var _this = {};
+
+    var getBCHDigit = function(data) {
+      var digit = 0;
+      while (data != 0) {
+        digit += 1;
+        data >>>= 1;
+      }
+      return digit;
+    };
+
+    _this.getBCHTypeInfo = function(data) {
+      var d = data << 10;
+      while (getBCHDigit(d) - getBCHDigit(G15) >= 0) {
+        d ^= (G15 << (getBCHDigit(d) - getBCHDigit(G15) ) );
+      }
+      return ( (data << 10) | d) ^ G15_MASK;
+    };
+
+    _this.getBCHTypeNumber = function(data) {
+      var d = data << 12;
+      while (getBCHDigit(d) - getBCHDigit(G18) >= 0) {
+        d ^= (G18 << (getBCHDigit(d) - getBCHDigit(G18) ) );
+      }
+      return (data << 12) | d;
+    };
+
+    _this.getPatternPosition = function(typeNumber) {
+      return PATTERN_POSITION_TABLE[typeNumber - 1];
+    };
+
+    _this.getMaskFunction = function(maskPattern) {
+
+      switch (maskPattern) {
+
+      case QRMaskPattern.PATTERN000 :
+        return function(i, j) { return (i + j) % 2 == 0; };
+      case QRMaskPattern.PATTERN001 :
+        return function(i, j) { return i % 2 == 0; };
+      case QRMaskPattern.PATTERN010 :
+        return function(i, j) { return j % 3 == 0; };
+      case QRMaskPattern.PATTERN011 :
+        return function(i, j) { return (i + j) % 3 == 0; };
+      case QRMaskPattern.PATTERN100 :
+        return function(i, j) { return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 == 0; };
+      case QRMaskPattern.PATTERN101 :
+        return function(i, j) { return (i * j) % 2 + (i * j) % 3 == 0; };
+      case QRMaskPattern.PATTERN110 :
+        return function(i, j) { return ( (i * j) % 2 + (i * j) % 3) % 2 == 0; };
+      case QRMaskPattern.PATTERN111 :
+        return function(i, j) { return ( (i * j) % 3 + (i + j) % 2) % 2 == 0; };
+
+      default :
+        throw 'bad maskPattern:' + maskPattern;
+      }
+    };
+
+    _this.getErrorCorrectPolynomial = function(errorCorrectLength) {
+      var a = qrPolynomial([1], 0);
+      for (var i = 0; i < errorCorrectLength; i += 1) {
+        a = a.multiply(qrPolynomial([1, QRMath.gexp(i)], 0) );
+      }
+      return a;
+    };
+
+    _this.getLengthInBits = function(mode, type) {
+
+      if (1 <= type && type < 10) {
+
+        // 1 - 9
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 10;
+        case QRMode.MODE_ALPHA_NUM : return 9;
+        case QRMode.MODE_8BIT_BYTE : return 8;
+        case QRMode.MODE_KANJI     : return 8;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 27) {
+
+        // 10 - 26
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 12;
+        case QRMode.MODE_ALPHA_NUM : return 11;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 10;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 41) {
+
+        // 27 - 40
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 14;
+        case QRMode.MODE_ALPHA_NUM : return 13;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 12;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else {
+        throw 'type:' + type;
+      }
+    };
+
+    _this.getLostPoint = function(qrcode) {
+
+      var moduleCount = qrcode.getModuleCount();
+
+      var lostPoint = 0;
+
+      // LEVEL1
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount; col += 1) {
+
+          var sameCount = 0;
+          var dark = qrcode.isDark(row, col);
+
+          for (var r = -1; r <= 1; r += 1) {
+
+            if (row + r < 0 || moduleCount <= row + r) {
+              continue;
+            }
+
+            for (var c = -1; c <= 1; c += 1) {
+
+              if (col + c < 0 || moduleCount <= col + c) {
+                continue;
+              }
+
+              if (r == 0 && c == 0) {
+                continue;
+              }
+
+              if (dark == qrcode.isDark(row + r, col + c) ) {
+                sameCount += 1;
+              }
+            }
+          }
+
+          if (sameCount > 5) {
+            lostPoint += (3 + sameCount - 5);
+          }
+        }
+      };
+
+      // LEVEL2
+
+      for (var row = 0; row < moduleCount - 1; row += 1) {
+        for (var col = 0; col < moduleCount - 1; col += 1) {
+          var count = 0;
+          if (qrcode.isDark(row, col) ) count += 1;
+          if (qrcode.isDark(row + 1, col) ) count += 1;
+          if (qrcode.isDark(row, col + 1) ) count += 1;
+          if (qrcode.isDark(row + 1, col + 1) ) count += 1;
+          if (count == 0 || count == 4) {
+            lostPoint += 3;
+          }
+        }
+      }
+
+      // LEVEL3
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount - 6; col += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row, col + 1)
+              &&  qrcode.isDark(row, col + 2)
+              &&  qrcode.isDark(row, col + 3)
+              &&  qrcode.isDark(row, col + 4)
+              && !qrcode.isDark(row, col + 5)
+              &&  qrcode.isDark(row, col + 6) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount - 6; row += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row + 1, col)
+              &&  qrcode.isDark(row + 2, col)
+              &&  qrcode.isDark(row + 3, col)
+              &&  qrcode.isDark(row + 4, col)
+              && !qrcode.isDark(row + 5, col)
+              &&  qrcode.isDark(row + 6, col) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      // LEVEL4
+
+      var darkCount = 0;
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount; row += 1) {
+          if (qrcode.isDark(row, col) ) {
+            darkCount += 1;
+          }
+        }
+      }
+
+      var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+      lostPoint += ratio * 10;
+
+      return lostPoint;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // QRMath
+  //---------------------------------------------------------------------
+
+  var QRMath = function() {
+
+    var EXP_TABLE = new Array(256);
+    var LOG_TABLE = new Array(256);
+
+    // initialize tables
+    for (var i = 0; i < 8; i += 1) {
+      EXP_TABLE[i] = 1 << i;
+    }
+    for (var i = 8; i < 256; i += 1) {
+      EXP_TABLE[i] = EXP_TABLE[i - 4]
+        ^ EXP_TABLE[i - 5]
+        ^ EXP_TABLE[i - 6]
+        ^ EXP_TABLE[i - 8];
+    }
+    for (var i = 0; i < 255; i += 1) {
+      LOG_TABLE[EXP_TABLE[i] ] = i;
+    }
+
+    var _this = {};
+
+    _this.glog = function(n) {
+
+      if (n < 1) {
+        throw 'glog(' + n + ')';
+      }
+
+      return LOG_TABLE[n];
+    };
+
+    _this.gexp = function(n) {
+
+      while (n < 0) {
+        n += 255;
+      }
+
+      while (n >= 256) {
+        n -= 255;
+      }
+
+      return EXP_TABLE[n];
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrPolynomial
+  //---------------------------------------------------------------------
+
+  function qrPolynomial(num, shift) {
+
+    if (typeof num.length == 'undefined') {
+      throw num.length + '/' + shift;
+    }
+
+    var _num = function() {
+      var offset = 0;
+      while (offset < num.length && num[offset] == 0) {
+        offset += 1;
+      }
+      var _num = new Array(num.length - offset + shift);
+      for (var i = 0; i < num.length - offset; i += 1) {
+        _num[i] = num[i + offset];
+      }
+      return _num;
+    }();
+
+    var _this = {};
+
+    _this.getAt = function(index) {
+      return _num[index];
+    };
+
+    _this.getLength = function() {
+      return _num.length;
+    };
+
+    _this.multiply = function(e) {
+
+      var num = new Array(_this.getLength() + e.getLength() - 1);
+
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        for (var j = 0; j < e.getLength(); j += 1) {
+          num[i + j] ^= QRMath.gexp(QRMath.glog(_this.getAt(i) ) + QRMath.glog(e.getAt(j) ) );
+        }
+      }
+
+      return qrPolynomial(num, 0);
+    };
+
+    _this.mod = function(e) {
+
+      if (_this.getLength() - e.getLength() < 0) {
+        return _this;
+      }
+
+      var ratio = QRMath.glog(_this.getAt(0) ) - QRMath.glog(e.getAt(0) );
+
+      var num = new Array(_this.getLength() );
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        num[i] = _this.getAt(i);
+      }
+
+      for (var i = 0; i < e.getLength(); i += 1) {
+        num[i] ^= QRMath.gexp(QRMath.glog(e.getAt(i) ) + ratio);
+      }
+
+      // recursive call
+      return qrPolynomial(num, 0).mod(e);
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // QRRSBlock
+  //---------------------------------------------------------------------
+
+  var QRRSBlock = function() {
+
+    var RS_BLOCK_TABLE = [
+
+      // L
+      // M
+      // Q
+      // H
+
+      // 1
+      [1, 26, 19],
+      [1, 26, 16],
+      [1, 26, 13],
+      [1, 26, 9],
+
+      // 2
+      [1, 44, 34],
+      [1, 44, 28],
+      [1, 44, 22],
+      [1, 44, 16],
+
+      // 3
+      [1, 70, 55],
+      [1, 70, 44],
+      [2, 35, 17],
+      [2, 35, 13],
+
+      // 4
+      [1, 100, 80],
+      [2, 50, 32],
+      [2, 50, 24],
+      [4, 25, 9],
+
+      // 5
+      [1, 134, 108],
+      [2, 67, 43],
+      [2, 33, 15, 2, 34, 16],
+      [2, 33, 11, 2, 34, 12],
+
+      // 6
+      [2, 86, 68],
+      [4, 43, 27],
+      [4, 43, 19],
+      [4, 43, 15],
+
+      // 7
+      [2, 98, 78],
+      [4, 49, 31],
+      [2, 32, 14, 4, 33, 15],
+      [4, 39, 13, 1, 40, 14],
+
+      // 8
+      [2, 121, 97],
+      [2, 60, 38, 2, 61, 39],
+      [4, 40, 18, 2, 41, 19],
+      [4, 40, 14, 2, 41, 15],
+
+      // 9
+      [2, 146, 116],
+      [3, 58, 36, 2, 59, 37],
+      [4, 36, 16, 4, 37, 17],
+      [4, 36, 12, 4, 37, 13],
+
+      // 10
+      [2, 86, 68, 2, 87, 69],
+      [4, 69, 43, 1, 70, 44],
+      [6, 43, 19, 2, 44, 20],
+      [6, 43, 15, 2, 44, 16],
+
+      // 11
+      [4, 101, 81],
+      [1, 80, 50, 4, 81, 51],
+      [4, 50, 22, 4, 51, 23],
+      [3, 36, 12, 8, 37, 13],
+
+      // 12
+      [2, 116, 92, 2, 117, 93],
+      [6, 58, 36, 2, 59, 37],
+      [4, 46, 20, 6, 47, 21],
+      [7, 42, 14, 4, 43, 15],
+
+      // 13
+      [4, 133, 107],
+      [8, 59, 37, 1, 60, 38],
+      [8, 44, 20, 4, 45, 21],
+      [12, 33, 11, 4, 34, 12],
+
+      // 14
+      [3, 145, 115, 1, 146, 116],
+      [4, 64, 40, 5, 65, 41],
+      [11, 36, 16, 5, 37, 17],
+      [11, 36, 12, 5, 37, 13],
+
+      // 15
+      [5, 109, 87, 1, 110, 88],
+      [5, 65, 41, 5, 66, 42],
+      [5, 54, 24, 7, 55, 25],
+      [11, 36, 12, 7, 37, 13],
+
+      // 16
+      [5, 122, 98, 1, 123, 99],
+      [7, 73, 45, 3, 74, 46],
+      [15, 43, 19, 2, 44, 20],
+      [3, 45, 15, 13, 46, 16],
+
+      // 17
+      [1, 135, 107, 5, 136, 108],
+      [10, 74, 46, 1, 75, 47],
+      [1, 50, 22, 15, 51, 23],
+      [2, 42, 14, 17, 43, 15],
+
+      // 18
+      [5, 150, 120, 1, 151, 121],
+      [9, 69, 43, 4, 70, 44],
+      [17, 50, 22, 1, 51, 23],
+      [2, 42, 14, 19, 43, 15],
+
+      // 19
+      [3, 141, 113, 4, 142, 114],
+      [3, 70, 44, 11, 71, 45],
+      [17, 47, 21, 4, 48, 22],
+      [9, 39, 13, 16, 40, 14],
+
+      // 20
+      [3, 135, 107, 5, 136, 108],
+      [3, 67, 41, 13, 68, 42],
+      [15, 54, 24, 5, 55, 25],
+      [15, 43, 15, 10, 44, 16],
+
+      // 21
+      [4, 144, 116, 4, 145, 117],
+      [17, 68, 42],
+      [17, 50, 22, 6, 51, 23],
+      [19, 46, 16, 6, 47, 17],
+
+      // 22
+      [2, 139, 111, 7, 140, 112],
+      [17, 74, 46],
+      [7, 54, 24, 16, 55, 25],
+      [34, 37, 13],
+
+      // 23
+      [4, 151, 121, 5, 152, 122],
+      [4, 75, 47, 14, 76, 48],
+      [11, 54, 24, 14, 55, 25],
+      [16, 45, 15, 14, 46, 16],
+
+      // 24
+      [6, 147, 117, 4, 148, 118],
+      [6, 73, 45, 14, 74, 46],
+      [11, 54, 24, 16, 55, 25],
+      [30, 46, 16, 2, 47, 17],
+
+      // 25
+      [8, 132, 106, 4, 133, 107],
+      [8, 75, 47, 13, 76, 48],
+      [7, 54, 24, 22, 55, 25],
+      [22, 45, 15, 13, 46, 16],
+
+      // 26
+      [10, 142, 114, 2, 143, 115],
+      [19, 74, 46, 4, 75, 47],
+      [28, 50, 22, 6, 51, 23],
+      [33, 46, 16, 4, 47, 17],
+
+      // 27
+      [8, 152, 122, 4, 153, 123],
+      [22, 73, 45, 3, 74, 46],
+      [8, 53, 23, 26, 54, 24],
+      [12, 45, 15, 28, 46, 16],
+
+      // 28
+      [3, 147, 117, 10, 148, 118],
+      [3, 73, 45, 23, 74, 46],
+      [4, 54, 24, 31, 55, 25],
+      [11, 45, 15, 31, 46, 16],
+
+      // 29
+      [7, 146, 116, 7, 147, 117],
+      [21, 73, 45, 7, 74, 46],
+      [1, 53, 23, 37, 54, 24],
+      [19, 45, 15, 26, 46, 16],
+
+      // 30
+      [5, 145, 115, 10, 146, 116],
+      [19, 75, 47, 10, 76, 48],
+      [15, 54, 24, 25, 55, 25],
+      [23, 45, 15, 25, 46, 16],
+
+      // 31
+      [13, 145, 115, 3, 146, 116],
+      [2, 74, 46, 29, 75, 47],
+      [42, 54, 24, 1, 55, 25],
+      [23, 45, 15, 28, 46, 16],
+
+      // 32
+      [17, 145, 115],
+      [10, 74, 46, 23, 75, 47],
+      [10, 54, 24, 35, 55, 25],
+      [19, 45, 15, 35, 46, 16],
+
+      // 33
+      [17, 145, 115, 1, 146, 116],
+      [14, 74, 46, 21, 75, 47],
+      [29, 54, 24, 19, 55, 25],
+      [11, 45, 15, 46, 46, 16],
+
+      // 34
+      [13, 145, 115, 6, 146, 116],
+      [14, 74, 46, 23, 75, 47],
+      [44, 54, 24, 7, 55, 25],
+      [59, 46, 16, 1, 47, 17],
+
+      // 35
+      [12, 151, 121, 7, 152, 122],
+      [12, 75, 47, 26, 76, 48],
+      [39, 54, 24, 14, 55, 25],
+      [22, 45, 15, 41, 46, 16],
+
+      // 36
+      [6, 151, 121, 14, 152, 122],
+      [6, 75, 47, 34, 76, 48],
+      [46, 54, 24, 10, 55, 25],
+      [2, 45, 15, 64, 46, 16],
+
+      // 37
+      [17, 152, 122, 4, 153, 123],
+      [29, 74, 46, 14, 75, 47],
+      [49, 54, 24, 10, 55, 25],
+      [24, 45, 15, 46, 46, 16],
+
+      // 38
+      [4, 152, 122, 18, 153, 123],
+      [13, 74, 46, 32, 75, 47],
+      [48, 54, 24, 14, 55, 25],
+      [42, 45, 15, 32, 46, 16],
+
+      // 39
+      [20, 147, 117, 4, 148, 118],
+      [40, 75, 47, 7, 76, 48],
+      [43, 54, 24, 22, 55, 25],
+      [10, 45, 15, 67, 46, 16],
+
+      // 40
+      [19, 148, 118, 6, 149, 119],
+      [18, 75, 47, 31, 76, 48],
+      [34, 54, 24, 34, 55, 25],
+      [20, 45, 15, 61, 46, 16]
+    ];
+
+    var qrRSBlock = function(totalCount, dataCount) {
+      var _this = {};
+      _this.totalCount = totalCount;
+      _this.dataCount = dataCount;
+      return _this;
+    };
+
+    var _this = {};
+
+    var getRsBlockTable = function(typeNumber, errorCorrectionLevel) {
+
+      switch(errorCorrectionLevel) {
+      case QRErrorCorrectionLevel.L :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+      case QRErrorCorrectionLevel.M :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+      case QRErrorCorrectionLevel.Q :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+      case QRErrorCorrectionLevel.H :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+      default :
+        return undefined;
+      }
+    };
+
+    _this.getRSBlocks = function(typeNumber, errorCorrectionLevel) {
+
+      var rsBlock = getRsBlockTable(typeNumber, errorCorrectionLevel);
+
+      if (typeof rsBlock == 'undefined') {
+        throw 'bad rs block @ typeNumber:' + typeNumber +
+            '/errorCorrectionLevel:' + errorCorrectionLevel;
+      }
+
+      var length = rsBlock.length / 3;
+
+      var list = [];
+
+      for (var i = 0; i < length; i += 1) {
+
+        var count = rsBlock[i * 3 + 0];
+        var totalCount = rsBlock[i * 3 + 1];
+        var dataCount = rsBlock[i * 3 + 2];
+
+        for (var j = 0; j < count; j += 1) {
+          list.push(qrRSBlock(totalCount, dataCount) );
+        }
+      }
+
+      return list;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrBitBuffer
+  //---------------------------------------------------------------------
+
+  var qrBitBuffer = function() {
+
+    var _buffer = [];
+    var _length = 0;
+
+    var _this = {};
+
+    _this.getBuffer = function() {
+      return _buffer;
+    };
+
+    _this.getAt = function(index) {
+      var bufIndex = Math.floor(index / 8);
+      return ( (_buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+    };
+
+    _this.put = function(num, length) {
+      for (var i = 0; i < length; i += 1) {
+        _this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+      }
+    };
+
+    _this.getLengthInBits = function() {
+      return _length;
+    };
+
+    _this.putBit = function(bit) {
+
+      var bufIndex = Math.floor(_length / 8);
+      if (_buffer.length <= bufIndex) {
+        _buffer.push(0);
+      }
+
+      if (bit) {
+        _buffer[bufIndex] |= (0x80 >>> (_length % 8) );
+      }
+
+      _length += 1;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrNumber
+  //---------------------------------------------------------------------
+
+  var qrNumber = function(data) {
+
+    var _mode = QRMode.MODE_NUMBER;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _data;
+
+      var i = 0;
+
+      while (i + 2 < data.length) {
+        buffer.put(strToNum(data.substring(i, i + 3) ), 10);
+        i += 3;
+      }
+
+      if (i < data.length) {
+        if (data.length - i == 1) {
+          buffer.put(strToNum(data.substring(i, i + 1) ), 4);
+        } else if (data.length - i == 2) {
+          buffer.put(strToNum(data.substring(i, i + 2) ), 7);
+        }
+      }
+    };
+
+    var strToNum = function(s) {
+      var num = 0;
+      for (var i = 0; i < s.length; i += 1) {
+        num = num * 10 + chatToNum(s.charAt(i) );
+      }
+      return num;
+    };
+
+    var chatToNum = function(c) {
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      }
+      throw 'illegal char :' + c;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrAlphaNum
+  //---------------------------------------------------------------------
+
+  var qrAlphaNum = function(data) {
+
+    var _mode = QRMode.MODE_ALPHA_NUM;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var s = _data;
+
+      var i = 0;
+
+      while (i + 1 < s.length) {
+        buffer.put(
+          getCode(s.charAt(i) ) * 45 +
+          getCode(s.charAt(i + 1) ), 11);
+        i += 2;
+      }
+
+      if (i < s.length) {
+        buffer.put(getCode(s.charAt(i) ), 6);
+      }
+    };
+
+    var getCode = function(c) {
+
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      } else if ('A' <= c && c <= 'Z') {
+        return c.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
+      } else {
+        switch (c) {
+        case ' ' : return 36;
+        case '$' : return 37;
+        case '%' : return 38;
+        case '*' : return 39;
+        case '+' : return 40;
+        case '-' : return 41;
+        case '.' : return 42;
+        case '/' : return 43;
+        case ':' : return 44;
+        default :
+          throw 'illegal char :' + c;
+        }
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qr8BitByte
+  //---------------------------------------------------------------------
+
+  var qr8BitByte = function(data) {
+
+    var _mode = QRMode.MODE_8BIT_BYTE;
+    var _data = data;
+    var _bytes = qrcode.stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _bytes.length;
+    };
+
+    _this.write = function(buffer) {
+      for (var i = 0; i < _bytes.length; i += 1) {
+        buffer.put(_bytes[i], 8);
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrKanji
+  //---------------------------------------------------------------------
+
+  var qrKanji = function(data) {
+
+    var _mode = QRMode.MODE_KANJI;
+    var _data = data;
+
+    var stringToBytes = qrcode.stringToBytesFuncs['SJIS'];
+    if (!stringToBytes) {
+      throw 'sjis not supported.';
+    }
+    !function(c, code) {
+      // self test for sjis support.
+      var test = stringToBytes(c);
+      if (test.length != 2 || ( (test[0] << 8) | test[1]) != code) {
+        throw 'sjis not supported.';
+      }
+    }('\u53cb', 0x9746);
+
+    var _bytes = stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return ~~(_bytes.length / 2);
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _bytes;
+
+      var i = 0;
+
+      while (i + 1 < data.length) {
+
+        var c = ( (0xff & data[i]) << 8) | (0xff & data[i + 1]);
+
+        if (0x8140 <= c && c <= 0x9FFC) {
+          c -= 0x8140;
+        } else if (0xE040 <= c && c <= 0xEBBF) {
+          c -= 0xC140;
+        } else {
+          throw 'illegal char at ' + (i + 1) + '/' + c;
+        }
+
+        c = ( (c >>> 8) & 0xff) * 0xC0 + (c & 0xff);
+
+        buffer.put(c, 13);
+
+        i += 2;
+      }
+
+      if (i < data.length) {
+        throw 'illegal char at ' + (i + 1);
+      }
+    };
+
+    return _this;
+  };
+
+  //=====================================================================
+  // GIF Support etc.
+  //
+
+  //---------------------------------------------------------------------
+  // byteArrayOutputStream
+  //---------------------------------------------------------------------
+
+  var byteArrayOutputStream = function() {
+
+    var _bytes = [];
+
+    var _this = {};
+
+    _this.writeByte = function(b) {
+      _bytes.push(b & 0xff);
+    };
+
+    _this.writeShort = function(i) {
+      _this.writeByte(i);
+      _this.writeByte(i >>> 8);
+    };
+
+    _this.writeBytes = function(b, off, len) {
+      off = off || 0;
+      len = len || b.length;
+      for (var i = 0; i < len; i += 1) {
+        _this.writeByte(b[i + off]);
+      }
+    };
+
+    _this.writeString = function(s) {
+      for (var i = 0; i < s.length; i += 1) {
+        _this.writeByte(s.charCodeAt(i) );
+      }
+    };
+
+    _this.toByteArray = function() {
+      return _bytes;
+    };
+
+    _this.toString = function() {
+      var s = '';
+      s += '[';
+      for (var i = 0; i < _bytes.length; i += 1) {
+        if (i > 0) {
+          s += ',';
+        }
+        s += _bytes[i];
+      }
+      s += ']';
+      return s;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64EncodeOutputStream
+  //---------------------------------------------------------------------
+
+  var base64EncodeOutputStream = function() {
+
+    var _buffer = 0;
+    var _buflen = 0;
+    var _length = 0;
+    var _base64 = '';
+
+    var _this = {};
+
+    var writeEncoded = function(b) {
+      _base64 += String.fromCharCode(encode(b & 0x3f) );
+    };
+
+    var encode = function(n) {
+      if (n < 0) {
+        // error.
+      } else if (n < 26) {
+        return 0x41 + n;
+      } else if (n < 52) {
+        return 0x61 + (n - 26);
+      } else if (n < 62) {
+        return 0x30 + (n - 52);
+      } else if (n == 62) {
+        return 0x2b;
+      } else if (n == 63) {
+        return 0x2f;
+      }
+      throw 'n:' + n;
+    };
+
+    _this.writeByte = function(n) {
+
+      _buffer = (_buffer << 8) | (n & 0xff);
+      _buflen += 8;
+      _length += 1;
+
+      while (_buflen >= 6) {
+        writeEncoded(_buffer >>> (_buflen - 6) );
+        _buflen -= 6;
+      }
+    };
+
+    _this.flush = function() {
+
+      if (_buflen > 0) {
+        writeEncoded(_buffer << (6 - _buflen) );
+        _buffer = 0;
+        _buflen = 0;
+      }
+
+      if (_length % 3 != 0) {
+        // padding
+        var padlen = 3 - _length % 3;
+        for (var i = 0; i < padlen; i += 1) {
+          _base64 += '=';
+        }
+      }
+    };
+
+    _this.toString = function() {
+      return _base64;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64DecodeInputStream
+  //---------------------------------------------------------------------
+
+  var base64DecodeInputStream = function(str) {
+
+    var _str = str;
+    var _pos = 0;
+    var _buffer = 0;
+    var _buflen = 0;
+
+    var _this = {};
+
+    _this.read = function() {
+
+      while (_buflen < 8) {
+
+        if (_pos >= _str.length) {
+          if (_buflen == 0) {
+            return -1;
+          }
+          throw 'unexpected end of file./' + _buflen;
+        }
+
+        var c = _str.charAt(_pos);
+        _pos += 1;
+
+        if (c == '=') {
+          _buflen = 0;
+          return -1;
+        } else if (c.match(/^\s$/) ) {
+          // ignore if whitespace.
+          continue;
+        }
+
+        _buffer = (_buffer << 6) | decode(c.charCodeAt(0) );
+        _buflen += 6;
+      }
+
+      var n = (_buffer >>> (_buflen - 8) ) & 0xff;
+      _buflen -= 8;
+      return n;
+    };
+
+    var decode = function(c) {
+      if (0x41 <= c && c <= 0x5a) {
+        return c - 0x41;
+      } else if (0x61 <= c && c <= 0x7a) {
+        return c - 0x61 + 26;
+      } else if (0x30 <= c && c <= 0x39) {
+        return c - 0x30 + 52;
+      } else if (c == 0x2b) {
+        return 62;
+      } else if (c == 0x2f) {
+        return 63;
+      } else {
+        throw 'c:' + c;
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // gifImage (B/W)
+  //---------------------------------------------------------------------
+
+  var gifImage = function(width, height) {
+
+    var _width = width;
+    var _height = height;
+    var _data = new Array(width * height);
+
+    var _this = {};
+
+    _this.setPixel = function(x, y, pixel) {
+      _data[y * _width + x] = pixel;
+    };
+
+    _this.write = function(out) {
+
+      //---------------------------------
+      // GIF Signature
+
+      out.writeString('GIF87a');
+
+      //---------------------------------
+      // Screen Descriptor
+
+      out.writeShort(_width);
+      out.writeShort(_height);
+
+      out.writeByte(0x80); // 2bit
+      out.writeByte(0);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Global Color Map
+
+      // black
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+
+      // white
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+
+      //---------------------------------
+      // Image Descriptor
+
+      out.writeString(',');
+      out.writeShort(0);
+      out.writeShort(0);
+      out.writeShort(_width);
+      out.writeShort(_height);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Local Color Map
+
+      //---------------------------------
+      // Raster Data
+
+      var lzwMinCodeSize = 2;
+      var raster = getLZWRaster(lzwMinCodeSize);
+
+      out.writeByte(lzwMinCodeSize);
+
+      var offset = 0;
+
+      while (raster.length - offset > 255) {
+        out.writeByte(255);
+        out.writeBytes(raster, offset, 255);
+        offset += 255;
+      }
+
+      out.writeByte(raster.length - offset);
+      out.writeBytes(raster, offset, raster.length - offset);
+      out.writeByte(0x00);
+
+      //---------------------------------
+      // GIF Terminator
+      out.writeString(';');
+    };
+
+    var bitOutputStream = function(out) {
+
+      var _out = out;
+      var _bitLength = 0;
+      var _bitBuffer = 0;
+
+      var _this = {};
+
+      _this.write = function(data, length) {
+
+        if ( (data >>> length) != 0) {
+          throw 'length over';
+        }
+
+        while (_bitLength + length >= 8) {
+          _out.writeByte(0xff & ( (data << _bitLength) | _bitBuffer) );
+          length -= (8 - _bitLength);
+          data >>>= (8 - _bitLength);
+          _bitBuffer = 0;
+          _bitLength = 0;
+        }
+
+        _bitBuffer = (data << _bitLength) | _bitBuffer;
+        _bitLength = _bitLength + length;
+      };
+
+      _this.flush = function() {
+        if (_bitLength > 0) {
+          _out.writeByte(_bitBuffer);
+        }
+      };
+
+      return _this;
+    };
+
+    var getLZWRaster = function(lzwMinCodeSize) {
+
+      var clearCode = 1 << lzwMinCodeSize;
+      var endCode = (1 << lzwMinCodeSize) + 1;
+      var bitLength = lzwMinCodeSize + 1;
+
+      // Setup LZWTable
+      var table = lzwTable();
+
+      for (var i = 0; i < clearCode; i += 1) {
+        table.add(String.fromCharCode(i) );
+      }
+      table.add(String.fromCharCode(clearCode) );
+      table.add(String.fromCharCode(endCode) );
+
+      var byteOut = byteArrayOutputStream();
+      var bitOut = bitOutputStream(byteOut);
+
+      // clear code
+      bitOut.write(clearCode, bitLength);
+
+      var dataIndex = 0;
+
+      var s = String.fromCharCode(_data[dataIndex]);
+      dataIndex += 1;
+
+      while (dataIndex < _data.length) {
+
+        var c = String.fromCharCode(_data[dataIndex]);
+        dataIndex += 1;
+
+        if (table.contains(s + c) ) {
+
+          s = s + c;
+
+        } else {
+
+          bitOut.write(table.indexOf(s), bitLength);
+
+          if (table.size() < 0xfff) {
+
+            if (table.size() == (1 << bitLength) ) {
+              bitLength += 1;
+            }
+
+            table.add(s + c);
+          }
+
+          s = c;
+        }
+      }
+
+      bitOut.write(table.indexOf(s), bitLength);
+
+      // end code
+      bitOut.write(endCode, bitLength);
+
+      bitOut.flush();
+
+      return byteOut.toByteArray();
+    };
+
+    var lzwTable = function() {
+
+      var _map = {};
+      var _size = 0;
+
+      var _this = {};
+
+      _this.add = function(key) {
+        if (_this.contains(key) ) {
+          throw 'dup key:' + key;
+        }
+        _map[key] = _size;
+        _size += 1;
+      };
+
+      _this.size = function() {
+        return _size;
+      };
+
+      _this.indexOf = function(key) {
+        return _map[key];
+      };
+
+      _this.contains = function(key) {
+        return typeof _map[key] != 'undefined';
+      };
+
+      return _this;
+    };
+
+    return _this;
+  };
+
+  var createDataURL = function(width, height, getPixel) {
+    var gif = gifImage(width, height);
+    for (var y = 0; y < height; y += 1) {
+      for (var x = 0; x < width; x += 1) {
+        gif.setPixel(x, y, getPixel(x, y) );
+      }
+    }
+
+    var b = byteArrayOutputStream();
+    gif.write(b);
+
+    var base64 = base64EncodeOutputStream();
+    var bytes = b.toByteArray();
+    for (var i = 0; i < bytes.length; i += 1) {
+      base64.writeByte(bytes[i]);
+    }
+    base64.flush();
+
+    return 'data:image/gif;base64,' + base64;
+  };
+
+  //---------------------------------------------------------------------
+  // returns qrcode function.
+
+  return qrcode;
+}();
+
+// multibyte support
+!function() {
+
+  qrcode.stringToBytesFuncs['UTF-8'] = function(s) {
+    // http://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
+    function toUTF8Array(str) {
+      var utf8 = [];
+      for (var i=0; i < str.length; i++) {
+        var charcode = str.charCodeAt(i);
+        if (charcode < 0x80) utf8.push(charcode);
+        else if (charcode < 0x800) {
+          utf8.push(0xc0 | (charcode >> 6),
+              0x80 | (charcode & 0x3f));
+        }
+        else if (charcode < 0xd800 || charcode >= 0xe000) {
+          utf8.push(0xe0 | (charcode >> 12),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+        // surrogate pair
+        else {
+          i++;
+          // UTF-16 encodes 0x10000-0x10FFFF by
+          // subtracting 0x10000 and splitting the
+          // 20 bits of 0x0-0xFFFFF into two halves
+          charcode = 0x10000 + (((charcode & 0x3ff)<<10)
+            | (str.charCodeAt(i) & 0x3ff));
+          utf8.push(0xf0 | (charcode >>18),
+              0x80 | ((charcode>>12) & 0x3f),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+      }
+      return utf8;
+    }
+    return toUTF8Array(s);
+  };
+
+}();
+
+(function (factory) {
+  if (typeof define === 'function' && define.amd) {
+      define([], factory);
+  } else if (typeof exports === 'object') {
+      module.exports = factory();
+  }
+}(function () {
+    return qrcode;
+}));
+
+/* end qrcode-generator */
+(function(){
+  if (typeof document === 'undefined') return;
+  function ready(fn){ if(document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded',fn); }
+  ready(function(){
+    var btn  = document.getElementById('qrBtn');
+    var mask = document.getElementById('qrMask');
+    var close= document.getElementById('qrClose');
+    var frame= document.getElementById('qrFrame');
+    var urlEl= document.getElementById('qrUrl');
+    var copy = document.getElementById('qrCopy');
+    var hint = document.getElementById('qrHint');
+    if(!btn||!mask) return;
+    function targetUrl(){
+      try { return new URL('spark-system.html', location.href).href; }
+      catch(e){ return location.href.replace(/[^/]*$/,'') + 'spark-system.html'; }
+    }
+    function isLocal(u){ return /localhost|127\.0\.0\.1|^file:|192\.168\.|^10\.|^172\.(1[6-9]|2\d|3[01])\./.test(u); }
+    function renderQR(){
+      var u = targetUrl();
+      urlEl.textContent = u.replace(/^https?:\/\//,'');
+      try {
+        var qr = qrcode(0, 'M');
+        qr.addData(u);
+        qr.make();
+        frame.innerHTML = qr.createSvgTag({ scalable: true, margin: 0 });
+      } catch(e){
+        frame.innerHTML = '<div style="font-size:11px;color:#000;text-align:center;padding:10px">QR error: '+(e&&e.message||e)+'</div>';
+      }
+      hint.style.display = isLocal(u) ? 'flex' : 'none';
+    }
+    function open(){ renderQR(); mask.classList.add('show'); document.body.style.overflow='hidden'; }
+    function shut(){ mask.classList.remove('show'); document.body.style.overflow=''; }
+    btn.addEventListener('click', open);
+    close.addEventListener('click', shut);
+    mask.addEventListener('click', function(e){ if(e.target===mask) shut(); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape' && mask.classList.contains('show')) shut(); });
+    copy.addEventListener('click', function(){
+      var u = targetUrl();
+      var done = function(){ copy.textContent='COPIED'; copy.classList.add('ok'); setTimeout(function(){ copy.textContent='COPY'; copy.classList.remove('ok'); }, 1400); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(u).then(done, done);
+      } else {
+        var ta=document.createElement('textarea'); ta.value=u; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy')}catch(e){} document.body.removeChild(ta); done();
+      }
+    });
+  });
+})();
+/* <<< QR-JS <<< */
+</script>
+
+
+<!-- >>> QR-MODAL >>> -->
+<div class="qr-mask" id="qrMask" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+  <div class="qr-modal">
+    <button class="qr-close" id="qrClose" aria-label="Close">✕</button>
+    <div class="qr-head">
+      <div class="qr-eyebrow">SCAN TO TRY</div>
+      <div class="qr-title" id="qrTitle">Open the live POS on your phone</div>
+      <div class="qr-sub">Point your camera at this code. The full Order + Kitchen + Reports app opens straight on the device — exactly what the floor staff will use.</div>
+    </div>
+    <div class="qr-frame" id="qrFrame"></div>
+    <div class="qr-url">
+      <span class="u" id="qrUrl">—</span>
+      <button class="qr-copy" id="qrCopy">COPY</button>
+    </div>
+    <div class="qr-hint" id="qrHint" style="display:none">
+      <span>ℹ</span>
+      <span><b>Heads up</b> — this URL is local. For partners on a different network, host this folder (GitHub Pages or any static host) and re-share the public URL.</span>
+    </div>
+  </div>
+</div>
+<!-- <<< QR-MODAL <<< -->
+</body>
+</html>
