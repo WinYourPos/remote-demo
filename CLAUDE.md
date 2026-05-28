@@ -38,7 +38,7 @@ browser (double-click) with zero build step.
 radii: 14px inputs / 16–20px cards
 fonts: 'Sora' (display+body), 'JetBrains Mono' (labels, numbers, code)
 ```
-Aesthetic: dark-first, iOS-style, single orange accent. Real product screenshots are NOT used —
+Aesthetic: dark-first, single orange accent. Real product screenshots are NOT used —
 UI is rendered in CSS. Keep that consistent.
 
 ## `spark-system.html` architecture (the important one)
