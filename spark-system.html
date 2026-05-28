@@ -405,25 +405,32 @@ button{font-family:inherit;cursor:pointer}
   .ad-card { padding: 14px; }
   .ad-card .big { font-size: 30px; min-width: 44px; }
 
-  /* REPORTS — sidebar becomes a horizontal scrolling chip strip on top */
+  /* REPORTS — sidebar becomes an off-canvas drawer; hamburger toggles it */
   #reports { flex-direction: column; overflow: visible; }
+  .rep-menu-btn { display: inline-grid; }
+  .rep-side-head { display: flex; }
   .rep-side {
-    width: 100%; height: auto; max-height: none;
-    border-right: none; border-bottom: 1px solid var(--border);
-    padding: 10px 12px;
-    display: flex; gap: 4px; flex-wrap: nowrap;
-    overflow-x: auto; overflow-y: hidden;
-    -webkit-overflow-scrolling: touch; scrollbar-width: thin;
-    position: sticky; top: 0; background: var(--bg); z-index: 5;
+    position: fixed; left: 0; top: 0; bottom: 0;
+    width: 290px; max-width: 86vw; height: 100dvh;
+    transform: translateX(-100%);
+    transition: transform .25s cubic-bezier(.2,.8,.2,1);
+    background: var(--surface);
+    border-right: 1px solid var(--border-2); border-bottom: none;
+    box-shadow: 8px 0 32px rgba(0,0,0,.55);
+    padding: 14px 12px; gap: 2px;
+    display: flex; flex-direction: column; flex-wrap: nowrap;
+    overflow-y: auto; overflow-x: hidden;
+    z-index: 999;
   }
-  .rep-side .grp { display: flex; align-items: center; gap: 3px; margin-bottom: 0; flex-shrink: 0; }
-  .rep-side .grp .gl { display: none; }
+  .rep-side.open { transform: translateX(0); }
+  .rep-side .grp { display: block; margin-bottom: 12px; }
+  .rep-side .grp .gl { display: block; text-align: left; padding: 10px 12px 4px; font-size: 10px; }
   .rep-side a {
-    white-space: nowrap; padding: 7px 11px; font-size: 12px;
-    gap: 6px; flex-shrink: 0;
+    width: 100%; justify-content: flex-start; white-space: normal;
+    padding: 11px 12px; font-size: 13.5px; gap: 11px;
   }
   .rep-side a span:not(.ic) { display: inline; }
-  .rep-side a .ic { width: 14px; font-size: 12px; }
+  .rep-side a .ic { width: 18px; font-size: 14px; }
 
   .rep-main { overflow: visible; }
   .rep-head { padding: 12px 14px; gap: 8px; flex-wrap: wrap; }
@@ -470,6 +477,37 @@ button{font-family:inherit;cursor:pointer}
   .toast { font-size: 12.5px; padding: 11px 16px; max-width: calc(100vw - 32px); }
 }
 /* <<< MOBILE-CSS <<< */
+
+/* Sidebar drawer toggle (mobile only) */
+.rep-menu-btn{
+  display:none;
+  width:38px;height:38px;border-radius:10px;
+  background:var(--surface-2);border:1px solid var(--border-2);
+  color:#fff;cursor:pointer;place-items:center;
+  font-size:18px;line-height:1;flex-shrink:0;
+}
+.rep-menu-btn:hover{background:var(--surface-3)}
+.rep-side-head{
+  display:none;
+  align-items:center;justify-content:space-between;
+  padding:4px 6px 12px;margin-bottom:6px;
+  border-bottom:1px solid var(--border);
+}
+.rep-side-head .ti{
+  font-family:'JetBrains Mono';font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--dim-2);font-weight:700;
+}
+.rep-side-head .x{
+  width:30px;height:30px;border-radius:8px;
+  background:var(--surface-2);border:1px solid var(--border);
+  color:var(--dim);font-size:16px;cursor:pointer;display:grid;place-items:center;
+}
+.rep-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.65);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  z-index:998;opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.rep-backdrop.show{opacity:1;pointer-events:auto}
 </style>
 </head>
 <body>
@@ -699,6 +737,7 @@ button{font-family:inherit;cursor:pointer}
     <div class="rep-side" id="repSide"></div>
     <div class="rep-main">
       <div class="rep-head">
+        <button class="rep-menu-btn" id="repMenuBtn" aria-label="Open report menu" type="button">☰</button>
         <div><h2 id="repTitle">Dashboard</h2><div class="desc" id="repDesc">Today at a glance · live</div></div>
         <div class="daterange" id="dateRange">
           <button>Yesterday</button><button class="on">Today</button><button>WTD</button><button>MTD</button><button>Custom…</button>
@@ -710,6 +749,8 @@ button{font-family:inherit;cursor:pointer}
   </div>
 </div>
 
+
+<div class="rep-backdrop" id="repBackdrop" aria-hidden="true"></div>
 <!-- modifier sheet -->
 <div class="sheet-bg" id="sheetBg">
   <div class="sheet">
@@ -2237,6 +2278,46 @@ seedTickets();renderCheck();updateKdsBadge();setupReportsSidebar();renderReports
   else init();
 })();
 /* <<< ICON-SYSTEM-JS <<< */
+
+
+/* >>> SIDEBAR-DRAWER-JS >>> */
+(function(){
+  if (typeof document === 'undefined') return;
+  function ready(fn){ if(document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded',fn); }
+  ready(function(){
+    var side = document.getElementById('repSide');
+    var btn  = document.getElementById('repMenuBtn');
+    var back = document.getElementById('repBackdrop');
+    if (!side || !btn || !back) return;
+    if (typeof btn.addEventListener !== 'function') return;  // test-stub guard
+    if (typeof MutationObserver === 'undefined') return;     // node stub
+    function open(){ side.classList.add('open'); back.classList.add('show'); document.body.style.overflow='hidden'; }
+    function shut(){ side.classList.remove('open'); back.classList.remove('show'); document.body.style.overflow=''; }
+    btn.addEventListener('click', function(e){ e.stopPropagation(); side.classList.contains('open') ? shut() : open(); });
+    back.addEventListener('click', shut);
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape' && side.classList.contains('open')) shut(); });
+    side.addEventListener('click', function(e){
+      // Header close button
+      if (e.target && e.target.id === 'repSideClose') { shut(); return; }
+      // Auto-close after a report is picked, on mobile only
+      var a = e.target && e.target.closest && e.target.closest('a');
+      if (a && window.innerWidth <= 720) setTimeout(shut, 120);
+    });
+    window.addEventListener('resize', function(){ if (window.innerWidth > 720) shut(); });
+    // Re-ensure a sidebar header exists after every renderReports() call
+    function ensureHead(){
+      if (side.querySelector('.rep-side-head')) return;
+      var h = document.createElement('div');
+      h.className = 'rep-side-head';
+      h.innerHTML = '<span class="ti">Reports · 36</span><button class="x" id="repSideClose" aria-label="Close">✕</button>';
+      side.insertBefore(h, side.firstChild);
+    }
+    ensureHead();
+    var mo = new MutationObserver(ensureHead);
+    mo.observe(side, { childList: true });
+  });
+})();
+/* <<< SIDEBAR-DRAWER-JS <<< */
 </script>
 
 </body>
