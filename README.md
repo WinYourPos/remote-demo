@@ -22,9 +22,10 @@ python3 -m http.server 8000
 # then visit http://localhost:8000/spark-pos.html
 ```
 
-> The **Try it yourself 📱** button always points at the live Pages URL above, so partners scanning from any device land on the public deployment regardless of how the presenter opened the page.
-
-The hero on `spark-pos.html` has a single CTA — **Test-drive the POS ↗** — that opens `spark-system.html` in a new tab.
+> Both hero CTAs are absolute-linked to the public Pages URL above, so
+> **Test-drive the POS ↗** (desktop click) and **Try it yourself 📱**
+> (QR scan) always land on the same public deployment — no localhost
+> split-brain when presenting from a laptop.
 
 ## What's in the interactive demo
 
@@ -40,7 +41,8 @@ The hero on `spark-pos.html` has a single CTA — **Test-drive the POS ↗** —
 - Modifiers colored on the card: green for add, red for remove, accent for temperature
 - All-Day view: total of every item working across active tickets
 
-**Reports** — 36 reports across 10 sidebar groups
+**Reports** — 36 reports across 10 sidebar groups, every pill on the header bar is live
+- **Date range** — Yesterday · Today · **WTD** · **MTD** · **Custom…** all rebind `state.rep` to their own seeded dataset and re-render the active report. Custom… opens a date picker; the chosen window auto-scales (e.g. "12 days").
 - **Insights** — AI Watchlist (anomaly feed)
 - **Overview** — Dashboard
 - **Sales** — Summary · Hourly · Daypart · Category · Service Type · Payment · Tax · Refunds · Channels (net of marketplace fees)
@@ -51,6 +53,11 @@ The hero on `spark-pos.html` has a single CTA — **Test-drive the POS ↗** —
 - **Operations** — Cash · Speed of service · Station throughput · Open tickets · Sales heatmap (hour × DOW) · End-of-day Z-report
 - **Inventory** — On-hand · Cost of goods (food / bev / prime)
 - **Multi-Unit** — Location comparison
+
+**Mobile** (≤720px viewport — the QR target)
+- Order screen stacks menu + check vertically; modifier sheet goes full-screen
+- KDS becomes single-column with bigger bump / rush tap targets
+- Reports sidebar collapses behind a **☰** button → slide-in drawer with all 36 reports grouped, backdrop blur, Esc / tap-outside / ✕ to close, auto-close after pick
 
 ## Design
 
