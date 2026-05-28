@@ -4,6 +4,9 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <meta name="theme-color" content="#FF6B00"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
 <title>Spark POS — Next-gen restaurant POS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -75,7 +78,7 @@
     filter:drop-shadow(0 24px 60px rgba(255,107,0,.45)) drop-shadow(0 8px 20px rgba(255,107,0,.35));
     animation:pulse 4s ease-in-out infinite;
   }
-  @keyframes pulse{50%{transform:scale(1.04);filter:drop-shadow(0 28px 70px rgba(255,107,0,.55)) drop-shadow(0 10px 24px rgba(255,107,0,.42))}}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
   .logo svg{width:100%;height:100%}
 
   .eyebrow{
@@ -205,20 +208,27 @@
       <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="tryPos" x1="40" y1="40" x2="40" y2="72" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#FF9500"/>
+            <stop offset="0" stop-color="#FFB340"/>
             <stop offset="1" stop-color="#FF6B00"/>
           </linearGradient>
+          <linearGradient id="tryScreen" x1="40" y1="46" x2="40" y2="60" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#FFFFFF" stop-opacity=".22"/>
+            <stop offset="1" stop-color="#FFFFFF" stop-opacity=".04"/>
+          </linearGradient>
           <linearGradient id="tryBolt" x1="40" y1="6" x2="40" y2="56" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#FFF1D6"/>
-            <stop offset=".5" stop-color="#FFC97A"/>
+            <stop offset="0" stop-color="#FFF7E6"/>
+            <stop offset=".5" stop-color="#FFCC80"/>
             <stop offset="1" stop-color="#FF9500"/>
           </linearGradient>
         </defs>
+        <!-- POS body -->
         <rect x="12" y="40" width="56" height="32" rx="7" fill="url(#tryPos)"/>
-        <rect x="18" y="46" width="44" height="14" rx="2" fill="#160a00" fill-opacity=".48"/>
-        <rect x="20" y="64" width="40" height="2.5" rx="1.25" fill="#160a00" fill-opacity=".35"/>
-        <circle cx="64" cy="69" r="1.4" fill="#160a00" fill-opacity=".35"/>
-        <path d="M44 6 L24 40 L36 40 L30 56 L52 28 L40 28 L48 6 Z" fill="url(#tryBolt)" stroke="#FFE8C7" stroke-width=".5" stroke-linejoin="round"/>
+        <!-- Soft screen highlight (white sheen instead of dark cut-out) -->
+        <rect x="18" y="46" width="44" height="14" rx="2" fill="url(#tryScreen)"/>
+        <!-- Hairline card slot -->
+        <rect x="20" y="65" width="40" height="1.4" rx=".7" fill="#FFFFFF" fill-opacity=".30"/>
+        <!-- Lightning bolt emerging from the screen -->
+        <path d="M44 6 L24 40 L36 40 L30 56 L52 28 L40 28 L48 6 Z" fill="url(#tryBolt)"/>
       </svg>
     </div>
     <div class="eyebrow"><span class="live"></span> LIVE DEMO</div>
