@@ -736,7 +736,6 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
       <a href="#surfaces">Platform</a>
       <a href="#ai">AI</a>
       <a href="#roi">Partner</a>
-      <a href="#contact" class="btn btn-primary" style="padding:11px 20px;font-size:14px">Become a partner</a>
     </div>
   </div>
 </nav>
@@ -767,48 +766,6 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
     <div class="marquee-track" id="marquee"></div>
   </div>
 </header>
-
-<!-- WHITE LABEL -->
-<section class="wl pad" id="whitelabel">
-  <div class="wrap">
-    <span class="eyebrow reveal">Your brand, not ours</span>
-    <h2 class="section-title reveal">A POS you can actually call your own.</h2>
-    <p class="section-sub reveal">Heartland and Toast keep the customer, the contract, and the brand. Spark hands them all to you. Pick a brand below and watch the entire platform re-skin — logo, color, and domain — in real time.</p>
-
-    <div class="wl-stage">
-      <div class="wl-controls reveal">
-        <h3>Switch the brand. Keep the product.</h3>
-        <p>Same engine. Same 100+ pages. Re-themed top to bottom in seconds — login screen, admin console, receipts, mobile apps.</p>
-        <div class="brand-picker" id="brandPicker"></div>
-        <p class="wl-note">Every touchpoint is yours: <b>custom domain</b>, <b>logo</b>, <b>color system</b>, <b>back office</b>, and <b>customer-facing apps</b> — not a co-branded skin on someone else's product.</p>
-      </div>
-
-      <div class="browser reveal">
-        <div class="browser-bar">
-          <div class="dots"><i style="background:#FF5F57"></i><i style="background:#FEBC2E"></i><i style="background:#28C840"></i></div>
-          <div class="url">https://pos.<b id="wlDomain">yourbrand</b>.com/admin</div>
-        </div>
-        <div class="app-mock">
-          <div class="app-side">
-            <div class="mark" id="wlMark">Y</div>
-            <div class="nav-ic on"></div><div class="nav-ic"></div><div class="nav-ic"></div><div class="nav-ic"></div>
-          </div>
-          <div class="app-main">
-            <div class="app-h">
-              <div class="ttl" id="wlTitle">YourBrand · Today</div>
-              <div class="badge" id="wlBadge">LIVE</div>
-            </div>
-            <div class="app-cards">
-              <div class="app-card"><div class="k">NET SALES</div><div class="v">$8.4k</div><div class="bar"><i style="width:72%"></i></div></div>
-              <div class="app-card"><div class="k">COVERS</div><div class="v">214</div><div class="bar"><i style="width:54%"></i></div></div>
-              <div class="app-card"><div class="k">AVG CHECK</div><div class="v">$39</div><div class="bar"><i style="width:61%"></i></div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- DEVICE SURFACES -->
 <section class="pad" id="surfaces">
@@ -936,31 +893,6 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
         <div class="tnum"><div class="n" style="font-size:22px;letter-spacing:-.01em">Guru</div><div class="l">AI advisor</div></div>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- FAQ -->
-<section class="pad" id="faq">
-  <div class="wrap">
-    <span class="eyebrow reveal">Partner FAQ</span>
-    <h2 class="section-title reveal">The questions a reseller actually asks.</h2>
-    <div class="faq-list reveal" id="faqList"></div>
-  </div>
-</section>
-
-<!-- FINAL CTA -->
-<section class="final" id="contact">
-  <div class="final-glow"></div>
-  <div class="wrap">
-    <h2>Get a branded sandbox in 48 hours.</h2>
-    <p>Tell us how many restaurants you service. We'll spin up Spark under your brand so you can pitch your own clients — before you commit to anything.</p>
-    <div class="cta-form">
-      <input type="text" placeholder="Your name" aria-label="Your name">
-      <input type="text" placeholder="Company" aria-label="Company">
-      <input type="text" placeholder="# restaurants you service" aria-label="Number of restaurants">
-      <a href="#" class="btn btn-primary" onclick="event.preventDefault()">Request my sandbox →</a>
-    </div>
-    <p class="cta-mini">No card. No contract. A real branded environment to put in front of your clients.</p>
   </div>
 </section>
 
@@ -1221,35 +1153,6 @@ const mq=document.getElementById('marquee');
 const chips=SURFACES.concat(SURFACES);
 chips.forEach(s=>{const c=document.createElement('div');c.className='surface-chip';c.innerHTML=`<span class="ic">${s.ic}</span>${s.nm}`;mq.appendChild(c)});
 
-/* ---------- white label ---------- */
-const BRANDS=[
-  {n:'Aurora',sw:'#FF6B00',g:'linear-gradient(135deg,#FF9500,#FF6B00)',soft:'rgba(255,149,0,.16)',solid:'#FF9500',d:'aurora'},
-  {n:'Bistro Cloud',sw:'#34C759',g:'linear-gradient(135deg,#34C759,#16934a)',soft:'rgba(52,199,89,.16)',solid:'#34C759',d:'bistrocloud'},
-  {n:'Verve',sw:'#0A84FF',g:'linear-gradient(135deg,#0A84FF,#0050d6)',soft:'rgba(10,132,255,.16)',solid:'#0A84FF',d:'verve'},
-  {n:'Noir',sw:'#BF5AF2',g:'linear-gradient(135deg,#BF5AF2,#8a2be2)',soft:'rgba(191,90,242,.16)',solid:'#BF5AF2',d:'noir'}
-];
-const bp=document.getElementById('brandPicker');
-BRANDS.forEach((b,i)=>{
-  const el=document.createElement('div');el.className='brand-btn'+(i===0?' active':'');el.style.setProperty('--swatch',b.sw);
-  el.innerHTML=`<span class="sw"></span>${b.n}`;
-  el.onclick=()=>{document.querySelectorAll('.brand-btn').forEach(x=>x.classList.remove('active'));el.classList.add('active');applyBrand(b)};
-  bp.appendChild(el);
-});
-function applyBrand(b){
-  document.documentElement.style.setProperty('--accent-live',b.g);
-  document.documentElement.style.setProperty('--accent-soft',b.soft);
-  document.documentElement.style.setProperty('--accent-live-solid',b.solid);
-  document.getElementById('wlMark').textContent=b.n[0];
-  document.getElementById('wlMark').style.background=b.g;
-  document.getElementById('wlDomain').textContent=b.d;
-  document.getElementById('wlTitle').textContent=b.n+' · Today';
-  document.querySelectorAll('.app-card .bar i').forEach(i=>i.style.background=b.solid);
-  document.querySelector('.app-side .nav-ic.on').style.background=b.soft;
-  document.getElementById('wlBadge').style.background=b.soft;
-  document.getElementById('wlBadge').style.color=b.solid;
-}
-applyBrand(BRANDS[0]);
-
 /* >>> GURU-JS >>> */
 const GURU = {
   campaign: {
@@ -1428,26 +1331,6 @@ function calcROI(){
 }
 Object.values(R).forEach(id=>document.getElementById(id).addEventListener('input',calcROI));
 calcROI();
-
-/* ---------- FAQ ---------- */
-const FAQ=[
-  ['How do partners get paid?','You set the retail price and bill your own customer. Spark invoices you at a flat wholesale rate — we never bill or contact your customer. You keep the spread plus your payment residual. The opposite of the captive model where the vendor bills your client and pays you a slice.'],
-  ['Can I use my own payment processor?','Yes. Spark is processor-agnostic. Bring your existing ISO or processor relationship and keep 100% of the residual you already earn. We don\'t require you to move payments to us.'],
-  ['How "white-label" is it, really?','Top to bottom: your logo, colors, domain, login screen, receipts, admin console and customer-facing apps. Not a co-branded skin on someone else\'s product — the whole environment is yours.'],
-  ['What hardware do my clients need?','Your choice. Spark runs on iPad and Android, and integrates natively with PAX A920 and A35 terminals. No proprietary, non-transferable hardware lock-in.'],
-  ['How long until a restaurant goes live?','A well-prepared single site is typically live in about 14 days — menu import, hardware ship, training, a test shift, then go-live with on-call support. Multi-location rollouts take longer; we scope each one.'],
-  ['Can I migrate my existing restaurant clients?','Yes — menu, customers, loyalty and gift-card balances import during onboarding, so switching a client off their current POS is low-friction.'],
-  ['What does "waiting for backend integration" mean for me?','The entire frontend — 100+ POS pages, 50+ admin pages, 13 surfaces, and the Ask Guru AI advisor — is built. The remaining work is wiring it to a backend (auth, API, your processor). That integration is exactly what the partnership defines; we scope and build it with you, not hand you a surprise.'],
-  ['What support do partners get?','Tier-1 platform support, a partner portal, training materials, sandbox tenants for demos, and a dedicated partnership lead. We back your support so it doesn\'t all fall on you.']
-];
-const faqList=document.getElementById('faqList');
-FAQ.forEach(([q,a])=>{
-  const item=document.createElement('div');item.className='faq-item';
-  item.innerHTML=`<button class="faq-q">${q}<span class="plus">+</span></button><div class="faq-a"><div>${a}</div></div>`;
-  const btn=item.querySelector('.faq-q'),ans=item.querySelector('.faq-a');
-  btn.onclick=()=>{const open=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(x=>{x.classList.remove('open');x.querySelector('.faq-a').style.maxHeight=null});if(!open){item.classList.add('open');ans.style.maxHeight=ans.scrollHeight+'px'}};
-  faqList.appendChild(item);
-});
 
 
 /* >>> ICON-SYSTEM-JS >>> */
