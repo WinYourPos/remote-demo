@@ -526,6 +526,79 @@ button{font-family:inherit;cursor:pointer}
 .dr-cancel{background:var(--surface-2);border:1px solid var(--border);color:#fff}
 .dr-apply{background:var(--grad);color:#160a00}
 /* <<< DR-CSS <<< */
+
+/* >>> PAY-MODAL-CSS >>> */
+.pay-mask{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:9990;display:none;align-items:center;justify-content:center;padding:18px}
+.pay-mask.show{display:flex;animation:fade .18s ease-out}
+.pay-modal{width:min(540px,100%);max-height:92vh;background:var(--surface);border:1px solid var(--border-2);border-radius:22px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.7)}
+.pay-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid var(--border)}
+.pay-eyebrow{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.14em;color:var(--primary);font-weight:700}
+.pay-title{font-size:18px;font-weight:700;margin-top:4px;letter-spacing:-.01em}
+.pay-x{width:32px;height:32px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);color:var(--dim);font-size:15px;cursor:pointer;display:grid;place-items:center}
+.pay-x:hover{color:#fff;background:var(--surface-3)}
+.pay-body{overflow-y:auto;padding:16px 22px;flex:1}
+
+.pay-summary{background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:18px}
+.ps-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13.5px}
+.ps-row span:first-child{color:var(--dim)}
+.ps-row.tip{color:var(--success)}
+.ps-row.tip span:first-child{color:var(--success)}
+.ps-row.total{padding-top:10px;margin-top:6px;border-top:1px solid var(--border);font-size:16px;font-weight:700}
+.ps-row.total span:first-child{color:var(--text)}
+.ps-row.total span.mono{font-size:18px;color:#fff;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.ps-tip-pct{font-size:11px;color:var(--dim-2);font-weight:400;margin-left:2px}
+
+.pay-section{margin-bottom:18px}
+.ps-label{font-family:'JetBrains Mono';font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim-2);margin-bottom:8px;font-weight:600;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ps-hint{font-family:'Sora';font-weight:400;font-size:10.5px;color:var(--dim-2);text-transform:none;letter-spacing:0}
+
+.tip-pills{display:flex;gap:6px;flex-wrap:wrap}
+.tip-pills button{padding:8px 13px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border);color:var(--dim);font-size:12.5px;font-weight:600;cursor:pointer}
+.tip-pills button:hover{border-color:var(--border-2);color:#fff}
+.tip-pills button.on{background:rgba(52,199,89,.16);border-color:var(--success);color:var(--success)}
+.tip-custom-input{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:#fff;font-family:'JetBrains Mono';font-size:14px;margin-top:8px}
+
+.pay-tender-row{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.pay-balance{flex:0 0 130px;background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:12px 14px}
+.pb-l{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.1em;color:var(--dim-2);text-transform:uppercase;font-weight:700}
+.pb-v{font-size:22px;font-weight:800;margin-top:4px;letter-spacing:-.02em;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.pb-v.paid{background:none;-webkit-text-fill-color:var(--success);color:var(--success)}
+.pay-tenders{flex:1;display:flex;flex-direction:column;gap:5px;min-width:160px}
+.pay-tenders:empty::before{content:'No tenders yet — pick a payment method below';font-family:'Sora';font-size:11px;color:var(--dim-2)}
+.pt-item{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;font-size:12.5px}
+.pt-item .meth{display:flex;align-items:center;gap:7px;font-weight:600}
+.pt-item .amt{font-family:'JetBrains Mono';font-weight:700;color:var(--success)}
+.pt-item .x{background:none;border:none;color:var(--dim-2);font-size:13px;margin-left:8px;cursor:pointer}
+.pt-item .x:hover{color:var(--error)}
+
+.pay-amount-row{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:6px 10px 6px 12px;margin-bottom:10px}
+.pay-currency{font-family:'JetBrains Mono';font-weight:700;font-size:15px;color:var(--dim)}
+.pay-amount-input{flex:1;background:none;border:none;color:#fff;font-family:'JetBrains Mono';font-size:18px;outline:none;padding:6px 0;font-weight:700}
+.pay-clear{background:var(--surface-3);border:1px solid var(--border);color:var(--dim);font-size:11px;font-weight:700;padding:6px 10px;border-radius:8px;cursor:pointer;letter-spacing:.04em}
+.pay-clear:hover{color:#fff}
+
+.pay-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pm-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 8px;background:var(--surface-2);border:1.5px solid var(--border);border-radius:12px;color:#fff;font-size:11.5px;font-weight:600;cursor:pointer;transition:.13s;line-height:1.2}
+.pm-btn:hover{border-color:var(--primary);background:var(--surface-3)}
+.pm-btn:disabled{opacity:.35;cursor:not-allowed}
+.pm-btn .pm-ic{font-size:20px}
+
+.pay-foot{display:flex;gap:10px;padding:14px 22px 18px;border-top:1px solid var(--border)}
+.pay-cancel{flex:0 0 auto;padding:13px 20px;background:var(--surface-2);border:1px solid var(--border);color:#fff;font-weight:600;font-size:14px;border-radius:12px;cursor:pointer}
+.pay-complete{flex:1;padding:13px;background:var(--grad);border:none;color:#160a00;font-weight:700;font-size:15px;border-radius:12px;cursor:pointer;box-shadow:0 6px 20px rgba(255,107,0,.35);transition:.13s}
+.pay-complete:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;background:var(--surface-3);color:var(--dim)}
+
+@media (max-width: 720px){
+  .pay-mask{padding:0;align-items:stretch}
+  .pay-modal{max-height:100dvh;height:100dvh;border-radius:0;width:100%}
+  .pay-head{padding:14px 16px 12px}
+  .pay-body{padding:14px 16px}
+  .pay-methods{grid-template-columns:repeat(2,1fr)}
+  .pay-balance{flex:0 0 100%}
+  .pay-foot{padding:12px 16px 16px}
+  .pay-summary .ps-row.total span.mono{font-size:18px}
+}
+/* <<< PAY-MODAL-CSS <<< */
 </style>
 </head>
 <body>
@@ -2486,6 +2559,205 @@ seedTickets();renderCheck();updateKdsBadge();setupReportsSidebar();renderReports
   });
 })();
 /* <<< DATERANGE-JS <<< */
+
+/* >>> PAY-FLOW-JS >>> */
+(function(){
+  if (typeof document === 'undefined') return;
+  if (typeof state === 'undefined' || !state.check) return;
+  if (typeof commitPayment !== 'function') {
+    // Refactor: turn the existing direct payAndClose into a commitPayment call
+    // and keep payAndClose as a back-compat shim for scripts/test.js.
+    var _origPayAndClose = window.payAndClose;
+    window.commitPayment = function(opts){
+      var sub = state._sub, tip = (opts && opts.tip) || 0, tenders = (opts && opts.tenders) || [];
+      var tax = sub * 0.0825;
+      var total = sub + tax + tip;
+      state.rep.netSales += sub;
+      state.rep.covers += state.guests;
+      state.rep.checks += 1;
+      state.rep.tips = (state.rep.tips || 0) + tip;
+      state.rep.taxCollected = (state.rep.taxCollected || 0) + tax;
+      // Distribute the bill across tenders
+      tenders.forEach(function(t){
+        state.rep.payMix[t.method] = (state.rep.payMix[t.method] || 0) + t.amount;
+      });
+      state.rep.svcMix[state.orderType] = (state.rep.svcMix[state.orderType] || 0) + sub;
+      var h = new Date().getHours();
+      var idx = Math.min(12, Math.max(0, h - 11));
+      state.rep.hourly[idx] += sub;
+      state.check.forEach(function(l){
+        state.rep.mix[l.id] = state.rep.mix[l.id] || {q:0};
+        state.rep.mix[l.id].q += l.qty;
+      });
+      var rcAmt = document.getElementById('rcAmt');
+      var rcSub = document.getElementById('rcSub');
+      if (rcAmt) rcAmt.textContent = 'Paid $' + total.toFixed(2);
+      if (rcSub) {
+        var brk = tenders.map(function(t){ return t.method + ' $' + t.amount.toFixed(2); }).join(' · ');
+        rcSub.textContent = 'Table ' + state.table + ' closed · ' +
+          state.guests + ' covers · ' + (tip>0 ? 'tip $' + tip.toFixed(2) + ' · ' : '') +
+          brk + ' · reporting updated';
+      }
+      var receipt = document.getElementById('receipt');
+      if (receipt) receipt.classList.add('show');
+      if (typeof toast === 'function') {
+        toast('pay', 'Closed <b>$' + total.toFixed(2) + '</b> · ' +
+          (tenders.length > 1 ? 'split ' + tenders.length + ' ways · ' : '') + 'Reporting updated');
+      }
+      if (typeof renderReports === 'function') renderReports();
+    };
+    // Override payAndClose to use commitPayment with sensible defaults (matches
+    // legacy behaviour — full Card tender, no tip — so the Node test harness
+    // still books the order correctly).
+    window.payAndClose = function(){
+      var sub = state._sub, tot = state._tot || (sub * 1.0825);
+      commitPayment({ tip: 0, tenders: [{ method: 'Card', amount: tot }] });
+    };
+  }
+
+  function ready(fn){ if(document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded',fn); }
+  ready(function(){
+    var payBtn = document.getElementById('payBtn');
+    var mask   = document.getElementById('payMask');
+    if (!payBtn || !mask) return;
+    if (typeof payBtn.addEventListener !== 'function') return;
+
+    var sub=0, tax=0, tipPct=20, tipAmt=0, tipCustom=null;
+    var tenders = [];
+
+    var psSub   = document.getElementById('psSub');
+    var psTax   = document.getElementById('psTax');
+    var psTip   = document.getElementById('psTip');
+    var psTipPct= document.getElementById('psTipPct');
+    var psTotal = document.getElementById('psTotal');
+    var pbVal   = document.getElementById('pbVal');
+    var payAmt  = document.getElementById('payAmtInput');
+    var payClear= document.getElementById('payClear');
+    var pCancel = document.getElementById('payCancel');
+    var pClose  = document.getElementById('payClose');
+    var pComplete = document.getElementById('payCompleteBtn');
+    var tendersEl = document.getElementById('payTenders');
+    var tipPills  = document.getElementById('tipPills');
+    var tipCustomI= document.getElementById('tipCustomInput');
+    var payTable  = document.getElementById('payTable');
+
+    function fmt(n){ return '$' + (n||0).toFixed(2); }
+    function grandTotal(){ return sub + tax + tipAmt; }
+    function paidSoFar(){ return tenders.reduce(function(a,t){ return a + t.amount; }, 0); }
+    function balance(){ return Math.max(0, Math.round((grandTotal() - paidSoFar()) * 100) / 100); }
+
+    function render(){
+      var bal = balance();
+      psSub.textContent = fmt(sub);
+      psTax.textContent = fmt(tax);
+      psTip.textContent = fmt(tipAmt);
+      psTipPct.textContent = tipCustom != null ? '(custom)' : '(' + tipPct + '%)';
+      psTotal.textContent = fmt(grandTotal());
+      pbVal.textContent = fmt(bal);
+      pbVal.classList.toggle('paid', bal <= 0);
+      // Tenders list
+      tendersEl.innerHTML = '';
+      tenders.forEach(function(t, i){
+        var row = document.createElement('div');
+        row.className = 'pt-item';
+        row.innerHTML = '<span class="meth">'+t.method+'</span><span class="amt">'+fmt(t.amount)+'</span>';
+        var x = document.createElement('button'); x.className='x'; x.type='button'; x.textContent='✕';
+        x.addEventListener('click', function(){ tenders.splice(i,1); render(); });
+        row.appendChild(x);
+        tendersEl.appendChild(row);
+      });
+      // Auto-fill the amount input with the remaining balance when empty
+      if (document.activeElement !== payAmt) payAmt.value = bal > 0 ? bal.toFixed(2) : '';
+      pComplete.disabled = !(bal <= 0 && tenders.length > 0);
+      // Disable method buttons when balance is 0
+      var methods = document.querySelectorAll('.pm-btn');
+      methods.forEach(function(b){ b.disabled = bal <= 0; });
+    }
+
+    function setTip(pct){
+      tipCustom = null;
+      tipPct = pct;
+      tipAmt = Math.round(sub * (pct/100) * 100) / 100;
+      Array.prototype.forEach.call(tipPills.children, function(b){
+        b.classList.toggle('on', b.dataset.tip == String(pct));
+      });
+      tipCustomI.style.display = 'none';
+      render();
+    }
+
+    function open(){
+      sub = state._sub || 0;
+      tax = Math.round(sub * 0.0825 * 100) / 100;
+      tenders = [];
+      tipCustom = null;
+      payTable.textContent = state.table || '—';
+      setTip(20);
+      mask.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function shut(){ mask.classList.remove('show'); document.body.style.overflow = ''; }
+
+    // Hook the Pay button — replace the existing payAndClose handler
+    payBtn.onclick = function(){
+      if (!state.check.length) return;
+      if (!state.check.find(function(l){ return l._fired; })) {
+        if (typeof fireToKitchen === 'function') fireToKitchen(true);
+      }
+      open();
+    };
+    pClose.addEventListener('click', shut);
+    pCancel.addEventListener('click', shut);
+    mask.addEventListener('click', function(e){ if (e.target === mask) shut(); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && mask.classList.contains('show')) shut(); });
+
+    // Tip pills
+    Array.prototype.forEach.call(tipPills.children, function(b){
+      b.addEventListener('click', function(){
+        if (b.dataset.tip === 'custom') {
+          Array.prototype.forEach.call(tipPills.children, function(x){ x.classList.remove('on'); });
+          b.classList.add('on');
+          tipCustomI.style.display = 'block';
+          tipCustomI.focus();
+        } else {
+          setTip(parseInt(b.dataset.tip, 10));
+        }
+      });
+    });
+    tipCustomI.addEventListener('input', function(){
+      var v = parseFloat(tipCustomI.value) || 0;
+      tipCustom = v; tipAmt = v;
+      render();
+    });
+
+    // Payment methods
+    document.querySelectorAll('.pm-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if (btn.disabled) return;
+        var typed = parseFloat(payAmt.value);
+        var bal = balance();
+        var amt = (isNaN(typed) || typed <= 0) ? bal : Math.min(typed, bal);
+        if (amt <= 0) return;
+        tenders.push({ method: btn.dataset.method, amount: Math.round(amt * 100) / 100 });
+        payAmt.value = '';
+        render();
+        if (typeof toast === 'function') {
+          toast('fire', btn.dataset.method + ' applied <b>'+fmt(amt)+'</b>' + (balance() > 0 ? ' · balance ' + fmt(balance()) : ' · paid in full'));
+        }
+      });
+    });
+
+    payClear.addEventListener('click', function(){ payAmt.value = ''; render(); });
+
+    pComplete.addEventListener('click', function(){
+      if (balance() > 0) return;
+      var tipCopy = tipAmt;
+      var tendersCopy = tenders.slice();
+      shut();
+      commitPayment({ tip: tipCopy, tenders: tendersCopy });
+    });
+  });
+})();
+/* <<< PAY-FLOW-JS <<< */
 </script>
 
 
@@ -2509,5 +2781,78 @@ seedTickets();renderCheck();updateKdsBadge();setupReportsSidebar();renderReports
   </div>
 </div>
 <!-- <<< CUSTOM-RANGE-MODAL <<< -->
+
+<!-- >>> PAY-MODAL >>> -->
+<div class="pay-mask" id="payMask" role="dialog" aria-modal="true">
+  <div class="pay-modal">
+    <div class="pay-head">
+      <div>
+        <div class="pay-eyebrow">PAY · TABLE <span id="payTable">14</span></div>
+        <div class="pay-title">Tender · Tip · Split</div>
+      </div>
+      <button class="pay-x" id="payClose" aria-label="Close">✕</button>
+    </div>
+
+    <div class="pay-body">
+      <!-- Summary -->
+      <div class="pay-summary">
+        <div class="ps-row"><span>Subtotal</span><span class="mono" id="psSub">$0.00</span></div>
+        <div class="ps-row"><span>Tax (8.25%)</span><span class="mono" id="psTax">$0.00</span></div>
+        <div class="ps-row tip"><span>Tip <span class="ps-tip-pct mono" id="psTipPct">(20%)</span></span><span class="mono" id="psTip">$0.00</span></div>
+        <div class="ps-row total"><span>Grand total</span><span class="mono" id="psTotal">$0.00</span></div>
+      </div>
+
+      <!-- Tip pills -->
+      <div class="pay-section">
+        <div class="ps-label">Add a tip</div>
+        <div class="tip-pills" id="tipPills">
+          <button data-tip="0">No tip</button>
+          <button data-tip="15">15%</button>
+          <button data-tip="18">18%</button>
+          <button data-tip="20" class="on">20% ★</button>
+          <button data-tip="25">25%</button>
+          <button data-tip="custom">Custom $</button>
+        </div>
+        <input type="number" class="pay-input tip-custom-input" id="tipCustomInput" placeholder="Custom tip amount" step="0.50" min="0" style="display:none">
+      </div>
+
+      <!-- Tenders applied + balance -->
+      <div class="pay-section pay-tender-row">
+        <div class="pay-balance">
+          <div class="pb-l">BALANCE</div>
+          <div class="pb-v mono" id="pbVal">$0.00</div>
+        </div>
+        <div class="pay-tenders" id="payTenders"></div>
+      </div>
+
+      <!-- Amount + methods -->
+      <div class="pay-section">
+        <div class="ps-label">
+          Pay with
+          <span class="ps-hint">Tap a method to pay the balance. Type an amount first to split.</span>
+        </div>
+        <div class="pay-amount-row">
+          <span class="pay-currency">$</span>
+          <input type="number" class="pay-amount-input" id="payAmtInput" step="0.01" min="0" placeholder="0.00">
+          <button class="pay-clear" id="payClear" type="button">Clear</button>
+        </div>
+        <div class="pay-methods">
+          <button data-method="Card"        class="pm-btn"><span class="pm-ic">💳</span><span>Credit / Debit</span></button>
+          <button data-method="Cash"        class="pm-btn"><span class="pm-ic">💵</span><span>Cash</span></button>
+          <button data-method="Apple Pay"   class="pm-btn"><span class="pm-ic">📱</span><span>Apple Pay</span></button>
+          <button data-method="Google Pay"  class="pm-btn"><span class="pm-ic">📲</span><span>Google Pay</span></button>
+          <button data-method="Gift card"   class="pm-btn"><span class="pm-ic">🎁</span><span>Gift card</span></button>
+          <button data-method="Loyalty"     class="pm-btn"><span class="pm-ic">⭐</span><span>Loyalty points</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pay-foot">
+      <button class="pay-cancel" id="payCancel">Cancel</button>
+      <button class="pay-complete" id="payCompleteBtn" disabled>Complete payment</button>
+    </div>
+  </div>
+</div>
+<!-- <<< PAY-MODAL <<< -->
 </body>
 </html>
