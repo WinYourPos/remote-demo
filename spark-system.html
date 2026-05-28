@@ -699,6 +699,33 @@ button{font-family:inherit;cursor:pointer}
 .rep-head .daterange button:active,
 .rep-head .exportbtn:active{transform:scale(.97)}
 /* <<< BTN-CONSISTENCY-CSS <<< */
+
+/* >>> GURU-REP-CSS >>> */
+.g-input-row{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1.5px solid var(--border-2);border-radius:14px;padding:6px 6px 6px 16px;margin:14px 0 12px;transition:border-color .15s,box-shadow .15s}
+.g-input-row:focus-within{border-color:var(--primary);box-shadow:0 0 0 4px rgba(255,149,0,.10)}
+.g-input{flex:1;background:none;border:none;outline:none;color:#fff;font-family:'Sora',inherit;font-size:14px;padding:10px 0}
+.g-input::placeholder{color:var(--dim-2)}
+.g-ask{padding:10px 16px;border-radius:10px;background:var(--grad);color:#160a00;font-family:inherit;font-weight:700;font-size:13px;border:none;cursor:pointer;flex-shrink:0;box-shadow:0 4px 14px rgba(255,107,0,.30);transition:transform .12s}
+.g-ask:hover{transform:translateY(-1px)}
+.g-ask:active{transform:scale(.97)}
+.g-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.g-chip{padding:8px 13px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border);color:var(--dim);font-family:inherit;font-size:12.5px;font-weight:500;cursor:pointer;transition:.15s}
+.g-chip:hover{border-color:rgba(255,149,0,.45);background:rgba(255,149,0,.08);color:#fff}
+.g-chip:active{transform:scale(.97)}
+.g-answer{position:relative}
+.g-answer::before{content:'';position:absolute;top:0;left:18%;right:18%;height:1px;background:linear-gradient(90deg,transparent,var(--primary),transparent);box-shadow:0 0 12px var(--primary)}
+.g-eyebrow{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.14em;font-weight:700;color:var(--primary);text-transform:uppercase;margin-bottom:10px}
+.g-body{display:flex;flex-direction:column;gap:18px}
+.g-block .g-l{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.12em;font-weight:700;color:var(--dim-2);text-transform:uppercase;margin-bottom:8px}
+.g-lead{font-size:14.5px;line-height:1.55;color:#fff}
+.g-lead b{color:var(--primary)}
+.g-ul{padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13.5px;color:var(--dim);line-height:1.55;margin:0}
+.g-ul li::marker{color:var(--primary)}
+.g-ul b{color:#fff}
+.g-meta{font-size:11.5px;color:var(--dim-2);margin-top:6px;font-family:'JetBrains Mono'}
+.g-disc{margin-top:18px;padding:11px 14px;background:rgba(255,149,0,.05);border:1px solid rgba(255,149,0,.18);border-radius:10px;font-size:12px;color:var(--dim);line-height:1.55}
+.g-disc b{color:#fff}
+/* <<< GURU-REP-CSS <<< */
 </style>
 </head>
 <body>
@@ -1842,7 +1869,7 @@ function mixArr(){
    ========================================================= */
 const REPORTS=[
  {group:'Insights',items:[
-   {id:'alerts',ic:'⚠',name:'AI Watchlist',desc:'Auto-detected anomalies across the day',fn:repAlerts}
+   {id:'guru',ic:'🔮',name:'Ask Guru',desc:'Your AI advisor — campaigns · menu · margin',fn:repGuru}
  ]},
  {group:'Overview',items:[
    {id:'dashboard',ic:'🏠',name:'Dashboard',desc:'Today at a glance · live',fn:repDashboard}
@@ -2386,6 +2413,157 @@ function repAlerts(){
     tbl([{t:'Severity'},{t:'Category'},{t:'Message'}],
       a.map(x=>({cells:[`<span style="color:${col(x.sev)};font-weight:600">${ic(x.sev)} ${x.sev}</span>`,x.cat,x.msg]}))));
 }
+
+function repGuru(){
+  return `
+    <div class="kpis" style="grid-template-columns:1fr;margin-bottom:14px">
+      <div class="kpi" style="background:linear-gradient(135deg,rgba(255,149,0,.06),rgba(255,107,0,.02));border-color:var(--border-2)">
+        <div class="glow"></div>
+        <div class="lab" style="color:var(--primary)">ASK GURU · YOUR AI ADVISOR</div>
+        <div style="font-size:14px;color:var(--dim);line-height:1.55;margin-top:6px;max-width:680px">Guru reads your live data and gives you a starting point — campaigns, menu ideas, margin diagnostics, business tips. Always with a clear disclaimer to consult a specialist for the big calls.</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Try a question</h3>
+      <div class="ph-sub">Type freely or pick a starter below</div>
+      <div class="g-input-row">
+        <input type="text" id="guruRepInput" class="g-input" placeholder="Ask Guru anything…" autocomplete="off" lang="en-US" />
+        <button id="guruRepAsk" type="button" class="g-ask">Ask Guru →</button>
+      </div>
+      <div class="g-chips">
+        <button class="g-chip" data-q="campaign">What campaign should I run this week?</button>
+        <button class="g-chip" data-q="dish">What new dish should I add?</button>
+        <button class="g-chip" data-q="opportunity">What's my biggest opportunity?</button>
+        <button class="g-chip" data-q="margin">How's my margin trending?</button>
+      </div>
+    </div>
+
+    <div class="panel g-answer" id="guruRepAnswer" style="display:none;margin-top:14px">
+      <div class="g-eyebrow">GURU'S TAKE</div>
+      <h3 id="guruRepQ" style="margin-bottom:14px">—</h3>
+      <div id="guruRepBody" class="g-body"></div>
+      <div class="g-disc">
+        <b>Starting point only.</b> Guru reads what's in your data — for pricing, supplier or staffing decisions, consult a restaurant industry specialist before acting.
+      </div>
+    </div>
+  `;
+}
+
+/* Ask Guru — embedded inside the reports view */
+const GURU_DATA = {
+  campaign: {
+    q: "What campaign should I run this week?",
+    body: `
+      <div class="g-block"><div class="g-l">Read of your data</div><ul class="g-ul">
+        <li>Pasta category margin sits at <b>64%</b> — your highest after Dessert</li>
+        <li>Wine attach on pasta orders is <b>78%</b> vs 62% on burger nights</li>
+        <li>Tuesday / Wednesday dinner is your softest daypart (avg 18 covers vs Friday 42)</li>
+      </ul></div>
+      <div class="g-block"><div class="g-l">Recommendation</div><p class="g-lead">Run a <b>"Pasta + Wine $24" prix-fixe</b> — Tuesday–Thursday 5–7pm.</p></div>
+      <div class="g-block"><div class="g-l">Why it'll work</div><ul class="g-ul">
+        <li>Hits a soft daypart with your highest-margin pairing</li>
+        <li>Wine-pairing positioning lifts the average check</li>
+        <li>Inventory check: 4 weeks of full-volume runs covered</li>
+      </ul></div>
+      <div class="g-block"><div class="g-l">Expected outcome</div>
+        <p class="g-lead">+18–22% pasta units · +$4–6 average check on those nights</p>
+        <p class="g-meta">Channel: SMS to loyalty + in-app banner · breakeven by week 2</p>
+      </div>`
+  },
+  dish: {
+    q: "What new dish should I add to the menu?",
+    body: `
+      <div class="g-block"><div class="g-l">Read of your data</div><ul class="g-ul">
+        <li>"Avocado +$2" sells <b>19 units/day</b> at near-100% margin</li>
+        <li>"Truffle fries +$3" sells <b>27 units/day</b> — premium add-ons resonate</li>
+        <li>Brunch has 5 items vs 12 dinner items, despite <b>32%</b> of under-30 guests ordering it</li>
+      </ul></div>
+      <div class="g-block"><div class="g-l">Recommendation</div><p class="g-lead">Add <b>"Smoked Salmon &amp; Avocado Toast" at $17</b> to the brunch menu.</p></div>
+      <div class="g-block"><div class="g-l">Why it'll work</div><ul class="g-ul">
+        <li>Combines two of your best-selling premium ingredients</li>
+        <li>Targets the under-30 brunch cohort that's still growing</li>
+        <li>Brunch margin is <b>71%</b> vs dinner average 56%</li>
+      </ul></div>
+      <div class="g-block"><div class="g-l">Expected outcome</div>
+        <p class="g-lead">8–12 units / weekend day in the first month</p>
+        <p class="g-meta">Validate with a 2-week trial menu insert + A/B social test before a permanent slot</p>
+      </div>`
+  },
+  opportunity: {
+    q: "What's my biggest opportunity right now?",
+    body: `
+      <div class="g-block"><div class="g-l">Read of your data</div><ul class="g-ul">
+        <li>Sauté station average ticket time: <b>11.1 min</b> — 1.1 min over the 10-min target</li>
+        <li>That bottleneck costs you ~3 turns per dinner service on busy nights</li>
+        <li>Pasta carries 64% margin but is only <b>7%</b> of revenue (vs 18% potential)</li>
+      </ul></div>
+      <div class="g-block"><div class="g-l">Recommendation</div><p class="g-lead">Speed up Sauté <b>and</b> reposition Pasta as a featured category.</p></div>
+      <div class="g-block"><div class="g-l">30-day plan</div><ul class="g-ul">
+        <li>Move 2 pasta items into the "Most ordered" carousel</li>
+        <li>Train Sauté on a parallel prep flow for the carbonara / scampi pair</li>
+        <li>Add a $12 lunch pasta special Mon–Wed</li>
+      </ul></div>
+      <div class="g-block"><div class="g-l">Expected outcome</div><p class="g-lead">+$3,200 / week revenue · Sauté ticket time → 9.5 min</p></div>`
+  },
+  margin: {
+    q: "How's my margin trending?",
+    body: `
+      <div class="g-block"><div class="g-l">Read of your data</div><ul class="g-ul">
+        <li>Net margin slipped from <b>25% → 23%</b> this month</li>
+        <li>COGS up <b>1.8 pts</b> — supplier price increase on ribeye + truffle</li>
+        <li>Labor flat (28.3%, within target). Service mix unchanged.</li>
+      </ul></div>
+      <div class="g-block"><div class="g-l">Recommendation</div><p class="g-lead">Two moves to recover ~1.5 pts within four weeks.</p></div>
+      <div class="g-block"><div class="g-l">Moves</div><ol class="g-ul">
+        <li><b>Renegotiate ribeye.</b> You order 18/day at $12.50. Vendor X (regional benchmark) prices the same cut at $10.85 — annual save ~$10,800.</li>
+        <li><b>Swap the "truffle fries" garnish</b> from truffle oil to shaved parmesan. Cost: −$0.40 / serve. Guest feedback delta: −1%.</li>
+      </ol></div>
+      <div class="g-block"><div class="g-l">Expected outcome</div><p class="g-lead">+1.5 pts net margin within 4 weeks of move 1</p></div>`
+  }
+};
+
+(function(){
+  if (typeof document === 'undefined') return;
+  function ready(fn){ if(document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded',fn); }
+  function pickKey(t){
+    t = (t || '').toLowerCase();
+    if (/camp|promo|run|event|special/.test(t)) return 'campaign';
+    if (/dish|menu|add|item|food|plate/.test(t)) return 'dish';
+    if (/margin|cogs|cost|profit|p&l|expense/.test(t)) return 'margin';
+    return 'opportunity';
+  }
+  function show(key){
+    var d = GURU_DATA[key]; if (!d) return;
+    var q = document.getElementById('guruRepQ');
+    var body = document.getElementById('guruRepBody');
+    var panel = document.getElementById('guruRepAnswer');
+    if (q) q.textContent = d.q;
+    if (body) body.innerHTML = d.body;
+    if (panel) panel.style.display = '';
+    if (panel && panel.scrollIntoView) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  ready(function(){
+    if (typeof document.addEventListener !== 'function') return;
+    // Event delegation — works whether or not the report panel is currently rendered.
+    document.addEventListener('click', function(e){
+      var chip = e.target && e.target.closest && e.target.closest('.g-chip');
+      if (chip && chip.dataset && chip.dataset.q) { show(chip.dataset.q); return; }
+      var ask = e.target && e.target.closest && e.target.closest('#guruRepAsk');
+      if (ask) {
+        var inp = document.getElementById('guruRepInput');
+        show(pickKey(inp && inp.value));
+      }
+    });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' && e.target && e.target.id === 'guruRepInput') {
+        e.preventDefault();
+        var btn = document.getElementById('guruRepAsk');
+        if (btn) btn.click();
+      }
+    });
+  });
+})();
 
 /* ---- sidebar + dispatch ---- */
 function setupReportsSidebar(){
