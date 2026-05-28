@@ -70,19 +70,13 @@
   @keyframes rise{from{opacity:0;transform:translateY(20px)}}
 
   .logo{
-    width:96px;height:96px;border-radius:28px;
-    background:var(--grad-hi);
-    display:grid;place-items:center;
-    box-shadow:
-      0 24px 80px rgba(255,107,0,.45),
-      0 8px 28px rgba(255,107,0,.35),
-      0 0 0 .5px rgba(255,255,255,.08) inset;
-    position:relative;
-    margin-bottom:22px;
+    width:120px;height:120px;display:grid;place-items:center;
+    position:relative;margin-bottom:22px;
+    filter:drop-shadow(0 24px 60px rgba(255,107,0,.45)) drop-shadow(0 8px 20px rgba(255,107,0,.35));
     animation:pulse 4s ease-in-out infinite;
   }
   @keyframes pulse{50%{transform:scale(1.03);box-shadow:0 28px 100px rgba(255,107,0,.55),0 12px 36px rgba(255,107,0,.45),0 0 0 .5px rgba(255,255,255,.12) inset}}
-  .logo svg{width:54px;height:54px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))}
+  .logo svg{width:100%;height:100%}
 
   .eyebrow{
     font-family:'JetBrains Mono',monospace;
@@ -178,8 +172,8 @@
       margin:0;flex:0 0 200px;
       align-items:flex-start;
     }
-    .logo{width:74px;height:74px;border-radius:22px;margin-bottom:14px}
-    .logo svg{width:42px;height:42px}
+    .logo{width:84px;height:84px;border-radius:0;margin-bottom:14px}
+    .logo svg{width:100%;height:100%}
     .copy{flex:1;max-width:480px}
     h1{font-size:clamp(26px,4.5vw,36px);margin-bottom:8px}
     .lead{margin:0 0 14px;font-size:13.5px;max-width:none}
@@ -192,8 +186,8 @@
 
   /* Extra-small phones */
   @media (max-height:600px) and (orientation:portrait){
-    .logo{width:80px;height:80px;margin-bottom:16px}
-    .logo svg{width:46px;height:46px}
+    .logo{width:90px;height:90px;margin-bottom:16px}
+    .logo svg{width:100%;height:100%}
     .lead{margin-bottom:20px}
     .chips{margin-bottom:22px}
     .cta{padding:15px 30px;font-size:15.5px}
@@ -210,17 +204,21 @@
     <div class="logo" aria-hidden="true">
       <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="fg" x1="40" y1="8" x2="40" y2="72" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#FFF7E8"/>
-            <stop offset="100%" stop-color="#FFE8C7"/>
+          <linearGradient id="tryPos" x1="40" y1="40" x2="40" y2="72" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#FF9500"/>
+            <stop offset="1" stop-color="#FF6B00"/>
           </linearGradient>
-          <linearGradient id="fi" x1="40" y1="32" x2="40" y2="68" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#FFD48A"/>
-            <stop offset="100%" stop-color="#FF9500"/>
+          <linearGradient id="tryBolt" x1="40" y1="6" x2="40" y2="56" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#FFF1D6"/>
+            <stop offset=".5" stop-color="#FFC97A"/>
+            <stop offset="1" stop-color="#FF9500"/>
           </linearGradient>
         </defs>
-        <path d="M40 8C40 8 22 28 22 46C22 56 28 64 36 67C32 63 30 57 30 52C30 40 40 32 40 32C40 32 50 40 50 52C50 57 48 63 44 67C52 64 58 56 58 46C58 28 40 8 40 8Z" fill="url(#fg)" opacity="0.95"/>
-        <path d="M40 32C40 32 32 42 32 52C32 58 35 62 40 64C45 62 48 58 48 52C48 42 40 32 40 32Z" fill="url(#fi)" opacity="0.9"/>
+        <rect x="12" y="40" width="56" height="32" rx="7" fill="url(#tryPos)"/>
+        <rect x="18" y="46" width="44" height="14" rx="2" fill="#160a00" fill-opacity=".48"/>
+        <rect x="20" y="64" width="40" height="2.5" rx="1.25" fill="#160a00" fill-opacity=".35"/>
+        <circle cx="64" cy="69" r="1.4" fill="#160a00" fill-opacity=".35"/>
+        <path d="M44 6 L24 40 L36 40 L30 56 L52 28 L40 28 L48 6 Z" fill="url(#tryBolt)" stroke="#FFE8C7" stroke-width=".5" stroke-linejoin="round"/>
       </svg>
     </div>
     <div class="eyebrow"><span class="live"></span> LIVE DEMO</div>
