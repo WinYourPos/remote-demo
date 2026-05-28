@@ -422,6 +422,116 @@
 .brand-logo.sm{width:24px;height:24px}
 .brand-logo.lg{width:96px;height:96px}
 /* <<< BRAND-LOGO-CSS <<< */
+
+/* >>> GURU-CSS >>> */
+.guru-card{
+  background:linear-gradient(135deg,rgba(255,149,0,.05),rgba(255,107,0,.02));
+  border:1px solid var(--border-2);border-radius:24px;
+  padding:36px;margin-top:42px;position:relative;overflow:hidden;
+}
+.guru-card::before{
+  content:'';position:absolute;top:-120px;right:-120px;
+  width:420px;height:420px;
+  background:radial-gradient(circle,rgba(255,107,0,.10),transparent 60%);
+  pointer-events:none;
+}
+.guru-prompt{position:relative;z-index:1}
+.guru-eyebrow{
+  font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;
+  font-weight:700;color:var(--primary);text-transform:uppercase;
+  display:block;margin-bottom:12px;
+}
+.guru-input-row{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface);border:1.5px solid var(--border-2);
+  border-radius:14px;padding:6px 6px 6px 16px;margin-bottom:14px;
+  transition:border-color .15s,box-shadow .15s;
+}
+.guru-input-row:focus-within{border-color:var(--primary);box-shadow:0 0 0 4px rgba(255,149,0,.10)}
+.guru-icon{display:grid;place-items:center;width:22px;height:22px;color:var(--primary);flex-shrink:0}
+.guru-icon svg{width:18px;height:18px}
+.guru-input{
+  flex:1;background:none;border:none;outline:none;
+  color:#fff;font-family:'Sora',inherit;font-size:15px;padding:10px 0;
+}
+.guru-input::placeholder{color:var(--dim-2)}
+.guru-ask{
+  padding:11px 20px;border-radius:10px;
+  background:var(--grad);color:#160a00;
+  font-family:inherit;font-weight:700;font-size:14px;letter-spacing:-.01em;
+  border:none;cursor:pointer;flex-shrink:0;
+  box-shadow:0 6px 16px rgba(255,107,0,.30);
+  transition:transform .12s,box-shadow .15s;
+}
+.guru-ask:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(255,107,0,.42)}
+.guru-ask:active{transform:scale(.97)}
+
+.guru-chips{display:flex;flex-wrap:wrap;gap:8px}
+.guru-chip{
+  padding:9px 15px;border-radius:999px;
+  background:var(--surface-2);border:1px solid var(--border);
+  color:var(--dim);font-family:inherit;font-size:13px;font-weight:500;letter-spacing:-.005em;
+  cursor:pointer;transition:border-color .15s,background .15s,color .15s,transform .12s;
+}
+.guru-chip:hover{
+  border-color:rgba(255,149,0,.45);background:rgba(255,149,0,.08);color:#fff;
+}
+.guru-chip:active{transform:scale(.97)}
+
+.guru-answer{
+  margin-top:28px;background:var(--surface);
+  border:1px solid var(--border-2);border-radius:20px;padding:30px 30px 24px;
+  position:relative;
+  opacity:0;transform:translateY(8px);
+  transition:opacity .35s ease-out,transform .35s ease-out;
+  pointer-events:none;
+}
+.guru-answer.on{opacity:1;transform:translateY(0);pointer-events:auto}
+.guru-answer::before{
+  content:'';position:absolute;top:0;left:18%;right:18%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--primary),transparent);
+  box-shadow:0 0 12px var(--primary);
+}
+.guru-answer-eyebrow{
+  font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.14em;
+  font-weight:700;color:var(--primary);text-transform:uppercase;margin-bottom:10px;
+}
+.guru-question{
+  font-size:20px;font-weight:700;letter-spacing:-.015em;margin-bottom:22px;line-height:1.3;
+}
+.guru-response{display:flex;flex-direction:column;gap:18px}
+.g-block-l{
+  font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.12em;
+  font-weight:700;color:var(--dim-2);text-transform:uppercase;margin-bottom:8px;
+}
+.g-lead{font-size:15px;line-height:1.55;color:#fff}
+.g-lead b{color:var(--primary)}
+.g-list{padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--dim);line-height:1.55;margin:0}
+.g-list li::marker{color:var(--primary)}
+.g-list b{color:#fff}
+.g-meta{font-size:11.5px;color:var(--dim-2);margin-top:6px;font-family:'JetBrains Mono'}
+
+.guru-disclaimer{
+  margin-top:22px;padding:13px 16px;
+  background:rgba(255,149,0,.05);
+  border:1px solid rgba(255,149,0,.18);border-radius:12px;
+  display:flex;gap:10px;align-items:flex-start;
+  font-size:12.5px;color:var(--dim);line-height:1.55;
+}
+.guru-disclaimer .guru-disclaimer-icon{display:grid;place-items:center;color:var(--primary);flex-shrink:0;width:18px;height:18px}
+.guru-disclaimer .guru-disclaimer-icon svg{width:15px;height:15px}
+.guru-disclaimer b{color:#fff}
+
+@media (max-width:640px){
+  .guru-card{padding:24px 22px}
+  .guru-input-row{flex-wrap:wrap;padding:8px}
+  .guru-input{font-size:14px;width:100%;padding:6px 0}
+  .guru-ask{width:100%;padding:12px}
+  .guru-icon{display:none}
+  .guru-answer{padding:22px 20px 20px}
+  .guru-question{font-size:17px}
+}
+/* <<< GURU-CSS <<< */
 </style>
 </head>
 <body>
@@ -629,7 +739,7 @@
       <span class="pill">Bring your own processor</span>
       <span class="pill">iPad · Android · PAX A920 / A35</span>
       <span class="pill">13 device surfaces</span>
-      <span class="pill">13 AI services included</span>
+      <span class="pill">Ask Guru · AI advisor</span>
     </div>
   </div>
 
@@ -698,17 +808,46 @@
 
 <!-- POS TEST DRIVE -->
 
-<!-- AI -->
+<!-- AI / Ask Guru -->
 <section class="pad" id="ai">
   <div class="wrap">
-    <span class="eyebrow reveal">13 AI services · included</span>
-    <h2 class="section-title reveal">AI that ships with the product — not a $200/mo add-on.</h2>
-    <p class="section-sub reveal">Toast and Heartland charge $75–$200 a month, each, for marketing, loyalty and analytics. Spark's intelligence layer is built in from day one.</p>
+    <span class="eyebrow reveal">ASK GURU · YOUR AI ADVISOR</span>
+    <h2 class="section-title reveal">An advisor in your back office — not a stack of add-ons.</h2>
+    <p class="section-sub reveal">Spark Guru reads your live data and gives you a starting point. Campaign ideas, menu suggestions, business tips — always with a clear disclaimer to consult a specialist for the big calls.</p>
 
-    <div class="ai-grid" id="aiGrid"></div>
+    <div class="guru-card reveal">
+      <div class="guru-prompt">
+        <span class="guru-eyebrow">TRY A QUESTION</span>
+        <div class="guru-input-row">
+          <span class="guru-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4M22 5h-4M4 17v2M5 18H3"/></svg>
+          </span>
+          <input type="text" class="guru-input" id="guruInput" placeholder="Ask Guru anything — about your menu, costs, campaigns…" autocomplete="off" lang="en-US">
+          <button class="guru-ask" id="guruAsk">Ask Guru →</button>
+        </div>
+        <div class="guru-chips" id="guruChips">
+          <button class="guru-chip" data-q="campaign">What campaign should I run this week?</button>
+          <button class="guru-chip" data-q="dish">What new dish should I add to the menu?</button>
+          <button class="guru-chip" data-q="opportunity">What's my biggest opportunity right now?</button>
+          <button class="guru-chip" data-q="margin">How's my margin trending?</button>
+        </div>
+      </div>
+
+      <div class="guru-answer" id="guruAnswer">
+        <div class="guru-answer-eyebrow">GURU'S TAKE</div>
+        <div class="guru-question" id="guruQuestion">—</div>
+        <div class="guru-response" id="guruResponse"></div>
+        <div class="guru-disclaimer">
+          <span class="guru-disclaimer-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9a4 4 0 0 0-2 7.5"/><path d="M12 3v2"/><path d="m6.6 18.4-1.4 1.4"/><path d="M20 4 4 20"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m4 4 1.4 1.4"/><path d="M15.7 18.4a4 4 0 0 0 2.3-3.4"/></svg>
+          </span>
+          <span><b>Starting point only.</b> Guru reads what's in your data — for pricing, supplier or staffing calls, please consult a restaurant industry specialist before acting.</span>
+        </div>
+      </div>
+    </div>
 
     <div class="ai-banner reveal">
-      <p>Your clients switch, get the analytics and forecasting incumbents bolt on for hundreds a month — and <b>you set the price</b>.</p>
+      <p>One advisor, baked in. <b>Your clients get this</b> instead of paying for stacked AI add-ons everywhere else.</p>
       <a href="#partner" class="btn btn-primary" style="white-space:nowrap">What's in it for me? →</a>
     </div>
   </div>
@@ -794,7 +933,7 @@
           <tr><td class="feat">Bring your own processor</td><td class="spark"><span class="yes">Yes</span></td><td><span class="no">Toast only</span></td><td><span class="no">Heartland only</span></td><td><span class="no">Square only</span></td></tr>
           <tr><td class="feat">You own the customer & contract</td><td class="spark"><span class="yes">Yes</span></td><td><span class="no">No</span></td><td><span class="no">No</span></td><td><span class="no">No</span></td></tr>
           <tr><td class="feat">You set the retail price</td><td class="spark"><span class="yes">Yes</span></td><td><span class="no">No</span></td><td><span class="mid">Limited</span></td><td><span class="no">No</span></td></tr>
-          <tr><td class="feat">AI suite included</td><td class="spark"><span class="yes">13 services</span></td><td><span class="mid">Paid add-ons</span></td><td><span class="mid">Paid add-ons</span></td><td><span class="mid">Limited</span></td></tr>
+          <tr><td class="feat">Built-in AI advisor</td><td class="spark"><span class="yes">Ask Guru</span></td><td><span class="mid">Paid add-ons</span></td><td><span class="mid">Paid add-ons</span></td><td><span class="mid">Limited</span></td></tr>
           <tr><td class="feat">Hardware flexibility</td><td class="spark"><span class="yes">iPad/Android/PAX</span></td><td><span class="no">Proprietary</span></td><td><span class="mid">Restricted</span></td><td><span class="mid">Square only</span></td></tr>
           <tr><td class="feat">Device surfaces</td><td class="spark"><span class="yes">13</span></td><td><span class="mid">~8</span></td><td><span class="mid">~9</span></td><td><span class="mid">~5</span></td></tr>
           <tr><td class="feat">Partner economics</td><td class="spark"><span class="yes">SaaS margin + residual</span></td><td><span class="mid">One-time bounty</span></td><td><span class="mid">Captive residual</span></td><td><span class="mid">Referral share</span></td></tr>
@@ -849,7 +988,7 @@
         <div class="tnum"><div class="n">100+</div><div class="l">POS pages</div></div>
         <div class="tnum"><div class="n">50+</div><div class="l">admin console pages</div></div>
         <div class="tnum"><div class="n">13</div><div class="l">device surfaces</div></div>
-        <div class="tnum"><div class="n">13</div><div class="l">AI services</div></div>
+        <div class="tnum"><div class="n" style="font-size:22px;letter-spacing:-.01em">Guru</div><div class="l">AI advisor</div></div>
       </div>
     </div>
   </div>
@@ -1166,24 +1305,157 @@ function applyBrand(b){
 }
 applyBrand(BRANDS[0]);
 
-/* ---------- AI grid ---------- */
-const AI=[
-  ['🔮','Demand Forecast','Predict tomorrow\'s covers from weather, events and seasonality.','within 2–5% accuracy'],
-  ['📈','Smart Upsell','Surface the right add-on at the right moment, on every channel.','higher avg check'],
-  ['🛡️','Fraud Detection','Flag void, refund and comp anomalies before close-of-day.','catch it same day'],
-  ['🍽️','Menu AI','Re-rank menu mix by profit, prep time and forecasted demand.','margin-first menu'],
-  ['🗓️','AI Scheduling','Match staffing to forecasted demand, shift by shift.','cut labor 8–12%'],
-  ['💬','Voice Ordering','Take drive-thru and phone orders with conversational AI.','fewer dropped orders'],
-  ['📷','Image AI','Auto-generate menu imagery and tag plates for online ordering.','launch faster'],
-  ['⚠️','KPI Anomaly','Catch the metric that broke before the daily report does.','early warning'],
-  ['🔁','Churn AI','Spot guests drifting away and trigger win-back automatically.','retain regulars'],
-  ['💲','Dynamic Pricing','Suggest price moves by daypart, demand and inventory.','protect margin'],
-  ['🧾','Receipt Intelligence','Parse and reconcile third-party orders automatically.','clean books'],
-  ['👥','Labor Insight','Forecast overtime risk and tip distribution fairness.','fewer surprises'],
-  ['📦','Inventory AI','Predict 86\'d items and reorder points before you run out.','never run dry']
-];
-const aiGrid=document.getElementById('aiGrid');
-AI.forEach(([ic,h,p,m])=>{const el=document.createElement('div');el.className='ai-card reveal';el.innerHTML=`<div class="ic">${ic}</div><h4>${h}</h4><p>${p}</p><span class="metric mono">→ ${m}</span>`;aiGrid.appendChild(el);io.observe(el)});
+/* >>> GURU-JS >>> */
+const GURU = {
+  campaign: {
+    q: "What campaign should I run this week?",
+    body: `
+      <div>
+        <div class="g-block-l">Read of your data</div>
+        <ul class="g-list">
+          <li>Pasta category margin sits at <b>64%</b> — your highest after Dessert</li>
+          <li>Wine attach on pasta orders is <b>78%</b> vs 62% on burger nights</li>
+          <li>Tuesday / Wednesday dinner is your softest daypart (avg 18 covers vs Friday 42)</li>
+        </ul>
+      </div>
+      <div>
+        <div class="g-block-l">Recommendation</div>
+        <p class="g-lead">Run a <b>"Pasta + Wine $24" prix-fixe</b> — Tuesday–Thursday 5–7pm.</p>
+      </div>
+      <div>
+        <div class="g-block-l">Why it'll work</div>
+        <ul class="g-list">
+          <li>Hits a soft daypart with your highest-margin pairing</li>
+          <li>Wine-pairing positioning lifts the average check</li>
+          <li>Inventory check: 4 weeks of full-volume runs covered</li>
+        </ul>
+      </div>
+      <div>
+        <div class="g-block-l">Expected outcome</div>
+        <p class="g-lead">+18–22% pasta units · +$4–6 average check on those nights</p>
+        <p class="g-meta">Channel: SMS to loyalty + in-app banner · breakeven by week 2</p>
+      </div>`
+  },
+  dish: {
+    q: "What new dish should I add to the menu?",
+    body: `
+      <div>
+        <div class="g-block-l">Read of your data</div>
+        <ul class="g-list">
+          <li>"Avocado +$2" sells <b>19 units/day</b> at near-100% margin</li>
+          <li>"Truffle fries +$3" sells <b>27 units/day</b> — premium add-ons resonate</li>
+          <li>Brunch has 5 items vs 12 dinner items, despite <b>32%</b> of under-30 guests ordering it</li>
+        </ul>
+      </div>
+      <div>
+        <div class="g-block-l">Recommendation</div>
+        <p class="g-lead">Add <b>"Smoked Salmon &amp; Avocado Toast" at $17</b> to the brunch menu.</p>
+      </div>
+      <div>
+        <div class="g-block-l">Why it'll work</div>
+        <ul class="g-list">
+          <li>Combines two of your best-selling premium ingredients</li>
+          <li>Targets the under-30 brunch cohort that's still growing</li>
+          <li>Brunch margin is <b>71%</b> vs dinner average 56%</li>
+        </ul>
+      </div>
+      <div>
+        <div class="g-block-l">Expected outcome</div>
+        <p class="g-lead">8–12 units / weekend day in the first month</p>
+        <p class="g-meta">Validate with a 2-week trial menu insert + A/B social test before a permanent slot</p>
+      </div>`
+  },
+  opportunity: {
+    q: "What's my biggest opportunity right now?",
+    body: `
+      <div>
+        <div class="g-block-l">Read of your data</div>
+        <ul class="g-list">
+          <li>Sauté station average ticket time: <b>11.1 min</b> — 1.1 min over the 10-min target</li>
+          <li>That bottleneck costs you ~3 turns per dinner service on busy nights</li>
+          <li>Pasta carries 64% margin but is only <b>7%</b> of revenue (vs 18% potential)</li>
+        </ul>
+      </div>
+      <div>
+        <div class="g-block-l">Recommendation</div>
+        <p class="g-lead">Speed up Sauté <b>and</b> reposition Pasta as a featured category.</p>
+      </div>
+      <div>
+        <div class="g-block-l">30-day plan</div>
+        <ul class="g-list">
+          <li>Move 2 pasta items into the "Most ordered" carousel</li>
+          <li>Train Sauté on a parallel prep flow for the carbonara / scampi pair</li>
+          <li>Add a $12 lunch pasta special Mon–Wed</li>
+        </ul>
+      </div>
+      <div>
+        <div class="g-block-l">Expected outcome</div>
+        <p class="g-lead">+$3,200 / week revenue · Sauté ticket time → 9.5 min</p>
+      </div>`
+  },
+  margin: {
+    q: "How's my margin trending?",
+    body: `
+      <div>
+        <div class="g-block-l">Read of your data</div>
+        <ul class="g-list">
+          <li>Net margin slipped from <b>25% → 23%</b> this month</li>
+          <li>COGS up <b>1.8 pts</b> — supplier price increase on ribeye + truffle</li>
+          <li>Labor flat (28.3%, within target). Service mix unchanged.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="g-block-l">Recommendation</div>
+        <p class="g-lead">Two moves to recover ~1.5 pts within four weeks.</p>
+      </div>
+      <div>
+        <div class="g-block-l">Moves</div>
+        <ol class="g-list">
+          <li><b>Renegotiate ribeye.</b> You order 18/day at $12.50. Vendor X (regional benchmark) prices the same cut at $10.85 — annual save ~$10,800.</li>
+          <li><b>Swap the "truffle fries" garnish</b> from truffle oil to shaved parmesan. Cost: −$0.40 / serve. Guest feedback delta: −1%.</li>
+        </ol>
+      </div>
+      <div>
+        <div class="g-block-l">Expected outcome</div>
+        <p class="g-lead">+1.5 pts net margin within 4 weeks of move 1</p>
+      </div>`
+  }
+};
+
+(function(){
+  if (typeof document === 'undefined') return;
+  function ready(fn){ if(document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded',fn); }
+  ready(function(){
+    var input = document.getElementById('guruInput');
+    var ask   = document.getElementById('guruAsk');
+    var q     = document.getElementById('guruQuestion');
+    var resp  = document.getElementById('guruResponse');
+    var ans   = document.getElementById('guruAnswer');
+    if (!input || !ask || !q || !resp || !ans) return;
+    if (typeof ask.addEventListener !== 'function') return;
+
+    function show(key){
+      var d = GURU[key]; if (!d) return;
+      q.textContent = d.q;
+      resp.innerHTML = d.body;
+      ans.classList.add('on');
+    }
+    function match(txt){
+      var t = (txt || '').toLowerCase();
+      if (/camp|promo|run|event|special/.test(t)) return 'campaign';
+      if (/dish|menu|add|item|food|plate/.test(t)) return 'dish';
+      if (/margin|cogs|cost|profit|cash|p&l|expense/.test(t)) return 'margin';
+      return 'opportunity';
+    }
+    document.querySelectorAll('.guru-chip').forEach(function(b){
+      b.addEventListener('click', function(){ show(b.dataset.q); });
+    });
+    ask.addEventListener('click', function(){ show(match(input.value)); });
+    input.addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); ask.click(); }});
+    show('campaign');
+  });
+})();
+/* <<< GURU-JS <<< */el.className='ai-card reveal';el.innerHTML=`<div class="ic">${ic}</div><h4>${h}</h4><p>${p}</p><span class="metric mono">→ ${m}</span>`;aiGrid.appendChild(el);io.observe(el)});
 
 /* ---------- pipeline ---------- */
 const PIPE=[
@@ -1238,7 +1510,7 @@ const FAQ=[
   ['What hardware do my clients need?','Your choice. Spark runs on iPad and Android, and integrates natively with PAX A920 and A35 terminals. No proprietary, non-transferable hardware lock-in.'],
   ['How long until a restaurant goes live?','A well-prepared single site is typically live in about 14 days — menu import, hardware ship, training, a test shift, then go-live with on-call support. Multi-location rollouts take longer; we scope each one.'],
   ['Can I migrate my existing restaurant clients?','Yes — menu, customers, loyalty and gift-card balances import during onboarding, so switching a client off their current POS is low-friction.'],
-  ['What does "waiting for backend integration" mean for me?','The entire frontend — 100+ POS pages, 50+ admin pages, 13 surfaces, 13 AI services — is built. The remaining work is wiring it to a backend (auth, API, your processor). That integration is exactly what the partnership defines; we scope and build it with you, not hand you a surprise.'],
+  ['What does "waiting for backend integration" mean for me?','The entire frontend — 100+ POS pages, 50+ admin pages, 13 surfaces, and the Ask Guru AI advisor — is built. The remaining work is wiring it to a backend (auth, API, your processor). That integration is exactly what the partnership defines; we scope and build it with you, not hand you a surprise.'],
   ['What support do partners get?','Tier-1 platform support, a partner portal, training materials, sandbox tenants for demos, and a dedicated partnership lead. We back your support so it doesn\'t all fall on you.']
 ];
 const faqList=document.getElementById('faqList');
