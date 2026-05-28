@@ -599,6 +599,71 @@ button{font-family:inherit;cursor:pointer}
   .pay-summary .ps-row.total span.mono{font-size:18px}
 }
 /* <<< PAY-MODAL-CSS <<< */
+
+/* >>> LANDSCAPE-CSS >>> */
+@media (orientation: landscape) and (max-height: 520px) {
+  /* Topbar: minimise vertical waste */
+  .topbar { padding: 8px 16px; gap: 12px; }
+  .logo { font-size: 15px; }
+  .logo small { display: none; }
+  .seg { padding: 3px; }
+  .seg button { padding: 7px 14px; font-size: 12.5px; }
+  .seg button .lbl-txt { font-size: 12px; }
+  .topbar .clock { font-size: 11px; }
+
+  /* Order — keep side-by-side, trim padding */
+  .menu-top { padding: 10px 16px; }
+  .menu-top h2 { font-size: 17px; }
+  .check-pane { width: 320px; }
+  .check-top { padding: 10px 16px; }
+  .cats { padding: 8px 16px; }
+  .items { padding: 12px 16px; gap: 10px; }
+
+  /* Modifier sheet shrinks */
+  .sheet { max-height: 96vh; }
+  .sheet-h { padding: 16px 22px 12px; }
+  .sheet-h h3 { font-size: 20px; margin: 8px 0 3px; }
+  .sheet-body { padding: 14px 22px; }
+  .mgroup { margin-bottom: 16px; }
+  .opts { grid-template-columns: repeat(3, 1fr); }
+  .sheet-f { padding: 12px 22px; }
+
+  /* KDS */
+  .kds-bar { padding: 8px 16px; }
+  .kds-board { padding: 14px; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  .tk-h { padding: 10px 14px; }
+  .tk-body { padding: 6px 14px; }
+  .tk-f { padding: 8px 14px; }
+
+  /* Reports — slim sidebar */
+  .rep-side { width: 200px; padding: 8px 6px; }
+  .rep-side .grp { margin-bottom: 8px; }
+  .rep-side .grp .gl { padding: 6px 10px 3px; font-size: 9px; }
+  .rep-side a { padding: 7px 10px; font-size: 12.5px; }
+  .rep-head { padding: 10px 18px; }
+  .rep-content { padding: 14px 18px 40px; }
+  .kpis { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+  .kpi { padding: 12px; }
+  .kpi .val { font-size: 22px; }
+
+  /* Pay modal — 6 methods in one row, compact summary */
+  .pay-modal { max-height: 96vh; }
+  .pay-head { padding: 14px 22px 10px; }
+  .pay-body { padding: 12px 22px; }
+  .pay-summary { padding: 10px 14px; margin-bottom: 12px; }
+  .ps-row { padding: 3px 0; font-size: 12.5px; }
+  .ps-row.total { font-size: 14px; padding-top: 7px; }
+  .pay-section { margin-bottom: 12px; }
+  .pay-tender-row { margin-bottom: 12px; }
+  .pay-methods { grid-template-columns: repeat(6, 1fr); }
+  .pm-btn { padding: 10px 4px; font-size: 10.5px; gap: 4px; }
+  .pm-btn .pm-ic { font-size: 17px; }
+  .pay-foot { padding: 10px 22px 14px; }
+
+  /* QR modal — keep visible */
+  .qr-frame { width: 200px; height: 200px; padding: 10px; }
+}
+/* <<< LANDSCAPE-CSS <<< */
 </style>
 </head>
 <body>
