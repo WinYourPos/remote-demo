@@ -735,7 +735,6 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
     <div class="nav-links">
       <a href="#surfaces">Platform</a>
       <a href="#ai">AI</a>
-      <a href="#roi">Partner</a>
     </div>
   </div>
 </nav>
@@ -751,7 +750,6 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
     <div class="hero-ctas">
       <a href="https://winyourpos.github.io/remote-demo/try.html" target="_blank" rel="noopener" class="btn btn-primary">Test-drive the POS ↗</a>
       <button type="button" class="btn btn-ghost" id="qrBtn">Try it yourself <span class="qr-ic" aria-hidden="true">📱</span></button>
-      <a href="#roi" class="btn btn-ghost">See the partner economics</a>
     </div>
     <div class="trust-strip">
       <span class="pill">100% white-label</span>
@@ -825,47 +823,6 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
 
     <div class="ai-banner reveal">
       <p>One advisor, baked in. <b>Your clients get this</b> instead of paying for stacked AI add-ons everywhere else.</p>
-      <a href="#roi" class="btn btn-primary" style="white-space:nowrap">What's in it for me? →</a>
-    </div>
-  </div>
-</section>
-
-<!-- ROI -->
-<section class="roi pad" id="roi">
-  <div class="wrap">
-    <span class="eyebrow reveal">Run your numbers</span>
-    <h2 class="section-title reveal">What your portfolio could earn.</h2>
-    <p class="section-sub reveal">Two stacked revenue lines from one customer: the SaaS margin you set, plus the payment residual you already keep. Move the sliders.</p>
-
-    <div class="roi-card reveal">
-      <div class="roi-inputs">
-        <div class="field">
-          <div class="lab"><span class="l">Restaurants you service</span><span class="val mono" id="vMerch">25</span></div>
-          <input type="range" id="rMerch" min="5" max="200" value="25" step="5">
-        </div>
-        <div class="field">
-          <div class="lab"><span class="l">Avg monthly card volume / restaurant</span><span class="val mono" id="vVol">$50k</span></div>
-          <input type="range" id="rVol" min="10" max="200" value="50" step="5">
-        </div>
-        <div class="field">
-          <div class="lab"><span class="l">Your processing margin</span><span class="val mono" id="vMargin">0.35%</span></div>
-          <input type="range" id="rMargin" min="10" max="100" value="35" step="5">
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <div class="lab"><span class="l">Your monthly SaaS markup / restaurant</span><span class="val mono" id="vSaas">$99</span></div>
-          <input type="range" id="rSaas" min="29" max="299" value="99" step="10">
-        </div>
-      </div>
-      <div class="roi-out">
-        <div class="ro-lab">Estimated annual portfolio value</div>
-        <div class="annual"><span class="mono" id="annual">$48,300</span></div>
-        <div class="ro-split">
-          <div class="box"><div class="k">SaaS margin / yr</div><div class="v grad-text" id="saasYr">$29,700</div></div>
-          <div class="box"><div class="k">Residual / yr</div><div class="v grad-text" id="resYr">$18,600</div></div>
-        </div>
-        <div class="ro-bars" id="roBars"></div>
-        <div class="ro-disclaim">Illustrative example using mid-market assumptions. Not a guarantee of earnings. Actual residuals and margins vary by processor agreement, pricing, and merchant mix. Industry benchmark: ~$3,000–$8,000/mo residual at 100 active merchants.</div>
-      </div>
     </div>
   </div>
 </section>
@@ -1304,34 +1261,6 @@ const GURU = {
   });
 })();
 /* <<< GURU-JS <<< */
-
-/* ---------- ROI calculator ---------- */
-const R={merch:'rMerch',vol:'rVol',margin:'rMargin',saas:'rSaas'};
-const roBars=document.getElementById('roBars');
-for(let i=0;i<12;i++){const b=document.createElement('div');b.className='b';roBars.appendChild(b)}
-function fmt(n){return '$'+Math.round(n).toLocaleString('en-US')}
-function calcROI(){
-  const merch=+document.getElementById('rMerch').value;
-  const vol=+document.getElementById('rVol').value*1000;
-  const margin=+document.getElementById('rMargin').value/100/100; // 35 -> 0.35%
-  const saas=+document.getElementById('rSaas').value;
-  document.getElementById('vMerch').textContent=merch;
-  document.getElementById('vVol').textContent='$'+(vol/1000)+'k';
-  document.getElementById('vMargin').textContent=(+document.getElementById('rMargin').value/100).toFixed(2)+'%';
-  document.getElementById('vSaas').textContent='$'+saas;
-  const saasYr=merch*saas*12;
-  const resYr=merch*vol*margin*12;
-  const annual=saasYr+resYr;
-  document.getElementById('saasYr').textContent=fmt(saasYr);
-  document.getElementById('resYr').textContent=fmt(resYr);
-  document.getElementById('annual').textContent=fmt(annual);
-  // bars: ramp toward annual
-  const bars=roBars.querySelectorAll('.b');
-  bars.forEach((b,i)=>{const h=8+ (i+1)/bars.length*72*(0.6+merch/200*0.7);b.style.height=Math.min(80,h)+'px'});
-}
-Object.values(R).forEach(id=>document.getElementById(id).addEventListener('input',calcROI));
-calcROI();
-
 
 /* >>> ICON-SYSTEM-JS >>> */
 /* Lucide icon replacer — swaps known emoji glyphs for inline SVG <use> refs.
