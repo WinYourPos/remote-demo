@@ -299,8 +299,18 @@
   .tnum{background:var(--surface-2);border:1px solid var(--border);border-radius:16px;padding:22px}
   .tnum .n{font-size:34px;font-weight:800;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
   .tnum .l{font-size:13px;color:var(--dim);margin-top:4px}
-  .status-line{display:inline-flex;align-items:center;gap:9px;font-family:'JetBrains Mono';font-size:12.5px;color:var(--dim);background:rgba(52,199,89,.08);border:1px solid rgba(52,199,89,.2);border-radius:999px;padding:8px 15px;margin-top:24px}
+  .status-line{display:inline-flex;align-items:center;gap:9px;font-family:'JetBrains Mono';font-size:12.5px;color:var(--dim);background:rgba(52,199,89,.08);border:1px solid rgba(52,199,89,.2);border-radius:999px;padding:8px 15px}
   .status-line .d{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 10px var(--success)}
+  .milestone-line{display:inline-flex;align-items:center;gap:9px;font-family:'JetBrains Mono';font-size:12.5px;color:var(--dim);background:rgba(255,149,0,.08);border:1px solid rgba(255,149,0,.28);border-radius:999px;padding:8px 15px}
+  .milestone-line .d{width:8px;height:8px;border-radius:50%;background:var(--primary);box-shadow:0 0 10px var(--primary);animation:milestone-pulse 2.2s ease-in-out infinite}
+  @keyframes milestone-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.86)}}
+  @media (prefers-reduced-motion: reduce){.milestone-line .d{animation:none}}
+  .status-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+  .team-pitch{margin-top:18px;padding:16px 18px;border:1px solid var(--border);border-radius:14px;background:linear-gradient(180deg,rgba(255,149,0,.05),rgba(255,149,0,.01));display:flex;gap:14px;align-items:flex-start}
+  .team-pitch .ic{flex-shrink:0;width:34px;height:34px;border-radius:10px;background:var(--grad);display:grid;place-items:center;color:#fff}
+  .team-pitch .ic svg{width:18px;height:18px}
+  .team-pitch p{font-size:14.5px;color:#cfcfd2;line-height:1.6;margin:0}
+  .team-pitch strong{color:#fff;font-weight:600}
 
   /* ---------- FAQ ---------- */
   .faq-list{margin-top:42px;max-width:820px}
@@ -986,13 +996,20 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
   <div class="wrap">
     <div class="tech-inner reveal">
       <div>
-        <span class="eyebrow">Built, not promised</span>
+        <span class="eyebrow">Built, not promised · Production Fall 2026</span>
         <h2 class="section-title" style="font-size:32px;margin-top:14px">Production-ready. Waiting for backend integration.</h2>
         <p class="section-sub" style="font-size:16px">The hard part — 100+ POS pages, 50+ admin pages, the full design system — is done. The integration is the partnership: connect the platform to your processor and stack, and go.</p>
+        <div class="team-pitch">
+          <div class="ic"><svg aria-hidden="true"><use href="#i-users"/></svg></div>
+          <p><strong>A strong, focused team behind the build.</strong> Senior engineering, product, and design working full-time on Spark — not a side project, not a contractor patchwork. We've spent the last twelve months shipping the frontend, the design system, and Guru. The runway to <strong>production launch in Fall 2026</strong> is backend integration and your processor stack.</p>
+        </div>
         <div class="tech-stack">
           <span>Angular 21</span><span>TypeScript strict</span><span>Tailwind v4</span><span>Signals · zoneless</span><span>Multi-tenant</span><span>Granular RBAC</span><span>Audit log</span><span>Open API</span><span>EN / EL i18n</span><span>No PAN storage</span>
         </div>
-        <div class="status-line"><span class="d"></span> Frontend complete · auth, guards & interceptor ready · BFF pending</div>
+        <div class="status-row">
+          <div class="status-line"><span class="d"></span> Frontend complete · auth, guards & interceptor ready · BFF pending</div>
+          <div class="milestone-line"><span class="d"></span> Production target · Fall 2026</div>
+        </div>
       </div>
       <div class="tech-nums">
         <div class="tnum"><div class="n">100+</div><div class="l">POS pages</div></div>
