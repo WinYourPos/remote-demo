@@ -195,6 +195,16 @@
     .chips{margin-bottom:22px}
     .cta{padding:15px 30px;font-size:15.5px}
   }
+
+/* >>> PAGE-TRANSITION-CSS >>> */
+@keyframes spark-page-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spark-page-out{to{opacity:0;transform:translateY(-4px)}}
+body{animation:spark-page-in .42s cubic-bezier(.2,.8,.2,1)}
+body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) forwards}
+@media (prefers-reduced-motion: reduce){
+  body,body.spark-leaving{animation:none}
+}
+/* <<< PAGE-TRANSITION-CSS <<< */
 </style>
 </head>
 <body>
@@ -259,5 +269,32 @@
   </footer>
 </div>
 
+<script>
+/* >>> PAGE-NAV-FADE-JS >>> */
+(function(){
+  if (typeof document === 'undefined') return;
+  if (typeof document.addEventListener !== 'function') return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  function ready(fn){ if(document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded',fn); }
+  ready(function(){
+    document.addEventListener('click', function(e){
+      var a = e.target && e.target.closest && e.target.closest('a[href]');
+      if (!a) return;
+      var href = a.getAttribute('href') || '';
+      if (!href || href.charAt(0) === '#' || href.indexOf('mailto:')===0 || href.indexOf('tel:')===0) return;
+      if (a.target && a.target !== '_self') return;          // _blank etc. — let it open in new tab
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var dest;
+      try { dest = new URL(a.href, location.href); } catch (err) { return; }
+      if (dest.origin !== location.origin) return;
+      if (dest.pathname === location.pathname && dest.hash) return; // same-page anchor
+      e.preventDefault();
+      document.body.classList.add('spark-leaving');
+      setTimeout(function(){ location.href = a.href; }, 200);
+    });
+  });
+})();
+/* <<< PAGE-NAV-FADE-JS <<< */
+</script>
 </body>
 </html>
