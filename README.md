@@ -35,6 +35,13 @@ python3 -m http.server 8000
 - Modifier groups with required min/max, temperature, remove kinds and priced add-ons (e.g. truffle fries `+$3`, lobster on tagliatelle `+$14`, big-rock-ice prep on the Old Fashioned, dry/wet/extra-dry on the Martini, size + crust on pizzas)
 - Guest count, table number, dine-in / takeout / delivery / bar — all live; split check, void, manager actions
 
+**Pay & close** — tender · tip · split modal (Heartland-equivalent)
+- Tip pills: No tip · 15 · 18 · **20% ★** · 25 · **Custom $** — live grand-total update
+- Six tender methods: 💳 Credit / Debit · 💵 Cash · 📱 Apple Pay · 📲 Google Pay · 🎁 Gift card · ⭐ Loyalty points
+- Live **Balance** card (flips green at $0.00); type a smaller amount than the balance to split — tap a method to apply
+- Applied tenders list with **✕** to remove each
+- **Complete payment** enables only at $0.00 balance; receipt subtitle itemises every tender + tip; reporting (`payMix`, `tips`, `taxCollected`, `svcMix`, `hourly`, menu mix) updates live
+
 **Kitchen (KDS)** — what the line sees
 - Station filter (Grill · Sauté · Cold · Bar · Pastry) with a live ticket count per station
 - Color-coded age timer (green < 6 min · yellow 6–10 · red > 10), bump · recall · rush
