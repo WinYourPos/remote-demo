@@ -873,25 +873,6 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
   </div>
 </section>
 
-<!-- PIPELINE -->
-<section class="pipe pad" id="pipeline">
-  <div class="wrap">
-    <span class="eyebrow reveal">Your activation journey</span>
-    <h2 class="section-title reveal">Sign Monday. Earning by month one.</h2>
-    <p class="section-sub reveal">This isn't how a restaurant goes live — it's how <em>you</em> turn a partnership into recurring revenue. We carry the build; you carry the relationship.</p>
-
-    <div class="pipe-track" id="pipeTrack">
-      <div class="pipe-line"></div>
-    </div>
-
-    <div class="pipe-badges reveal">
-      <div class="pbadge"><div class="big grad-text">48h</div><div class="lbl">to your branded<br>sandbox</div></div>
-      <div class="pbadge"><div class="big grad-text">14 days</div><div class="lbl">first restaurant<br>live, typical</div></div>
-      <div class="pbadge"><div class="big grad-text">100%</div><div class="lbl">of your processor<br>residual kept</div></div>
-    </div>
-  </div>
-</section>
-
 <!-- ROI -->
 <section class="roi pad" id="roi">
   <div class="wrap">
@@ -929,38 +910,6 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
         <div class="ro-disclaim">Illustrative example using mid-market assumptions. Not a guarantee of earnings. Actual residuals and margins vary by processor agreement, pricing, and merchant mix. Industry benchmark: ~$3,000–$8,000/mo residual at 100 active merchants.</div>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- COMPARISON -->
-<section class="pad" id="compare">
-  <div class="wrap">
-    <span class="eyebrow reveal">Compare what you sell today</span>
-    <h2 class="section-title reveal">The only "yes" across the top.</h2>
-    <p class="section-sub reveal">The lines that matter to a reseller — not a restaurant.</p>
-
-    <div class="cmp-wrap reveal">
-      <table class="cmp">
-        <thead><tr>
-          <th>What a reseller cares about</th>
-          <th class="spark">Spark POS</th>
-          <th>Toast</th>
-          <th>Heartland / Genius</th>
-          <th>Square</th>
-        </tr></thead>
-        <tbody>
-          <tr><td class="feat">True white-label (brand, domain, apps)</td><td class="spark"><span class="yes">Yes</span></td><td><span class="no">No</span></td><td><span class="mid">Co-brand only</span></td><td><span class="no">No</span></td></tr>
-          <tr><td class="feat">Bring your own processor</td><td class="spark"><span class="yes">Yes</span></td><td><span class="no">Toast only</span></td><td><span class="no">Heartland only</span></td><td><span class="no">Square only</span></td></tr>
-          <tr><td class="feat">You own the customer & contract</td><td class="spark"><span class="yes">Yes</span></td><td><span class="no">No</span></td><td><span class="no">No</span></td><td><span class="no">No</span></td></tr>
-          <tr><td class="feat">You set the retail price</td><td class="spark"><span class="yes">Yes</span></td><td><span class="no">No</span></td><td><span class="mid">Limited</span></td><td><span class="no">No</span></td></tr>
-          <tr><td class="feat">Built-in AI advisor</td><td class="spark"><span class="yes">Ask Guru</span></td><td><span class="mid">Paid add-ons</span></td><td><span class="mid">Paid add-ons</span></td><td><span class="mid">Limited</span></td></tr>
-          <tr><td class="feat">Hardware flexibility</td><td class="spark"><span class="yes">iPad/Android/PAX</span></td><td><span class="no">Proprietary</span></td><td><span class="mid">Restricted</span></td><td><span class="mid">Square only</span></td></tr>
-          <tr><td class="feat">Device surfaces</td><td class="spark"><span class="yes">13</span></td><td><span class="mid">~8</span></td><td><span class="mid">~9</span></td><td><span class="mid">~5</span></td></tr>
-          <tr><td class="feat">Partner economics</td><td class="spark"><span class="yes">SaaS margin + residual</span></td><td><span class="mid">One-time bounty</span></td><td><span class="mid">Captive residual</span></td><td><span class="mid">Referral share</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="cmp-foot">Competitor details are industry-reported and current as of early 2026; programs change. Heartland Restaurant is now marketed as "Genius." Comparison reflects standard published terms, not negotiated deals.</p>
   </div>
 </section>
 
@@ -1452,24 +1401,6 @@ const GURU = {
   });
 })();
 /* <<< GURU-JS <<< */
-
-/* ---------- pipeline ---------- */
-const PIPE=[
-  {n:'01',h:'Sign & brand',p:'Sign the partnership and send us your logo, colors and domain.',w:'YOU',wc:'you',when:'Day 0'},
-  {n:'02',h:'Branded sandbox',p:'We spin up Spark fully re-skinned under your brand for live client demos.',w:'WE BUILD',wc:'us',when:'48 hours'},
-  {n:'03',h:'First restaurant live',p:'Menu import, hardware ship, train, test shift, go-live with on-call backup.',w:'WE BUILD',wc:'us',when:'~14 days'},
-  {n:'04',h:'First revenue',p:'SaaS margin and payment residual start flowing — both recurring, both yours.',w:'YOU EARN',wc:'you',when:'Month 1'},
-  {n:'05',h:'Scale the portfolio',p:'Repeat across your book of clients. AI insights deepen retention as you grow.',w:'YOU SCALE',wc:'you',when:'Ongoing'}
-];
-const pt=document.getElementById('pipeTrack');
-PIPE.forEach((s,i)=>{const el=document.createElement('div');el.className='pstep reveal';el.style.transitionDelay=(i*70)+'ms';
-  el.innerHTML=`<div class="num">${s.n}</div><h4>${s.h}</h4><p>${s.p}</p><span class="who ${s.wc}">${s.w}</span><div class="when">⏱ <b>${s.when}</b></div>`;
-  pt.appendChild(el);io.observe(el);
-  setTimeout(()=>{},0);
-});
-// light up steps progressively when in view
-const litObs=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){document.querySelectorAll('.pstep').forEach((p,idx)=>setTimeout(()=>p.classList.add('lit'),idx*180));litObs.disconnect()}}),{threshold:.3});
-litObs.observe(pt);
 
 /* ---------- ROI calculator ---------- */
 const R={merch:'rMerch',vol:'rVol',margin:'rMargin',saas:'rSaas'};
