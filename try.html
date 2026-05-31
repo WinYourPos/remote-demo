@@ -27,7 +27,7 @@
     background:var(--bg);color:var(--text);
     font-family:'Sora',-apple-system,BlinkMacSystemFont,sans-serif;
     -webkit-font-smoothing:antialiased;
-    overflow:hidden;position:relative;
+    overflow-y:auto;overflow-x:hidden;position:relative;
     /* respect iOS notch/home indicator */
     padding-top:env(safe-area-inset-top);
     padding-bottom:env(safe-area-inset-bottom);
@@ -58,7 +58,7 @@
   .wrap{
     position:relative;z-index:1;
     min-height:100dvh;
-    display:flex;flex-direction:column;
+    display:flex;flex-direction:column;justify-content:center;
     padding:32px 24px;
     max-width:560px;margin:0 auto;
     text-align:center;
@@ -67,7 +67,7 @@
   /* Brand block */
   .brand{
     display:flex;flex-direction:column;align-items:center;
-    margin-top:auto;
+    margin-top:0;
     animation:rise .8s cubic-bezier(.2,.8,.2,1) both;
   }
   @keyframes rise{from{opacity:0;transform:translateY(20px)}}
@@ -156,7 +156,7 @@
 
   /* Footer */
   footer{
-    margin-top:auto;padding-top:28px;
+    margin-top:30px;padding-top:28px;
     display:flex;flex-direction:column;align-items:center;gap:6px;
     font-family:'JetBrains Mono',monospace;
     font-size:10px;color:var(--dim-2);

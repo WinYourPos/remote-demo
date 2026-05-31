@@ -733,6 +733,98 @@ button{font-family:inherit;cursor:pointer}
 .g-disc b{color:var(--text)}
 /* <<< GURU-REP-CSS <<< */
 
+/* >>> LAUNCHER-CSS >>> */
+.lz{position:fixed;inset:0;z-index:300;background:var(--bg);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;animation:spark-view-in .3s cubic-bezier(.2,.8,.2,1)}
+.lz[hidden]{display:none}
+.lz::before{content:'';position:absolute;top:-22%;left:50%;transform:translateX(-50%);width:120vw;height:62vh;background:radial-gradient(ellipse 50% 50% at 50% 50%,rgba(27,111,243,.12),transparent 70%);pointer-events:none}
+.lz-inner{position:relative;z-index:1;max-width:1100px;margin:0 auto;width:100%;padding:clamp(26px,5vw,54px) 24px 60px}
+.lz-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;letter-spacing:-.02em}
+.lz-brand small{font-weight:400;opacity:.5}
+.lz-brand .brand-logo{width:30px;height:30px}
+.lz-eyebrow{font-family:'JetBrains Mono';font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--primary);margin:30px 0 12px;display:inline-flex;align-items:center;gap:8px}
+.lz-eyebrow .live{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 10px var(--success);animation:pulse 2s infinite}
+.lz h1{font-size:clamp(27px,4vw,40px);font-weight:800;letter-spacing:-.03em;line-height:1.04}
+.lz .sub{color:var(--dim);font-size:clamp(14px,1.6vw,16px);margin-top:11px;max-width:64ch;line-height:1.55}
+.lz-zone{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim-2);font-weight:700;margin:32px 0 14px}
+.lz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(236px,1fr));gap:14px}
+.lz-card{position:relative;display:block;text-align:left;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px;cursor:pointer;font-family:inherit;color:var(--text);transition:transform .16s cubic-bezier(.2,.8,.2,1),border-color .16s,box-shadow .16s}
+.lz-card:hover{transform:translateY(-3px);border-color:var(--primary);box-shadow:0 16px 44px rgba(17,24,39,.12)}
+.lz-card:active{transform:scale(.99)}
+.lz-bezel{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:rgba(27,111,243,.10);color:var(--primary);font-size:22px;margin-bottom:14px}
+.lz-card h3{font-size:16px;font-weight:700;letter-spacing:-.01em;line-height:1.2}
+.lz-persona{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--dim-2);margin-top:5px;line-height:1.3}
+.lz-card p{font-size:12.5px;color:var(--dim);margin-top:10px;line-height:1.5}
+.lz-badge{position:absolute;top:14px;right:14px;font-family:'JetBrains Mono';font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
+.lz-badge.live{background:rgba(22,163,74,.14);color:var(--success)}
+.lz-badge.preview{background:rgba(27,111,243,.12);color:var(--primary)}
+.lz-foot{margin-top:38px;font-family:'JetBrains Mono';font-size:11px;color:var(--dim-2);letter-spacing:.02em;line-height:1.7}
+.lz-foot b{color:var(--text)}
+
+/* role / sign-in picker */
+.rp-mask{position:fixed;inset:0;z-index:360;background:rgba(11,13,18,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px}
+.rp-mask.show{display:flex;animation:fade .18s}
+.rp-modal{width:min(470px,100%);background:var(--surface);border:1px solid var(--border-2);border-radius:22px;padding:26px;box-shadow:0 30px 90px rgba(17,24,39,.24);animation:rise .26s cubic-bezier(.2,.8,.2,1)}
+.rp-eyebrow{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--primary);font-weight:700}
+.rp-modal h3{font-size:21px;font-weight:800;margin:7px 0 5px;letter-spacing:-.02em}
+.rp-modal .rp-sub{color:var(--dim);font-size:13px;line-height:1.5}
+.rp-roles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0 4px}
+.rp-role{display:flex;align-items:center;gap:11px;text-align:left;padding:13px 14px;border-radius:14px;background:var(--surface-2);border:1.5px solid var(--border);cursor:pointer;font-family:inherit;color:var(--text);transition:.14s}
+.rp-role:hover{border-color:var(--primary);background:rgba(27,111,243,.06);transform:translateY(-1px)}
+.rp-role .av{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:var(--grad);color:#fff;font-weight:800;font-size:14px;flex-shrink:0}
+.rp-role>span:last-child{display:flex;flex-direction:column;gap:3px;min-width:0}
+.rp-role .rn{display:block;font-weight:700;font-size:14px;line-height:1.15}
+.rp-role .rr{display:block;font-family:'JetBrains Mono';font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--dim-2);line-height:1.3}
+.rp-note{font-family:'JetBrains Mono';font-size:10.5px;color:var(--dim-2);margin-top:16px;text-align:center;line-height:1.5}
+.rp-x{float:right;width:32px;height:32px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);color:var(--dim);font-size:15px;cursor:pointer}
+
+/* device-mode topbar additions */
+.stations-back{display:none;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border);color:var(--text);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0}
+.stations-back:hover{border-color:var(--primary);color:var(--primary)}
+.device-chip{display:none;align-items:center;gap:7px;font-family:'JetBrains Mono';font-size:11px;font-weight:600;color:var(--dim);background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:5px 12px;white-space:nowrap}
+.device-chip .role{color:var(--primary);font-weight:700}
+.app.in-device .stations-back{display:inline-flex}
+.app.in-device .device-chip{display:inline-flex}
+/* role-gated tabs: single-surface roles hide the segmented control */
+.app[data-access="pos"] #seg,
+.app[data-access="kds"] #seg,
+.app[data-access="preview"] #seg{display:none}
+
+/* preview surface (guest-facing devices) */
+#preview{flex-direction:column;overflow-y:auto}
+.pv-host{max-width:900px;margin:0 auto;width:100%;padding:clamp(20px,4vw,40px) 20px 64px;display:flex;flex-direction:column;align-items:center;gap:20px}
+.pv-eyebrow{font-family:'JetBrains Mono';font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--primary);text-align:center}
+.pv-host h2{font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.02em;text-align:center}
+.pv-host .pv-lead{color:var(--dim);font-size:14.5px;line-height:1.55;text-align:center;max-width:58ch}
+.pv-screen{width:100%;max-width:520px;border:1px solid var(--border-2);border-radius:22px;background:var(--surface);box-shadow:0 30px 80px rgba(17,24,39,.14);overflow:hidden}
+.pv-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid var(--border);font-family:'JetBrains Mono';font-size:11px;color:var(--dim);background:var(--surface-2)}
+.pv-bar .dot{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success)}
+.pv-bar .grow{flex:1}
+.pv-body{padding:20px}
+.pv-h{font-size:17px;font-weight:800;letter-spacing:-.01em}
+.pv-hs{font-size:12.5px;color:var(--dim-2);margin-top:2px}
+.pv-pills{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
+.pv-pill{padding:9px 13px;border-radius:11px;background:var(--surface-2);border:1px solid var(--border);font-size:12.5px;font-weight:600;color:var(--dim)}
+.pv-pill.on{background:rgba(27,111,243,.12);border-color:var(--primary);color:var(--primary)}
+.pv-line{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border);font-size:14px}
+.pv-line:last-of-type{border-bottom:none}
+.pv-line .p{font-family:'JetBrains Mono';font-weight:600;color:var(--text);white-space:nowrap}
+.pv-line .pv-sub{font-size:11.5px;color:var(--dim-2);margin-top:2px}
+.pv-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;padding-top:14px;border-top:1px solid var(--border-2);font-size:19px;font-weight:800}
+.pv-total .p{font-family:'JetBrains Mono'}
+.pv-cta{margin-top:16px;width:100%;padding:14px;border-radius:14px;background:var(--grad);color:#fff;border:none;font-weight:700;font-size:15px;font-family:inherit;cursor:pointer;box-shadow:0 8px 24px rgba(27,111,243,.30)}
+.pv-ring{width:88px;height:88px;border-radius:50%;display:grid;place-items:center;margin:4px auto 0;background:conic-gradient(var(--primary) calc(var(--pct,72)*1%),var(--surface-3) 0)}
+.pv-ring .in{width:66px;height:66px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-family:'JetBrains Mono';font-weight:800;font-size:15px}
+.pv-reward{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--border);font-size:13.5px}
+.pv-reward:last-child{border-bottom:none}
+.pv-reward .ic{width:34px;height:34px;border-radius:9px;background:rgba(27,111,243,.10);color:var(--primary);display:grid;place-items:center;flex-shrink:0}
+.pv-feats{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.pv-feat{font-size:12px;color:var(--dim);background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 12px}
+.pv-note{font-family:'JetBrains Mono';font-size:10.5px;color:var(--dim-2);text-align:center;display:flex;align-items:center;gap:7px;justify-content:center}
+.pv-note .d{width:6px;height:6px;border-radius:50%;background:var(--primary)}
+@media(max-width:560px){.lz-grid{grid-template-columns:1fr 1fr}.rp-roles{grid-template-columns:1fr}}
+@media(max-width:400px){.lz-grid{grid-template-columns:1fr}}
+/* <<< LAUNCHER-CSS <<< */
+
 /* >>> PAGE-TRANSITION-CSS >>> */
 @keyframes spark-page-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spark-page-out{to{opacity:0;transform:translateY(-4px)}}
@@ -917,10 +1009,15 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
 <div class="app">
   <!-- TOPBAR -->
   <div class="topbar">
+    <button class="stations-back" id="stationsBack" type="button" title="Choose another station">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M15 18l-6-6 6-6"/></svg>
+      <span class="lbl-txt">Stations</span>
+    </button>
     <div class="logo">
       <svg class="brand-logo sm" viewBox="0 0 80 80" aria-hidden="true"><use href="#brand-spark-pos"/></svg>
       Win your <small>POS</small>
     </div>
+    <span class="device-chip" id="deviceChip"></span>
     <div class="seg" id="seg">
       <button data-v="order" class="active">🧾 <span class="lbl-txt">Order</span></button>
       <button data-v="kds">🍳 <span class="lbl-txt">Kitchen</span> <span class="badge" id="kdsBadge" style="display:none">0</span></button>
@@ -996,8 +1093,35 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
       <div class="rep-content" id="repContent"></div>
     </div>
   </div>
+
+  <!-- ============ DEVICE PREVIEW (guest-facing surfaces) ============ -->
+  <div class="view" id="preview"><div class="pv-host" id="pvHost"></div></div>
 </div>
 
+
+<!-- ============ STATION LAUNCHER ============ -->
+<div class="lz" id="launcher">
+  <div class="lz-inner">
+    <div class="lz-brand"><svg class="brand-logo" viewBox="0 0 80 80" aria-hidden="true"><use href="#brand-spark-pos"/></svg> Win your <small>POS</small></div>
+    <div class="lz-eyebrow"><span class="live"></span> Live demo · The Ember Room</div>
+    <h1>Choose your station</h1>
+    <p class="sub">One platform, every surface. Tap a device to launch it full-screen — exactly what your staff and guests would touch. Switch role or station anytime.</p>
+    <div id="lzZones"></div>
+    <div class="lz-foot"><b>Live</b> = fully interactive demo &nbsp;·&nbsp; <b>Preview</b> = representative screen &nbsp;·&nbsp; grounded 1:1 in the real Win your POS app</div>
+  </div>
+</div>
+
+<!-- role / sign-in picker -->
+<div class="rp-mask" id="rpMask" aria-hidden="true">
+  <div class="rp-modal" role="dialog" aria-modal="true">
+    <button class="rp-x" id="rpClose" aria-label="Close">✕</button>
+    <div class="rp-eyebrow" id="rpEyebrow">Sign in</div>
+    <h3 id="rpTitle">Server POS</h3>
+    <div class="rp-sub" id="rpSub">Who's signing in? Role decides what's visible — manager actions, voids and reporting follow the same RBAC as the real app.</div>
+    <div class="rp-roles" id="rpRoles"></div>
+    <div class="rp-note">Demo — no PIN required. In production each staffer taps a 4–6 digit PIN.</div>
+  </div>
+</div>
 
 <div class="rep-backdrop" id="repBackdrop" aria-hidden="true"></div>
 <!-- modifier sheet -->
@@ -2630,6 +2754,167 @@ setInterval(tickClock,1000);tickClock();
 /* init */
 seedTickets();renderCheck();updateKdsBadge();setupReportsSidebar();renderReports();
 
+/* >>> LAUNCHER-JS >>> */
+/* Device + role launcher — mirrors the real app's home.component device family.
+   Pick a device → (POS/Console) pick a role → launch the surface full-screen,
+   with a "Stations" back button to re-select. Guarded so the Node test stub
+   (no addEventListener/setAttribute) never throws. */
+(function(){
+  if (typeof document === 'undefined' || typeof document.getElementById !== 'function') return;
+
+  var DEVICES = [
+    { zone:'Front of house', items:[
+      { id:'pos-server', ic:'🧾', label:'Server POS',    persona:'Server',          desc:'Floor → ticket → fire → checkout. Split, coursing, manager PIN.', mode:'live', surface:'order',   access:'pos',  roles:['server','bartender','manager','owner'] },
+      { id:'pos-mobile', ic:'📱', label:'Mobile POS',    persona:'Handheld',        desc:'Pocket twin of the server POS — order & pay tableside.',          mode:'live', surface:'order',   access:'pos',  roles:['server','bartender','manager','owner'] }
+    ]},
+    { zone:'Kitchen', items:[
+      { id:'kds-grill', ic:'🔥', label:'KDS · Grill',    persona:'Line cook',       desc:'Tickets age white → gold → red. Bump & recall, station routing.', mode:'live', surface:'kds', access:'kds', station:'grill' },
+      { id:'kds-saute', ic:'🍳', label:'KDS · Sauté',    persona:'Line cook',       desc:'Per-station queue with predictive prep timing.',                  mode:'live', surface:'kds', access:'kds', station:'saute' },
+      { id:'kds-expo',  ic:'🛎', label:'KDS · Expo',     persona:'Expediter',       desc:'All-day item counts across every open ticket.',                   mode:'live', surface:'kds', access:'kds', expo:true }
+    ]},
+    { zone:'Guest-facing', items:[
+      { id:'kiosk',  ic:'🖥', label:'Self-order Kiosk',  persona:'Guest',           desc:'Walk-in browse → build → Apple Pay. Bigger checks, less labour.',  mode:'preview', surface:'preview', access:'preview', preview:'kiosk' },
+      { id:'cfd',    ic:'📺', label:'Customer Display',  persona:'Guest',           desc:'Live order total facing the guest + on-screen tipping.',           mode:'preview', surface:'preview', access:'preview', preview:'cfd' },
+      { id:'guest',  ic:'❤', label:'Guest App',         persona:'Guest',           desc:'Loyalty · Skip-the-Line · Scan-to-Pay, on your brand.',            mode:'preview', surface:'preview', access:'preview', preview:'guest' },
+      { id:'online', ic:'🌐', label:'Online Ordering',   persona:'Web',             desc:'Dine-in · Takeout · Delivery · Curbside, commission-free.',        mode:'preview', surface:'preview', access:'preview', preview:'online' }
+    ]},
+    { zone:'Back office', items:[
+      { id:'admin', ic:'📊', label:'Owner Console',      persona:'Owner / Manager', desc:'Dashboard · 36 live reports · AI advisor · multi-store.',          mode:'live', surface:'reports', access:'full', roles:['owner','manager'] }
+    ]}
+  ];
+  var ROLE_META = {
+    owner:    { n:'Owner',     d:'Full access' },
+    manager:  { n:'Manager',   d:'Overrides · reports' },
+    server:   { n:'Server',    d:'Take & fire orders' },
+    bartender:{ n:'Bartender', d:'Bar tabs & tenders' }
+  };
+  var PREVIEWS = {
+    kiosk:{ eyebrow:'Self-order Kiosk', title:'Walk up, build it, pay — no line', lead:'Guests order and pay themselves: bigger average checks, fewer mistakes, less labour at the counter.',
+      screen:'<div class="pv-bar"><span class="dot"></span> Self-order Kiosk · Tap to start <span class="grow"></span> The Ember Room</div><div class="pv-body"><div class="pv-h">Build Your Burger</div><div class="pv-hs">Patty · cheese · toppings</div><div class="pv-pills"><span class="pv-pill on">Single · $14</span><span class="pv-pill">Double · +$5</span><span class="pv-pill">Plant · +$2</span></div><div class="pv-line"><span>Aged cheddar</span><span class="p">+$1.50</span></div><div class="pv-line"><span>Smoked bacon</span><span class="p">+$2.50</span></div><div class="pv-line"><span>Truffle fries</span><span class="p">+$3.00</span></div><div class="pv-total"><span>Running total</span><span class="p">$21.00</span></div><button class="pv-cta">Pay at kiosk →</button></div>',
+      feats:['Full modifiers','Apple Pay / card','Upsell prompts','Multi-language'] },
+    cfd:{ eyebrow:'Customer-Facing Display', title:'The guest sees every line as it rings', lead:'A branded second screen facing the guest — itemised total, loyalty sign-up, and on-screen tipping.',
+      screen:'<div class="pv-bar"><span class="dot"></span> Customer Display · Table 14 <span class="grow"></span> #2904</div><div class="pv-body"><div class="pv-line"><span>1× BYO Burger</span><span class="p">$19.50</span></div><div class="pv-line"><span>2× Margherita</span><span class="p">$32.00</span></div><div class="pv-line"><span>1× Old Fashioned</span><span class="p">$19.00</span></div><div class="pv-line"><span>Tax (8.25%)</span><span class="p">$5.82</span></div><div class="pv-total"><span>Total</span><span class="p">$76.32</span></div><div class="pv-hs" style="margin-top:14px">Add a tip?</div><div class="pv-pills"><span class="pv-pill on">20% · $15.26</span><span class="pv-pill">18% · $13.74</span><span class="pv-pill">25% · $19.08</span><span class="pv-pill">Custom</span></div><button class="pv-cta">Confirm &amp; pay</button></div>',
+      feats:['Itemised total','On-screen tipping','Loyalty sign-up','Your branding'] },
+    guest:{ eyebrow:'Guest App', title:'Loyalty, skip-the-line and scan-to-pay', lead:'Your branded guest app — points, rewards and pay-at-table that keep diners coming back.',
+      screen:'<div class="pv-bar"><span class="dot"></span> Win your POS · Guest <span class="grow"></span> J. Alvarez</div><div class="pv-body"><div class="pv-ring" style="--pct:72"><div class="in">72%</div></div><div class="pv-hs" style="text-align:center;margin-top:10px">180 points to your next reward</div><div style="margin-top:14px"><div class="pv-reward"><span class="ic">🎁</span><div><div style="font-weight:700">Free dessert</div><div class="pv-sub">1,000 pts · unlocked</div></div></div><div class="pv-reward"><span class="ic">☕</span><div><div style="font-weight:700">$10 off entrée</div><div class="pv-sub">1,200 pts</div></div></div><div class="pv-reward"><span class="ic">⭐</span><div><div style="font-weight:700">VIP tasting night</div><div class="pv-sub">2,500 pts</div></div></div></div><button class="pv-cta">Scan to pay →</button></div>',
+      feats:['Loyalty & points','Skip-the-line','Scan-to-pay','Push offers'] },
+    online:{ eyebrow:'Online Ordering', title:'Your site, your menu, your margin', lead:'Commission-free online ordering across dine-in, takeout, delivery and curbside — on your own domain.',
+      screen:'<div class="pv-bar"><span class="dot"></span> order.emberroom.com <span class="grow"></span> Cart · 2</div><div class="pv-body"><div class="pv-pills"><span class="pv-pill on">Takeout</span><span class="pv-pill">Dine-in</span><span class="pv-pill">Delivery</span><span class="pv-pill">Curbside</span></div><div class="pv-line"><span>BYO Burger<div class="pv-sub">Med-rare · bacon · truffle fries</div></span><span class="p">$19.50</span></div><div class="pv-line"><span>Margherita 16"<div class="pv-sub">+ prosciutto</div></span><span class="p">$18.00</span></div><div class="pv-total"><span>Subtotal</span><span class="p">$37.50</span></div><button class="pv-cta">Checkout →</button></div>',
+      feats:['Commission-free','Your own domain','Delivery dispatch','Curbside / future orders'] }
+  };
+
+  function findDevice(id){ for (var i=0;i<DEVICES.length;i++){ for (var j=0;j<DEVICES[i].items.length;j++){ if (DEVICES[i].items[j].id===id) return DEVICES[i].items[j]; } } return null; }
+
+  function showSurface(v){
+    var seg = document.getElementById('seg');
+    if (seg && seg.children) [].slice.call(seg.children).forEach(function(x){ x.classList.toggle('active', x.dataset && x.dataset.v===v); });
+    var views = document.querySelectorAll('.view');
+    [].slice.call(views).forEach(function(x){ x.classList.toggle('active', x.id===v); });
+    if (v==='kds' && typeof renderKDS==='function') renderKDS();
+    if (v==='reports' && typeof renderReports==='function') renderReports();
+  }
+
+  function renderPreview(key){
+    var p = PREVIEWS[key] || PREVIEWS.kiosk;
+    var host = document.getElementById('pvHost'); if (!host) return;
+    host.innerHTML =
+      '<div class="pv-eyebrow">'+p.eyebrow+'</div>'+
+      '<h2>'+p.title+'</h2>'+
+      '<p class="pv-lead">'+p.lead+'</p>'+
+      '<div class="pv-screen">'+p.screen+'</div>'+
+      '<div class="pv-feats">'+p.feats.map(function(f){ return '<span class="pv-feat">'+f+'</span>'; }).join('')+'</div>'+
+      '<div class="pv-note"><span class="d"></span> Representative screen — fully interactive in your production build</div>';
+  }
+
+  function launch(d, role){
+    state.device = d.id; state.role = role || '';
+    var app = document.querySelector('.app');
+    if (app && app.setAttribute){
+      app.classList.add('in-device');
+      app.setAttribute('data-access', d.access);
+      if (state.role) app.setAttribute('data-role', state.role); else app.removeAttribute('data-role');
+    }
+    var chip = document.getElementById('deviceChip');
+    if (chip) chip.innerHTML = d.label + ' · <span class="role">' + (state.role ? ROLE_META[state.role].n : d.persona) + '</span>';
+    if (d.surface==='kds'){
+      allDayOn = !!d.expo;
+      var adb = document.getElementById('allDayBtn'); if (adb) adb.classList.toggle('on', allDayOn);
+      var bd = document.getElementById('kdsBoard');   if (bd && bd.style) bd.style.display = allDayOn ? 'none' : '';
+      var ad = document.getElementById('allDay');     if (ad) ad.classList.toggle('show', allDayOn);
+      kStation = d.station || 'all';
+      showSurface('kds');
+    } else if (d.surface==='preview'){
+      renderPreview(d.preview); showSurface('preview');
+    } else {
+      showSurface(d.surface);
+    }
+    var lz = document.getElementById('launcher'); if (lz) lz.setAttribute('hidden','');
+    hideRolePicker();
+    if (typeof window!=='undefined' && window.scrollTo) window.scrollTo(0,0);
+  }
+
+  function backToStations(){
+    var lz = document.getElementById('launcher'); if (lz) lz.removeAttribute('hidden');
+    var app = document.querySelector('.app');
+    if (app && app.removeAttribute){ app.classList.remove('in-device'); app.removeAttribute('data-access'); app.removeAttribute('data-role'); }
+    if (typeof window!=='undefined' && window.scrollTo) window.scrollTo(0,0);
+  }
+
+  function pickDevice(d){ if (d.roles && d.roles.length) openRolePicker(d); else launch(d, ''); }
+
+  function openRolePicker(d){
+    var t = document.getElementById('rpTitle'); if (t) t.textContent = d.label;
+    var ey = document.getElementById('rpEyebrow'); if (ey) ey.textContent = 'Sign in · ' + d.persona;
+    var host = document.getElementById('rpRoles'); if (!host) return;
+    host.innerHTML = d.roles.map(function(r){
+      var m = ROLE_META[r] || { n:r, d:'' };
+      return '<button class="rp-role" data-r="'+r+'"><span class="av">'+m.n.charAt(0)+'</span><span><span class="rn">'+m.n+'</span><span class="rr">'+m.d+'</span></span></button>';
+    }).join('');
+    [].slice.call(host.querySelectorAll('.rp-role')).forEach(function(b){
+      if (typeof b.addEventListener!=='function') return;
+      b.addEventListener('click', function(){ launch(d, b.dataset.r); });
+    });
+    var mask = document.getElementById('rpMask'); if (mask) mask.classList.add('show');
+  }
+  function hideRolePicker(){ var mask = document.getElementById('rpMask'); if (mask) mask.classList.remove('show'); }
+
+  function renderLauncher(){
+    var host = document.getElementById('lzZones'); if (!host) return;
+    host.innerHTML = DEVICES.map(function(z){
+      return '<div class="lz-zone">'+z.zone+'</div><div class="lz-grid">'+
+        z.items.map(function(d){
+          return '<button class="lz-card" data-id="'+d.id+'">'+
+            '<span class="lz-badge '+d.mode+'">'+(d.mode==='live'?'Live':'Preview')+'</span>'+
+            '<div class="lz-bezel">'+d.ic+'</div>'+
+            '<h3>'+d.label+'</h3>'+
+            '<div class="lz-persona">'+d.persona+'</div>'+
+            '<p>'+d.desc+'</p>'+
+          '</button>';
+        }).join('')+'</div>';
+    }).join('');
+    [].slice.call(host.querySelectorAll('.lz-card')).forEach(function(btn){
+      if (typeof btn.addEventListener!=='function') return;
+      btn.addEventListener('click', function(){ var d = findDevice(btn.dataset.id); if (d) pickDevice(d); });
+    });
+  }
+
+  // Role-aware void: servers/bartenders need a manager — demonstrates RBAC.
+  var vb = document.getElementById('voidB');
+  if (vb){
+    vb.onclick = function(){
+      if (state.role==='server' || state.role==='bartender'){ if (typeof toast==='function') toast('warn','Manager approval required to void'); return; }
+      state.check = []; if (typeof renderCheck==='function') renderCheck();
+    };
+  }
+
+  renderLauncher();
+  var back = document.getElementById('stationsBack'); if (back && typeof back.addEventListener==='function') back.addEventListener('click', backToStations);
+  var rpx  = document.getElementById('rpClose');     if (rpx  && typeof rpx.addEventListener==='function')  rpx.addEventListener('click', hideRolePicker);
+  var rpm  = document.getElementById('rpMask');       if (rpm  && typeof rpm.addEventListener==='function')  rpm.addEventListener('click', function(e){ if (e.target===rpm) hideRolePicker(); });
+  if (typeof document.addEventListener==='function') document.addEventListener('keydown', function(e){ if (e.key==='Escape') hideRolePicker(); });
+})();
+/* <<< LAUNCHER-JS <<< */
+
 
 /* >>> ICON-SYSTEM-JS >>> */
 /* Lucide icon replacer — swaps known emoji glyphs for inline SVG <use> refs.
@@ -2811,11 +3096,55 @@ seedTickets();renderCheck();updateKdsBadge();setupReportsSidebar();renderReports
     };
   }
 
-  function applyRange(overlay){
-    // Reset to today snapshot first (cheap deep clone of the touched keys)
-    Object.keys(overlay).forEach(function(k){ state.rep[k] = TODAY[k] ? JSON.parse(JSON.stringify(TODAY[k])) : state.rep[k]; });
-    // Now overlay the new range's values
-    Object.keys(overlay).forEach(function(k){ state.rep[k] = overlay[k]; });
+  // Volume factor for a preset range, derived from its curated net-sales vs today.
+  function factorFor(rangeKey){
+    if (rangeKey === 'today') return 1;
+    var o = RANGES[rangeKey];
+    return (o && o.netSales) ? o.netSales / TODAY.netSales : 1;
+  }
+
+  // Rebuild the whole reporting model from the TODAY snapshot, scaling every
+  // *flow* dataset (sales, covers, hours, counts, per-server, per-station,
+  // per-channel, labour, promos, loyalty/gift activity, z-report…) by k so
+  // EVERY report moves with the window. Rates/averages/snapshots (tax rate,
+  // COGS %, ticket-time averages, on-hand inventory, weekly heat-map, cumulative
+  // member/gift balances) are intentionally left put — they don't scale per-day.
+  function scaleRep(k){
+    var r = JSON.parse(JSON.stringify(TODAY));
+    if (k === 1) return r;
+    var S  = function(v){ return Math.round(v * k * 100) / 100; };  // money
+    var Si = function(v){ return Math.round(v * k); };              // counts
+    var H  = function(v){ return Math.round(v * k * 10) / 10; };    // hours
+    ['netSales','grossSales','refunds','tips','serviceCharges','voidAmt','compAmt','discAmt','laborCost','taxable','exempt','taxCollected']
+      .forEach(function(key){ if (typeof r[key] === 'number') r[key] = S(r[key]); });
+    ['covers','checks','voids','comps','discounts']
+      .forEach(function(key){ if (typeof r[key] === 'number') r[key] = Si(r[key]); });
+    if (typeof r.laborHours === 'number') r.laborHours = H(r.laborHours);
+    ['hourly','hourlyLW'].forEach(function(key){ if (Array.isArray(r[key])) r[key] = r[key].map(Si); });
+    ['payMix','svcMix','catSales','daypart','channels','discountReasons','compReasons','voidReasons']
+      .forEach(function(key){ var o = r[key]; if (o) for (var p in o) o[p] = S(o[p]); });
+    if (r.mix) for (var m in r.mix){ if (typeof r.mix[m].q === 'number') r.mix[m].q = Si(r.mix[m].q); }
+    (r.servers   || []).forEach(function(s){ s.s = S(s.s); s.c = Si(s.c); s.v = Si(s.v); s.cmp = Si(s.cmp); });
+    (r.modifiers || []).forEach(function(o){ o.q = Si(o.q); o.rev = S(o.rev); });
+    (r.laborByRole|| []).forEach(function(o){ o.hrs = H(o.hrs); o.cost = Si(o.cost); });
+    (r.promos    || []).forEach(function(o){ o.redeem = Si(o.redeem); o.rev = S(o.rev); o.disc = S(o.disc); });
+    (r.locations || []).forEach(function(o){ o.sales = S(o.sales); o.covers = Si(o.covers); });
+    (r.stationStats|| []).forEach(function(o){ o.items = Si(o.items); o.covers = Si(o.covers); });
+    (r.tipDecl   || []).forEach(function(o){ o.sales = S(o.sales); o.card = S(o.card); o.cash = S(o.cash); o.decl = S(o.decl); o.fica = S(o.fica); });
+    (r.upsellEng || []).forEach(function(o){ o.modUpcharge = Si(o.modUpcharge); });
+    if (r.cash)    ['cashSales','paidIn','paidOut','expected','counted','variance'].forEach(function(p){ if (typeof r.cash[p] === 'number') r.cash[p] = S(r.cash[p]); });
+    if (r.loyalty) ['newToday','visitsToday','redemptions','pointsIssued','redeemValue'].forEach(function(p){ if (typeof r.loyalty[p] === 'number') r.loyalty[p] = Si(r.loyalty[p]); });
+    if (r.giftCards) ['issuedToday','redeemedToday'].forEach(function(p){ if (typeof r.giftCards[p] === 'number') r.giftCards[p] = Si(r.giftCards[p]); });
+    if (r.customerCohort){ var cc = r.customerCohort; cc.new = Si(cc.new); cc.returning = Si(cc.returning); if (cc.visits) for (var vp in cc.visits) cc.visits[vp] = Si(cc.visits[vp]); }
+    if (r.zReport) ['sales','tax','tips','refundsTotal','paidOut','paidIn','expectedCash','countedCash','deposits','ccBatch','ccBatchFees','overshort','variance'].forEach(function(p){ if (typeof r.zReport[p] === 'number') r.zReport[p] = S(r.zReport[p]); });
+    return r;
+  }
+
+  // k = volume factor; override = curated headline numbers laid on top so the
+  // marquee figures read as hand-tuned while everything else scales coherently.
+  function applyRange(k, override){
+    state.rep = scaleRep(k);
+    if (override) Object.keys(override).forEach(function(key){ state.rep[key] = override[key]; });
     if (typeof renderReports === 'function') renderReports();
   }
 
@@ -2833,7 +3162,7 @@ seedTickets();renderCheck();updateKdsBadge();setupReportsSidebar();renderReports
         var key = keys[i];
         if (key === 'custom') { setActive(b); openCustom(); return; }
         setActive(b);
-        applyRange(RANGES[key] || {});
+        applyRange(factorFor(key), RANGES[key] || null);
         if (typeof toast === 'function') {
           var label = b.textContent.trim();
           toast('fire', 'Date range: <b>'+label+'</b>');
@@ -2865,7 +3194,7 @@ seedTickets();renderCheck();updateKdsBadge();setupReportsSidebar();renderReports
       var f = new Date(fromI.value); var t = new Date(toI.value);
       if (isNaN(f) || isNaN(t) || t < f) { if (typeof toast === 'function') toast('warn', 'Pick valid dates'); return; }
       var days = Math.max(1, Math.round((t - f)/864e5) + 1);
-      applyRange(customRangeFor(days));
+      applyRange(days, customRangeFor(days));
       var label = days + (days === 1 ? ' day' : ' days');
       btns[4].textContent = label;
       shutCustom();
