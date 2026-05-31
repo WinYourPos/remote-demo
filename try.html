@@ -3,23 +3,23 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<meta name="theme-color" content="#FF6B00"/>
+<meta name="theme-color" content="#1B6FF3"/>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta http-equiv="Expires" content="0"/>
-<title>Spark POS — Next-gen restaurant POS</title>
+<title>Win your POS — Next-gen restaurant POS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#000;--surface:#0f0f10;--surface-2:#161618;
-    --border:rgba(255,255,255,.08);--border-2:rgba(255,255,255,.15);
-    --text:#fff;--dim:rgba(255,255,255,.62);--dim-2:rgba(255,255,255,.40);
-    --primary:#FF9500;--primary-2:#FF6B00;
-    --grad:linear-gradient(135deg,#FF9500,#FF6B00);
-    --grad-hi:linear-gradient(135deg,#FFB340 0%,#FF9500 45%,#FF6B00 100%);
-    --success:#34C759;
+    --bg:#FFFFFF;--surface:#FFFFFF;--surface-2:#F4F6F8;
+    --border:rgba(17,24,39,.10);--border-2:rgba(17,24,39,.16);
+    --text:#0B0D12;--dim:rgba(13,17,23,.58);--dim-2:rgba(13,17,23,.40);
+    --primary:#1B6FF3;--primary-2:#0A5FE0;
+    --grad:linear-gradient(135deg,#2F86FF,#1366EC);
+    --grad-hi:linear-gradient(135deg,#4D9BFF 0%,#1B6FF3 45%,#0A5FE0 100%);
+    --success:#16A34A;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;height:100dvh}
@@ -33,22 +33,22 @@
     padding-bottom:env(safe-area-inset-bottom);
   }
 
-  /* Atmospheric background — radial glow + dot grid */
+  /* Atmospheric background — soft blue glow + dot grid on white */
   .bg-glow{position:fixed;inset:0;z-index:0;pointer-events:none}
   .bg-glow::before{
     content:'';position:absolute;top:-15%;left:50%;transform:translateX(-50%);
     width:140vw;height:90vh;
-    background:radial-gradient(ellipse 50% 50% at 50% 50%,rgba(255,149,0,.22) 0%,transparent 70%);
+    background:radial-gradient(ellipse 50% 50% at 50% 50%,rgba(27,111,243,.14) 0%,transparent 70%);
     filter:blur(40px);
   }
   .bg-glow::after{
     content:'';position:absolute;bottom:-15%;right:-20%;width:80vw;height:60vh;
-    background:radial-gradient(circle,rgba(255,107,0,.16) 0%,transparent 65%);
+    background:radial-gradient(circle,rgba(10,95,224,.10) 0%,transparent 65%);
     filter:blur(50px);
   }
   .dots{
     position:fixed;inset:0;z-index:0;pointer-events:none;
-    background-image:radial-gradient(circle,rgba(255,255,255,.04) 1px,transparent 1px);
+    background-image:radial-gradient(circle,rgba(17,24,39,.05) 1px,transparent 1px);
     background-size:24px 24px;
     -webkit-mask-image:radial-gradient(ellipse at center,#000 20%,transparent 75%);
             mask-image:radial-gradient(ellipse at center,#000 20%,transparent 75%);
@@ -75,7 +75,7 @@
   .logo{
     width:120px;height:120px;display:grid;place-items:center;
     position:relative;margin-bottom:22px;
-    filter:drop-shadow(0 24px 60px rgba(255,107,0,.45)) drop-shadow(0 8px 20px rgba(255,107,0,.35));
+    filter:drop-shadow(0 24px 60px rgba(27,111,243,.32)) drop-shadow(0 8px 20px rgba(27,111,243,.22));
     animation:pulse 4s ease-in-out infinite;
   }
   @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
@@ -119,7 +119,7 @@
   .chip{
     display:inline-flex;align-items:center;gap:7px;
     padding:7px 13px;border-radius:999px;
-    background:rgba(255,255,255,.04);
+    background:rgba(17,24,39,.04);
     border:1px solid var(--border);
     font-size:12px;color:var(--dim);font-weight:500;letter-spacing:-.005em;
     backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
@@ -130,12 +130,12 @@
   .cta{
     display:inline-flex;align-items:center;justify-content:center;gap:10px;
     padding:18px 36px;border-radius:18px;
-    background:var(--grad);color:#160a00;
+    background:var(--grad);color:#FFFFFF;
     font-family:inherit;font-weight:700;font-size:17px;letter-spacing:-.01em;
     border:none;cursor:pointer;text-decoration:none;
     box-shadow:
-      0 12px 40px rgba(255,107,0,.45),
-      0 4px 12px rgba(255,107,0,.35),
+      0 12px 40px rgba(27,111,243,.38),
+      0 4px 12px rgba(27,111,243,.28),
       0 0 0 .5px rgba(255,255,255,.20) inset;
     transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .15s;
     position:relative;overflow:hidden;
@@ -218,17 +218,17 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
       <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="tryPos" x1="40" y1="40" x2="40" y2="72" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#FFB340"/>
-            <stop offset="1" stop-color="#FF6B00"/>
+            <stop offset="0" stop-color="#2F86FF"/>
+            <stop offset="1" stop-color="#0A5FE0"/>
           </linearGradient>
           <linearGradient id="tryScreen" x1="40" y1="46" x2="40" y2="60" gradientUnits="userSpaceOnUse">
             <stop offset="0" stop-color="#FFFFFF" stop-opacity=".22"/>
             <stop offset="1" stop-color="#FFFFFF" stop-opacity=".04"/>
           </linearGradient>
           <linearGradient id="tryBolt" x1="40" y1="6" x2="40" y2="56" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#FFF7E6"/>
-            <stop offset=".5" stop-color="#FFCC80"/>
-            <stop offset="1" stop-color="#FF9500"/>
+            <stop offset="0" stop-color="#EAF3FF"/>
+            <stop offset=".5" stop-color="#7DB4FF"/>
+            <stop offset="1" stop-color="#1B6FF3"/>
           </linearGradient>
         </defs>
         <!-- POS body -->
@@ -245,7 +245,7 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
   </div>
 
   <div class="copy">
-    <h1>Spark POS<br><span class="grad-text">Next-gen restaurant POS</span></h1>
+    <h1>Win your POS<br><span class="grad-text">Next-gen restaurant POS</span></h1>
     <p class="lead">The white-label restaurant platform partners pitch as their own. AI-native, processor-agnostic, modern and fast.</p>
 
     <div class="chips" aria-hidden="true">
@@ -265,7 +265,7 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
 
   <footer>
     <div class="dash"></div>
-    <span>Powered by Spark POS</span>
+    <span>Powered by Win your POS</span>
   </footer>
 </div>
 

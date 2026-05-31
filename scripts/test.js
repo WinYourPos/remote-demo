@@ -6,7 +6,7 @@
  * - Simulates pay-and-close to confirm the live reporting update path works
  *
  * Usage:  node scripts/test.js
- * Expect: "JS parses OK", "Reports OK 24/24", "payAndClose OK ..."
+ * Expect: "JS parses OK", "Reports OK 36/36", "payAndClose OK ..."
  */
 const fs = require('fs');
 const path = require('path');

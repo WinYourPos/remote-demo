@@ -1,11 +1,11 @@
-# Spark POS — Research & Strategy Summary
+# Win your POS — Research & Strategy Summary
 
 Condensed reasoning behind the demo. Read before changing messaging, page structure, or the
 competitive framing.
 
 ## Audience & objective
 - **Audience:** a US restaurant-tech reseller / distributor evaluating whether to **resell
-  Spark POS under their own brand** to their existing restaurant clients.
+  Win your POS under their own brand** to their existing restaurant clients.
 - **Objective of the demos:** make that partner think *"I can sell this profitably, easily, and
   it's better than what I sell today."* The page does double duty — it impresses the partner's
   restaurant prospects (product demo) **and** sells the partner on the economics (partner section).
@@ -13,12 +13,12 @@ competitive framing.
 ## Benchmark: Heartland (now marketed as "Genius")
 - Heartland leads with **outcomes, not features** ("smoother shifts", "memorable experiences")
   and names features in a **verb-first** cadence (Order & Pay at the Table, Scan to Pay, Split
-  Checks). Spark mirrors this voice.
+  Checks). Win your POS mirrors this voice.
 - Heartland's reseller program ("Stronger Together") offers residuals + co-branding, but is a
   **captive model**: Heartland bills the customer and owns the relationship; the partner never
   gets true white-label ownership.
-- **Spark's wedge = the opposite:** full white-label, the partner owns the customer/contract,
-  the partner sets retail price and keeps the SaaS margin, and Spark is **processor-agnostic**
+- **The Win your POS wedge = the opposite:** full white-label, the partner owns the customer/contract,
+  the partner sets retail price and keeps the SaaS margin, and Win your POS is **processor-agnostic**
   (partner keeps their existing payment residual). That's the single biggest differentiator and
   why the landing page's most memorable moment is the live brand-swap.
 
@@ -39,7 +39,7 @@ competitive framing.
 - **Lightspeed** — strong inventory/international, dated UX.
 - **SpotOn** — restaurant-built, transparent pricing, but closed API/dev experience.
 - **Heartland/Genius** — payments-first, deep features, but captive economics, owns merchant data.
-- **Spark's gap to fill:** modern, AI-native UI that is **white-label by default** with
+- **The Win your POS gap to fill:** modern, AI-native UI that is **white-label by default** with
   **processor flexibility** — no incumbent offers all three.
 
 ## Persuasion levers used in the demo
@@ -60,7 +60,7 @@ competitive framing.
 - Short forms (3 fields) at the CTA.
 
 ## Product facts to keep accurate
-- Spark POS surfaces: POS terminal, KDS, kiosk, customer-facing display, online ordering, guest
+- Win your POS surfaces: POS terminal, KDS, kiosk, customer-facing display, online ordering, guest
   app, delivery dispatch, drive-thru, PAX A920/A35 + admin console (50+ pages) + 13 AI services.
 - Real product stack (separate repo): Angular 21, TypeScript strict, Tailwind v4, signals/zoneless,
   Dexie/IndexedDB swap-seam, transloco EN/EL — "production-ready, waiting for backend integration."

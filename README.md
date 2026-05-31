@@ -1,22 +1,27 @@
-# Spark POS — Demo
+# Win your POS — Demo
 
-> 🚀 **Live demo:** **<https://winyourpos.github.io/remote-demo/spark-pos.html>**
-> Open the **Test-drive the POS ↗** button or the **Try it yourself 📱** QR (scan from any phone — mobile-optimised UI).
+> 🚀 **Live demo (public mirror):** **<https://winyourpos.github.io/remote-demo/spark-pos.html>**
+> Hosted from [`WinYourPos/remote-demo`](https://github.com/WinYourPos/remote-demo) (public Pages). This `demo-repository` stays **private** as the canonical source — push here, mirror to `remote-demo` for sharing.
 
-Two standalone, zero-build HTML demos for pitching **Spark POS** — a white-label
-restaurant point-of-sale platform — to a US reseller partner.
+Standalone, zero-build HTML demos for pitching **Win your POS** — a white-label,
+**processor-agnostic** restaurant point-of-sale platform — to a **US payments + POS reseller**.
+
+The pitch, in the reseller's language:
+- **Keep your processing revenue** — processor-agnostic; bring your own processor, you're not disintermediated.
+- **Your brand, your client, your contract** — true white-label; the partner owns the relationship, the platform powers it.
+- **Always-current** — modern cloud stack + AI included (not an upsell), continuous updates.
+- **Migrate legacy** (e.g. MICROS) to a modern multi-unit, multi-location cloud POS.
+- **Reliable + local** — offline-first so the floor never stops; the partner provides local support.
 
 | File | What it is | Live |
 |------|------------|------|
-| **`try.html`** | Branded welcome splash partners see after scanning the QR. New POS + lightning-bolt logo (120 / 84 / 90px depending on viewport), eyebrow "● LIVE DEMO", "Next-gen restaurant POS" headline, 5 capability chips, one big "Try the live system →" CTA → `spark-system.html`. Portrait + landscape layouts. | [open ↗](https://winyourpos.github.io/remote-demo/try.html) |
-| **`spark-pos.html`** | Partner-facing landing/marketing page. Hero → live white-label brand-swap → **13 device-surface mockups** → **Ask Guru AI advisor** → partner-activation pipeline → ROI/residual calculator → competitor comparison → partner economics → "production-ready" tech block → FAQ → CTA. | [open ↗](https://winyourpos.github.io/remote-demo/spark-pos.html) |
-| **`spark-system.html`** | Interactive product demo. **Order + Kitchen (KDS) + Reports**, wired together: ring an item with modifiers → fire to the kitchen → close the check → reporting updates live. Mobile + landscape optimised — works on phone via the in-hero QR scan (lands on `try.html` first). | [open ↗](https://winyourpos.github.io/remote-demo/spark-system.html) |
+| **`try.html`** | Branded welcome splash partners see after scanning the QR. New POS + lightning-bolt logo, eyebrow "● LIVE DEMO", "Next-gen restaurant POS" headline, 5 capability chips, one "Try the live system →" CTA → `spark-system.html`. Portrait + landscape layouts. | [open ↗](https://winyourpos.github.io/remote-demo/try.html) |
+| **`spark-pos.html`** | Partner-facing landing/marketing page. Hero → live white-label brand-swap → **device-surface mockups** → **Ask Guru AI advisor** → partner-activation pipeline → ROI/residual calculator → competitor comparison → partner economics → "production-ready" tech block → FAQ → CTA. | [open ↗](https://winyourpos.github.io/remote-demo/spark-pos.html) |
+| **`spark-system.html`** | Interactive product demo. **Order + Kitchen (KDS) + Reports**, wired together: ring an item with modifiers → fire to the kitchen → close the check → reporting updates live. Mobile + landscape optimised so partners can scan & try from any phone (lands on `try.html` first). | [open ↗](https://winyourpos.github.io/remote-demo/spark-system.html) |
 
 ## Open the demos
 
-Just visit the live URL above, no install needed.
-
-Or run locally — double-click either file, or serve the folder:
+Just visit the live URL above. Or run locally — double-click either file, or serve the folder:
 
 ```bash
 python3 -m http.server 8000
@@ -36,7 +41,7 @@ python3 -m http.server 8000
 - Modifier groups with required min/max, temperature, remove kinds and priced add-ons (e.g. truffle fries `+$3`, lobster on tagliatelle `+$14`, big-rock-ice prep on the Old Fashioned, dry/wet/extra-dry on the Martini, size + crust on pizzas)
 - Guest count, table number, dine-in / takeout / delivery / bar — all live; split check, void, manager actions
 
-**Pay & close** — tender · tip · split modal (Heartland-equivalent)
+**Pay & close** — tender · tip · split modal (server-authoritative money; processor-agnostic)
 - Tip pills: No tip · 15 · 18 · **20% ★** · 25 · **Custom $** — live grand-total update
 - Six tender methods: 💳 Credit / Debit · 💵 Cash · 📱 Apple Pay · 📲 Google Pay · 🎁 Gift card · ⭐ Loyalty points
 - Live **Balance** card (flips green at $0.00); type a smaller amount than the balance to split — tap a method to apply
@@ -74,7 +79,7 @@ The AI surface is no longer a feature catalogue — it's one advisor that reads 
 
 **`guru.html` — full chat page (linked from both surfaces)**
 - Brand topbar: POS+bolt logo · "Ask Guru · your AI advisor" · LIVE dot · ← Back to `spark-system.html`
-- **Conversation layout**: user bubbles right-aligned in the orange gradient, Guru bubbles left-aligned with a soft orange tint and avatar
+- **Conversation layout**: user bubbles right-aligned in the blue gradient, Guru bubbles left-aligned with a soft blue tint and avatar
 - **Four starter chips** above the composer stay visible for the whole session — partners can keep one-tapping
 - **Thinking-dots animation** for ~1.9s on every reply, followed by a **block-by-block staggered reveal** (380 ms between *Read of your data → Recommendation → Why it'll work → Expected outcome*, then a final beat for the disclaimer) so an answer materialises like a considered read rather than a lookup
 - **Free-form composer**: input + paper-plane send button, Enter sends, iOS safe-area-aware padding
@@ -92,13 +97,19 @@ The AI surface is no longer a feature catalogue — it's one advisor that reads 
 
 ## Brand & design
 
-- **Logo:** new "POS terminal with lightning bolt emerging from the screen" mark. Defined once as `<symbol id="brand-spark-pos">` + two `<linearGradient>` defs inside the Lucide sprite, then referenced via `<svg class="brand-logo"><use href="#brand-spark-pos"/></svg>` from every consumer (sm 24 / default 32 / lg 96). `try.html` inlines the same artwork.
-- **Palette:** dark-first, single orange accent (`#FF9500 → #FF6B00`).
+- **Logo:** "POS terminal with lightning bolt emerging from the screen" mark. Defined once as `<symbol id="brand-spark-pos">` + two `<linearGradient>` defs inside the Lucide sprite, then referenced via `<svg class="brand-logo"><use href="#brand-spark-pos"/></svg>` from every consumer (sm 24 / default 32 / lg 96). `try.html` inlines the same artwork. The wordmark reads **Win your POS**.
+- **Palette:** light-first, single blue accent. CSS variable **names** stay; the **values** are the Win-your-POS identity:
+  - `--bg #FFFFFF` · `--surface #FFFFFF` · `--surface-2 #F4F6F8` · `--surface-3 #E8EBEF`
+  - `--border rgba(17,24,39,.10)` (stronger `rgba(17,24,39,.16)`)
+  - `--primary #1B6FF3` · `--primary-2 #0A5FE0` · `--grad linear-gradient(135deg,#2F86FF,#1366EC)`
+  - `--text #0B0D12` · dimmed `rgba(13,17,23,.58)` / `rgba(13,17,23,.40)`
+  - status: `--success #16A34A` · `--warn #D97706` · `--error #DC2626` · `--blue #1B6FF3` · `--purple #7C3AED`
+  - on-primary text/icons that sit on the blue accent are `#FFFFFF`; shadows are soft `rgba(17,24,39,.10–.14)` (modal/overlay scrims + chart tooltips stay dark with white text).
 - **Typography:** **Sora** display + body + **JetBrains Mono** for labels and numerals.
 - **Icons:** Lucide SVG sprite (ISC, bundled — no CDN).
 - **Buttons:** the reports header bar (date range pills, Export, ☰ drawer toggle) shares one consistent pill spec — 34px height (40px for the toggle), 10px radius, Sora 12.5/600, surface-2 default, hover lifts to surface-3 with brighter border, active scales to .97.
 
-Production frontend (separate repo `WinYourPos/PDA-front`, Angular 21 + Tailwind v4) is aligned to the same tokens and icon system so what a partner sees here is what their restaurant clients will see in the real app.
+Production frontend (separate repo `WinYourPos/PDA-front`, Angular + Tailwind, alongside `PDA` / `PDA-deployment`) is aligned **to** these demos — same tokens and icon system — so what a partner sees here is what their restaurant clients will see in the real app.
 
 ## Verify edits
 
@@ -112,23 +123,23 @@ node scripts/test.js
 ## Files
 
 ```
-remote-demo/
+demo-repository/
 ├── CLAUDE.md                 # project context for AI assistants
 ├── README.md                 # this file
 ├── try.html                  # branded welcome splash (QR landing target)
 ├── spark-pos.html            # landing / partner pitch page
 ├── spark-system.html         # Order + KDS + Reports interactive demo
 ├── guru.html                 # Ask Guru full chat page (opens from POS sidebar)
-├── index.html                # redirects → spark-pos.html
 ├── docs/RESEARCH_SUMMARY.md  # strategy & competitive research (the "why")
 └── scripts/test.js           # syntax + render harness for spark-system.html
 ```
 
 ## Ground rules
 
-- Never name a specific individual in the demos — use roles only ("partners", "your clients", "resellers").
-- Keep both HTML files **single-file and dependency-free** (Google Fonts only — Lucide is inlined as an SVG sprite).
-- No fabricated logos / testimonials / hard pricing. Competitor figures are labelled industry-reported; the ROI calculator is clearly illustrative.
+- Never name a specific individual in the demos — use roles only ("partners", "resellers", "your clients"). Never insert the partner company name.
+- Keep every HTML file **single-file and dependency-free** (Google Fonts only — Lucide is inlined as an SVG sprite). Anyone must be able to open it by double-click.
+- No fabricated logos / testimonials / hard pricing. Competitor figures are labelled industry-reported; the ROI/residual calculator is clearly illustrative.
+- Brand is **Win your POS** — never reintroduce "Spark" / "Spark POS" (word boundary; leave "Sparkling" alone).
 
 ## Continuing with Claude Code
 
