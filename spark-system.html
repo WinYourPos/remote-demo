@@ -944,6 +944,8 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
 <symbol id="i-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2" />
   <line x1="8" x2="16" y1="21" y2="21" />
   <line x1="12" x2="12" y1="17" y2="21" /></symbol>
+<symbol id="i-tv" viewBox="0 0 24 24"><rect width="20" height="15" x="2" y="7" rx="2" ry="2" />
+  <polyline points="17 2 12 7 7 2" /></symbol>
 <symbol id="i-credit-card" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2" />
   <line x1="2" x2="22" y1="10" y2="10" /></symbol>
 <symbol id="i-dollar-sign" viewBox="0 0 24 24"><line x1="12" x2="12" y1="2" y2="22" />
@@ -3185,7 +3187,7 @@ var PV = (function(){
   if (typeof document === 'undefined') return;
   if (typeof MutationObserver === 'undefined') return;
   if (typeof document.createTreeWalker !== 'function') return;
-  const M = {"📱":"smartphone","📲":"tablet","📷":"camera","🖥":"monitor","💳":"credit-card","💲":"dollar-sign","💵":"banknote","📊":"chart-column","📈":"trending-up","🛡":"shield-check","⚙":"settings","🌐":"globe","🍳":"utensils-crossed","🍽":"utensils","🎁":"gift","👥":"users","💬":"message-square","🔁":"repeat-2","🔮":"sparkles","🗓":"calendar","🚗":"car","🛣":"route","🧾":"receipt","🪑":"armchair","📦":"package","⚠":"triangle-alert","🔥":"flame","🕐":"clock","🌅":"sunrise","🎯":"target","🏅":"award","🏠":"house","🏢":"building-2","👷":"hard-hat","📉":"trending-down","📝":"file-text","🔔":"bell","🗂":"folder-tree","🚩":"flag","🛎":"concierge-bell","🧰":"wrench","⚖":"scale","✓":"check","✕":"x","❤":"heart","➕":"plus","🌡":"thermometer","💰":"wallet","⏱":"timer"};
+  const M = {"📱":"smartphone","📲":"tablet","📷":"camera","🖥":"monitor","📺":"tv","💳":"credit-card","💲":"dollar-sign","💵":"banknote","📊":"chart-column","📈":"trending-up","🛡":"shield-check","⚙":"settings","🌐":"globe","🍳":"utensils-crossed","🍽":"utensils","🎁":"gift","👥":"users","💬":"message-square","🔁":"repeat-2","🔮":"sparkles","🗓":"calendar","🚗":"car","🛣":"route","🧾":"receipt","🪑":"armchair","📦":"package","⚠":"triangle-alert","🔥":"flame","🕐":"clock","🌅":"sunrise","🎯":"target","🏅":"award","🏠":"house","🏢":"building-2","👷":"hard-hat","📉":"trending-down","📝":"file-text","🔔":"bell","🗂":"folder-tree","🚩":"flag","🛎":"concierge-bell","🧰":"wrench","⚖":"scale","✓":"check","✕":"x","❤":"heart","➕":"plus","🌡":"thermometer","💰":"wallet","⏱":"timer"};
   const keys = Object.keys(M);
   const re = new RegExp(keys.map(c=>c.split('').map(ch=>'\\u'+('0000'+ch.charCodeAt(0).toString(16)).slice(-4)).join('')).join('|'),'gu');
   function svgFor(name){ return '<svg class="ic" aria-hidden="true"><use href="#i-'+name+'"/></svg>'; }
