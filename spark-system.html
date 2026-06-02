@@ -3122,23 +3122,15 @@ function suPlayScene(k,done){
 }
 
 function setupBoard(){
+  // Board the store and go straight to the setup checklist — no backend-provisioning
+  // modal (org/tenant/RLS internals are noise in a pitch). Each step's screen still
+  // auto-fills when opened (suPlayScene).
   var nm=(setupVal('suName')||'').trim()||'The Ember Room';
   var stv=setupVal('suState')||'CA';
-  setupReset(); setupState.usState=stv; setupState.boarded=true; setupState.running=true;
+  setupReset(); setupState.usState=stv; setupState.boarded=true; setupState.running=false;
   setupState.store={name:nm,id:'wyp_'+setupRand(),org:'org_'+setupRand()};
   renderSetup();
-  var m=suModalEl();
-  if(!m){ setupState.running=false; renderSetup(); return; }
-  var steps=['Creating identity org','Provisioning tenant + row-level security','Seeding the 8 roles','Creating the owner account','Seeding defaults · location · station · menu','Health check → LIVE'];
-  m.innerHTML='<div class="su-sheet"><div class="su-sheet-h"><div class="su-sheet-t">Provisioning '+nm+'</div><div class="su-sheet-s">Its own identity, data &amp; settings · '+suStateName(stv)+'</div></div><div class="su-sheet-b"><div class="su-prov-list" id="suProv"></div></div></div>';
-  m.removeAttribute('hidden');
-  var hostEl=document.getElementById('suProv');
-  (function step(idx){
-    if(idx>=steps.length){ suWait(460,function(){ setupState.running=false; suCloseModal(); toast('fire','<b>'+nm+'</b> provisioned — org, tenant, owner & seed created'); renderSetup(); }); return; }
-    var r=document.createElement('div'); r.className='su-prov-line'; r.innerHTML='<span class="su-spin sm"></span><span>'+steps[idx]+'</span>'; if(hostEl)hostEl.appendChild(r);
-    suWait(400,function(){ r.className='su-prov-line ok'; r.innerHTML='<span class="su-lg ok">✓</span><span>'+steps[idx]+'</span>'; });
-    suWait(580,function(){ step(idx+1); });
-  })(0);
+  if(typeof toast==='function')toast('fire','<b>'+nm+'</b> created — complete the steps below to go live');
 }
 function setupRunAll(){
   if(setupState.running)return;
