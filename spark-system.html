@@ -1280,9 +1280,11 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
     .su-fv.pend{color:var(--dim-2)}
     .su-fv.ok{color:var(--success);font-weight:700}
     .su-fv.warn{color:var(--warn)}
+    .su-continue{position:fixed;bottom:18px;right:18px;z-index:40;font-family:'Sora';font-weight:700;font-size:13px;border:none;border-radius:999px;padding:11px 18px;background:var(--grad);color:#fff;box-shadow:0 8px 24px rgba(27,111,243,.35);cursor:pointer}
+    .su-continue[hidden]{display:none}
     @media(max-width:560px){.su-board{grid-template-columns:1fr}}
   </style>
-  <div class="view" id="setup"><div class="setup-wrap" id="setupHost"></div><div class="su-modal" id="suModal" hidden></div></div>
+  <div class="view" id="setup"><div class="setup-wrap" id="setupHost"></div><div class="su-modal" id="suModal" hidden></div><button class="su-continue" id="suContinue" hidden>Continue to your POS →</button></div>
 </div>
 
 
@@ -3235,6 +3237,10 @@ function setupAction(act,k){
   var histOk = (function(){ try{ return (typeof history!=='undefined' && history.pushState && typeof window!=='undefined' && window.addEventListener) ? true : false; }catch(e){ return false; } })();
 
   var DEVICES = [
+    { zone:'Back office', items:[
+      { id:'setup', ic:'🏪', label:'Store Setup',        persona:'Owner / Admin',   desc:'Board a new store → configure → go live, end to end.',            mode:'live', surface:'setup',   access:'setup' },
+      { id:'admin', ic:'📊', label:'Owner Console',      persona:'Owner / Manager', desc:'Dashboard · 36 live reports · AI advisor · multi-store.',          mode:'live', surface:'reports', access:'full', roles:['owner','manager'] }
+    ]},
     { zone:'Front of house', items:[
       { id:'pos-server', ic:'🧾', label:'Server POS',    persona:'Server',          desc:'Floor → ticket → fire → checkout. Split, coursing, manager PIN.', mode:'live', surface:'order',   access:'pos',  roles:['server','bartender','manager','owner'] },
       { id:'pos-mobile', ic:'📱', label:'Mobile POS',    persona:'Handheld',        desc:'Pocket twin of the server POS — order & pay tableside.',          mode:'live', surface:'order',   access:'pos',  roles:['server','bartender','manager','owner'] }
@@ -3249,10 +3255,6 @@ function setupAction(act,k){
       { id:'cfd',    ic:'📺', label:'Customer Display',  persona:'Guest',           desc:'Live order total facing the guest + on-screen tipping.',           mode:'live', surface:'preview', access:'preview', preview:'cfd' },
       { id:'guest',  ic:'❤', label:'Guest App',         persona:'Guest',           desc:'Loyalty · Skip-the-Line · Scan-to-Pay, on your brand.',            mode:'live', surface:'preview', access:'preview', preview:'guest' },
       { id:'online', ic:'🌐', label:'Online Ordering',   persona:'Web',             desc:'Dine-in · Takeout · Delivery · Curbside, commission-free.',        mode:'live', surface:'preview', access:'preview', preview:'online' }
-    ]},
-    { zone:'Back office', items:[
-      { id:'setup', ic:'🏪', label:'Store Setup',        persona:'Owner / Admin',   desc:'Board a new store → configure → go live, end to end.',            mode:'live', surface:'setup',   access:'setup' },
-      { id:'admin', ic:'📊', label:'Owner Console',      persona:'Owner / Manager', desc:'Dashboard · 36 live reports · AI advisor · multi-store.',          mode:'live', surface:'reports', access:'full', roles:['owner','manager'] }
     ]}
   ];
   var ROLE_META = {
@@ -4088,6 +4090,34 @@ var PV = (function(){
   });
 })();
 /* <<< PAGE-NAV-FADE-JS <<< */
+
+/* >>> SETUP-GATE: the store-setup is the mandatory FIRST screen on open; from there
+   "Continue to your POS →" reveals the Stations launcher and the rest of the app. */
+function wypShowStations(){
+  if(typeof document==='undefined'||!document.getElementById)return;
+  var lz=document.getElementById('launcher'); if(lz)lz.removeAttribute('hidden');
+  var app=document.querySelector('.app');
+  if(app&&app.classList){ app.classList.remove('in-device'); if(app.removeAttribute){app.removeAttribute('data-access');app.removeAttribute('data-role');} }
+  var c=document.getElementById('suContinue'); if(c)c.setAttribute('hidden','');
+  if(typeof window!=='undefined'&&window.scrollTo)window.scrollTo(0,0);
+}
+function wypEnterSetupGate(){
+  if(typeof document==='undefined'||!document.getElementById)return;
+  var lz=document.getElementById('launcher'); if(lz)lz.setAttribute('hidden','');
+  var app=document.querySelector('.app');
+  if(app&&app.classList){ app.classList.add('in-device'); if(app.setAttribute)app.setAttribute('data-access','setup'); }
+  var views=document.querySelectorAll('.view');
+  if(views&&views.length)[].slice.call(views).forEach(function(x){ x.classList.toggle('active', x.id==='setup'); });
+  if(typeof renderSetup==='function')renderSetup();
+  var c=document.getElementById('suContinue');
+  if(c){ c.removeAttribute('hidden'); if(c.addEventListener&&!c._wired){ c._wired=1; c.addEventListener('click',wypShowStations); } }
+  if(typeof window!=='undefined'&&window.scrollTo)window.scrollTo(0,0);
+}
+(function(){
+  if(typeof document==='undefined'||typeof document.getElementById!=='function')return;
+  if(typeof window!=='undefined'&&window.addEventListener){ window.addEventListener('load',wypEnterSetupGate); }
+})();
+/* <<< SETUP-GATE <<< */
 </script>
 
 
