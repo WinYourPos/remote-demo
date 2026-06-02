@@ -798,6 +798,7 @@ button{font-family:inherit;cursor:pointer}
 /* role-gated tabs: single-surface roles hide the segmented control */
 .app[data-access="pos"] #seg,
 .app[data-access="kds"] #seg,
+.app[data-access="setup"] #seg,
 .app[data-access="preview"] #seg{display:none}
 
 /* preview surface (guest-facing devices) */
@@ -1175,6 +1176,115 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
 
   <!-- ============ DEVICE PREVIEW (guest-facing surfaces) ============ -->
   <div class="view" id="preview"><div class="pv-host" id="pvHost"></div></div>
+
+  <!-- ============ STORE SETUP (onboarding / boarding pipeline) ============ -->
+  <style>
+    #setup{padding:0;overflow:auto}
+    .setup-wrap{max-width:760px;margin:0 auto;padding:24px 18px 64px}
+    .su-head h2{font-size:24px;font-weight:800;margin:4px 0 6px;color:var(--text)}
+    .su-eyebrow{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--primary);font-weight:700}
+    .su-lead{color:var(--dim);font-size:14px;line-height:1.55;max-width:62ch}
+    .su-prov{font-family:'JetBrains Mono';font-size:11.5px;color:var(--dim);margin-top:6px}
+    .su-prov .ok{color:var(--success);font-weight:700}
+    .su-prog{margin-top:16px}
+    .su-prog-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--dim);margin-bottom:6px;font-family:'JetBrains Mono'}
+    .su-bar{height:8px;border-radius:99px;background:var(--surface-3);overflow:hidden}
+    .su-bar i{display:block;height:100%;background:var(--grad);border-radius:99px;transition:width .35s}
+    .su-list{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+    .su-stage{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 1px 2px rgba(17,24,39,.05)}
+    .su-ic{width:40px;height:40px;flex:none;display:grid;place-items:center;border-radius:12px;background:var(--surface-2);font-size:19px}
+    .su-meta{flex:1;min-width:0}
+    .su-t{font-weight:700;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .su-d{color:var(--dim);font-size:12.5px;margin-top:2px}
+    .su-act{flex:none;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .su-chip{font-family:'JetBrains Mono';font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:2px 8px;border-radius:99px;background:var(--surface-3);color:var(--dim);font-weight:700}
+    .su-chip.ok{background:rgba(22,163,74,.12);color:var(--success)}
+    .su-chip.pe{background:rgba(217,119,6,.14);color:var(--warn)}
+    .su-chip.sk{background:var(--surface-3);color:var(--dim-2)}
+    .su-btn{font-family:'Sora';font-weight:600;font-size:13px;border:1px solid var(--border-2);background:var(--surface);color:var(--text);border-radius:12px;padding:8px 14px;cursor:pointer;transition:.15s;white-space:nowrap}
+    .su-btn:hover{border-color:var(--primary)}
+    .su-btn.primary{background:var(--grad);color:#fff;border:none}
+    .su-btn.ai{background:var(--purple);color:#fff;border:none}
+    .su-btn.sec{background:var(--surface-2)}
+    .su-btn.ghost{background:transparent;border-color:transparent;color:var(--dim)}
+    .su-btn.sm{padding:4px 10px;font-size:12px}
+    .su-card{margin-top:18px;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px}
+    .su-board{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .su-board label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--dim);font-weight:600;position:relative}
+    .su-board label:first-child{grid-column:1/-1}
+    .su-board input{height:42px;border:1px solid var(--border-2);border-radius:14px;padding:0 12px;font-family:'Sora';font-size:14px;color:var(--text);background:var(--bg)}
+    .su-board>.su-btn{grid-column:1/-1}
+    .su-live{margin-top:18px;text-align:center;background:linear-gradient(135deg,rgba(47,134,255,.10),rgba(22,163,74,.10));border:1px solid rgba(22,163,74,.25)}
+    .su-live-t{font-size:18px;font-weight:800;color:var(--text)}
+    .su-chip.wk{background:rgba(27,111,243,.14);color:var(--primary);animation:supulse 1s ease-in-out infinite}
+    @keyframes supulse{0%,100%{opacity:1}50%{opacity:.5}}
+    .su-stage{transition:border-color .2s,box-shadow .2s}
+    .su-stage.active{border-color:var(--primary);box-shadow:0 0 0 3px rgba(27,111,243,.12)}
+    .su-stage.is-done .su-ic{background:rgba(22,163,74,.12)}
+    .su-prog-ctl{display:flex;align-items:center;gap:8px}
+    .su-running{display:inline-flex;align-items:center;gap:7px;font-family:'JetBrains Mono';font-size:11.5px;color:var(--primary);font-weight:700}
+    .su-spin{width:13px;height:13px;border-radius:50%;border:2px solid rgba(27,111,243,.25);border-top-color:var(--primary);display:inline-block;animation:suspin .7s linear infinite;flex:none}
+    .su-spin.sm{width:11px;height:11px}
+    @keyframes suspin{to{transform:rotate(360deg)}}
+    .su-lg{display:inline-flex;width:14px;justify-content:center;flex:none}
+    .su-lg.ok{color:#34D399;font-weight:700}
+    .su-btn:disabled{opacity:.55;cursor:default}
+    /* ---- auto-filling step screens (modal scenes) ---- */
+    .su-modal{position:fixed;inset:0;background:rgba(11,13,18,.55);display:flex;align-items:center;justify-content:center;padding:24px;z-index:60}
+    .su-modal[hidden]{display:none}
+    .su-sheet{width:min(460px,94vw);background:var(--surface);border-radius:20px;box-shadow:0 30px 90px rgba(17,24,39,.35);overflow:hidden;animation:supop .24s ease}
+    @keyframes supop{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+    .su-sheet-h{padding:16px 18px;border-bottom:1px solid var(--border)}
+    .su-sheet-t{font-weight:800;font-size:16px;color:var(--text)}
+    .su-sheet-s{font-size:12px;color:var(--dim);margin-top:2px}
+    .su-brand{display:inline-block;font-family:'JetBrains Mono';font-weight:700;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#635BFF;background:rgba(99,91,255,.12);padding:3px 8px;border-radius:6px;margin-bottom:8px}
+    .su-sheet-b{padding:16px 18px 18px}
+    .su-f{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:10px 0;border-bottom:1px dashed var(--border)}
+    .su-fl{font-size:12.5px;color:var(--dim);flex:none}
+    .su-fv{font-family:'JetBrains Mono';font-size:13px;color:var(--text);font-weight:600;min-height:18px;text-align:right}
+    .su-fv.typing:after{content:'';display:inline-block;width:1px;height:14px;background:var(--primary);margin-left:2px;vertical-align:-2px;animation:sucaret .8s steps(1) infinite}
+    @keyframes sucaret{50%{opacity:0}}
+    .su-status{margin-top:14px;font-size:12.5px;color:var(--dim);font-family:'JetBrains Mono';display:flex;align-items:center;gap:8px;min-height:18px}
+    .su-status.ok{color:var(--success);font-weight:700}
+    .su-status.wait{color:var(--primary)}
+    .su-drop{border:2px dashed var(--border-2);border-radius:14px;padding:24px;text-align:center;color:var(--dim);transition:.25s}
+    .su-drop.have{border-color:var(--primary);color:var(--text);background:rgba(27,111,243,.06)}
+    .su-drop-ic{font-size:22px;margin-bottom:6px}
+    .su-up-row{display:flex;justify-content:space-between;font-family:'JetBrains Mono';font-size:12px;color:var(--text);margin-bottom:6px}
+    .su-up-bar{height:8px;border-radius:99px;background:var(--surface-3);overflow:hidden}
+    .su-up-bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:99px;transition:width .12s linear}
+    .su-rows{margin-top:12px;display:flex;flex-direction:column;gap:6px;max-height:230px;overflow:auto}
+    .su-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:11px;font-size:13px;color:var(--text)}
+    .su-row.in{animation:surow .3s ease}
+    @keyframes surow{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+    .su-row .p{font-family:'JetBrains Mono';color:var(--dim)}
+    .su-pairing{font-family:'JetBrains Mono';font-size:11.5px;color:var(--warn)}
+    .su-online{font-family:'JetBrains Mono';font-size:11.5px;color:var(--success);font-weight:700}
+    .su-reader{border:1px solid var(--border-2);border-radius:18px;padding:26px 18px;text-align:center;background:var(--surface-2)}
+    .su-reader-top{font-family:'JetBrains Mono';font-size:11px;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+    .su-amt{font-family:'JetBrains Mono';font-weight:800;font-size:40px;color:var(--text);margin:10px 0}
+    .su-reader-st{font-size:12.5px;color:var(--dim);font-family:'JetBrains Mono';display:flex;align-items:center;justify-content:center;gap:8px;min-height:18px}
+    .su-reader-st.ok{color:var(--success);font-weight:700}.su-reader-st.wait{color:var(--primary)}
+    .su-golive{text-align:center;padding:14px 0}
+    .su-switch{width:64px;height:34px;border-radius:99px;background:var(--surface-3);margin:0 auto 12px;position:relative;transition:.3s}
+    .su-switch .su-knob{position:absolute;top:3px;left:3px;width:28px;height:28px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:.3s}
+    .su-switch.on{background:var(--success)}.su-switch.on .su-knob{left:33px}
+    .su-switch-lbl{font-family:'JetBrains Mono';font-size:13px;color:var(--text)}.su-switch-lbl .ok{color:var(--success)}
+    .su-prov-list{display:flex;flex-direction:column;gap:9px}
+    .su-prov-line{display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono';font-size:12.5px;color:var(--dim)}
+    .su-prov-line.ok{color:var(--text)}
+    .su-board select{height:42px;border:1px solid var(--border-2);border-radius:14px;padding:0 10px;font-family:'Sora';font-size:14px;color:var(--text);background:var(--bg)}
+    .su-scroll{max-height:82vh;overflow:auto}
+    .su-f .su-fl{flex:1;min-width:0;display:flex;align-items:center}
+    .su-f .su-fv{max-width:54%;overflow-wrap:anywhere}
+    .su-req{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--primary);margin-left:5px;flex:none}
+    .su-req.cond{background:var(--warn)}
+    .su-fv.pend{color:var(--dim-2)}
+    .su-fv.ok{color:var(--success);font-weight:700}
+    .su-fv.warn{color:var(--warn)}
+    @media(max-width:560px){.su-board{grid-template-columns:1fr}}
+  </style>
+  <div class="view" id="setup"><div class="setup-wrap" id="setupHost"></div><div class="su-modal" id="suModal" hidden></div></div>
 </div>
 
 
@@ -2820,6 +2930,7 @@ document.getElementById('seg').onclick=e=>{
   document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===v));
   if(v==='kds')renderKDS();
   if(v==='reports')renderReports();
+  if(v==='setup')renderSetup();
 };
 function toast(type,html){
   const t=document.createElement('div');t.className='toast '+type;
@@ -2833,6 +2944,288 @@ setInterval(tickClock,1000);tickClock();
 
 /* init */
 seedTickets();renderCheck();updateKdsBadge();setupReportsSidebar();renderReports();
+
+/* =========================================================
+   STORE SETUP — guided onboarding / boarding pipeline
+   Mirrors the real platform's server-backed pipeline: board a
+   store (identity org + tenant + owner) → business profile →
+   payments boarding (processor KYC) → menu / tax / staff /
+   hardware → verify (test charge) → go live. Simulated end to
+   end so a partner can see a new merchant boarded in minutes.
+   Self-contained + safe under the Node test stub.
+   ========================================================= */
+var setupState;
+var BOARDING={"sections": [{"key": "business-entity", "title": "Business / Legal Entity", "intro": "Core legal-entity identification required by Visa/Mastercard merchant data standards, FinCEN CDD, IRS, and Stripe/Heart…", "fields": [{"label": "Legal Business Name", "example": "Rosewood Kitchen LLC", "type": "text", "required": "required", "perState": false}, {"label": "DBA / Trade Name", "example": "The Rosewood Bistro", "type": "text", "required": "conditional", "perState": true}, {"label": "Business Type / Entity Structure", "example": "Single-Member LLC (options: Sole Proprietorship, Single-M…", "type": "select", "required": "required", "perState": false}, {"label": "State of Incorporation / Formation", "example": "DE", "type": "state", "required": "conditional", "perState": true}, {"label": "Federal Tax ID (EIN)", "example": "45-3456789", "type": "ein", "required": "conditional", "perState": false}, {"label": "Sole Proprietor SSN", "example": "***-**-5678 (last 4 collected initially)", "type": "ssn", "required": "conditional", "perState": false}, {"label": "Physical Business Address (Line 1)", "example": "456 Oak Street", "type": "text", "required": "required", "perState": false}, {"label": "Address Line 2 / Suite", "example": "Suite 200", "type": "text", "required": "optional", "perState": false}, {"label": "Business City", "example": "Portland", "type": "text", "required": "required", "perState": false}, {"label": "Business State", "example": "OR", "type": "state", "required": "required", "perState": true}, {"label": "Business ZIP Code", "example": "97214", "type": "text", "required": "required", "perState": false}, {"label": "Registered Agent / Legal Address (if different)", "example": "999 Registered Agent St, Wilmington, DE 19801", "type": "text", "required": "conditional", "perState": true}, {"label": "Business Phone Number", "example": "+1-503-555-0142", "type": "tel", "required": "required", "perState": false}, {"label": "Business Website / URL", "example": "https://rosewoodkitchen.com", "type": "url", "required": "conditional", "perState": false}, {"label": "Product / Service Description", "example": "Full-service restaurant: dine-in, takeout, catering", "type": "text", "required": "conditional", "perState": false}, {"label": "Business Establishment / Start Date", "example": "2022-03-15", "type": "date", "required": "required", "perState": false}, {"label": "Number of Locations", "example": "1", "type": "number", "required": "optional", "perState": false}]}, {"key": "beneficial-owners", "title": "Beneficial Owners & Control Person", "intro": "FinCEN Customer Due Diligence rule (31 CFR 1010.230): identify and verify every natural person owning 25%+ of equity, p…", "fields": [{"label": "Owner Full Legal Name", "example": "Jane Marie Smith", "type": "text", "required": "conditional", "perState": false}, {"label": "Owner Date of Birth", "example": "1985-07-23", "type": "date", "required": "conditional", "perState": false}, {"label": "Owner Residential Address", "example": "555 Oak Ave, Berkeley, CA 94702", "type": "text", "required": "conditional", "perState": false}, {"label": "Owner SSN / ITIN", "example": "Last 4: 6789 (escalates to full 9-digit SSN on failure or…", "type": "ssn", "required": "conditional", "perState": false}, {"label": "Owner Government Photo ID Type & Number", "example": "Driver License: CA D1234567 (or Passport US A12345678, or…", "type": "text", "required": "conditional", "perState": false}, {"label": "Owner Ownership Percentage", "example": "30", "type": "percent", "required": "conditional", "perState": false}, {"label": "Owner Title / Role", "example": "Managing Member", "type": "text", "required": "conditional", "perState": false}, {"label": "Owner Email", "example": "jane.smith@example.com", "type": "email", "required": "optional", "perState": false}, {"label": "Owner Phone", "example": "+1-415-555-0100", "type": "tel", "required": "optional", "perState": false}, {"label": "Owner Nationality / Country (if non-US)", "example": "Canada", "type": "text", "required": "conditional", "perState": false}, {"label": "Control Person (Authorized Signatory / Representative)", "example": "Yes — identify one individual (CEO, CFO, COO, Managing Me…", "type": "select", "required": "required", "perState": false}, {"label": "PEP Screening Declaration", "example": "No — Not a Politically Exposed Person (options: No / Yes)", "type": "select", "required": "required", "perState": false}, {"label": "Beneficial Ownership Certification", "example": "Certified — captures date, IP, user-agent at certification", "type": "select", "required": "conditional", "perState": false}]}, {"key": "bank-settlement", "title": "Bank & Settlement", "intro": "Verified settlement banking per ACH/Federal Reserve standards. The account must be in the legal entity (or DBA) name ma…", "fields": [{"label": "Bank Name", "example": "Wells Fargo Bank", "type": "text", "required": "optional", "perState": false}, {"label": "ABA Routing Number", "example": "063000047", "type": "routing", "required": "required", "perState": false}, {"label": "Account Number", "example": "123456789012 (8-17 digits; store only last 4)", "type": "account", "required": "required", "perState": false}, {"label": "Account Holder Name", "example": "Rosewood Kitchen LLC", "type": "text", "required": "required", "perState": false}, {"label": "Account Type", "example": "Checking (options: Checking, Savings)", "type": "select", "required": "required", "perState": false}, {"label": "Account Holder Type", "example": "Company (options: Individual, Company)", "type": "select", "required": "required", "perState": false}, {"label": "Account Verification Method", "example": "Instant (Plaid) (options: Voided Check, Bank Letter, Micr…", "type": "select", "required": "required", "perState": false}, {"label": "Voided Check", "example": "PDF/JPG of a check marked VOID showing routing, account, …", "type": "file", "required": "conditional", "perState": false}, {"label": "Bank Letter", "example": "Signed bank letterhead confirming merchant name, account …", "type": "file", "required": "conditional", "perState": false}, {"label": "Micro-Deposit Confirmation", "example": "Confirm two amounts, e.g. $0.47 and $0.83", "type": "currency", "required": "conditional", "perState": false}]}, {"key": "processing-underwriting", "title": "Processing Profile (Underwriting)", "intro": "Transaction patterns and risk-history data used to set approval limits, reserves, pricing, and fraud controls. Material…", "fields": [{"label": "Estimated Monthly Processing Volume (USD)", "example": "25000", "type": "currency", "required": "required", "perState": false}, {"label": "Estimated Annual Processing Volume (USD)", "example": "300000", "type": "currency", "required": "required", "perState": false}, {"label": "Average Ticket Amount (USD)", "example": "22", "type": "currency", "required": "required", "perState": false}, {"label": "Highest / Maximum Ticket Amount (USD)", "example": "200", "type": "currency", "required": "required", "perState": false}, {"label": "Card-Present Percentage", "example": "85", "type": "percent", "required": "required", "perState": false}, {"label": "Card-Not-Present Breakdown", "example": "15% CNP: 10% ecommerce, 5% MOTO", "type": "text", "required": "conditional", "perState": false}, {"label": "Estimated Monthly Transaction Count", "example": "1500", "type": "number", "required": "optional", "perState": false}, {"label": "Business Model — B2B / B2C / Hybrid", "example": "B2C (options: B2C, B2B, Hybrid)", "type": "select", "required": "required", "perState": false}, {"label": "Refund / Return Policy", "example": "No cash refunds; store credit only on prepared food. Post…", "type": "text", "required": "required", "perState": false}, {"label": "Delivery / Fulfillment Timing", "example": "Same-day dine-in; under 1 hour delivery", "type": "text", "required": "conditional", "perState": false}, {"label": "Seasonal Business Flag", "example": "Yes — peak Nov-Dec ~50% of annual volume (options: Yes, N…", "type": "select", "required": "conditional", "perState": false}, {"label": "Current / Projected Chargeback Ratio", "example": "0.5", "type": "percent", "required": "required", "perState": false}, {"label": "Prior / Current Payment Processor", "example": "Square Inc.", "type": "text", "required": "conditional", "perState": false}, {"label": "Reserve / Hold Terms (if applicable)", "example": "5-10% of monthly volume held 6-12 months", "type": "text", "required": "conditional", "perState": false}, {"label": "Prohibited-Items Attestation", "example": "Confirmed — no gambling, adult content, Rx without prescr…", "type": "select", "required": "required", "perState": false}]}, {"key": "tax-state-registration", "title": "Tax & State Registration", "intro": "State/local sales-tax registration and the data states require to issue a seller's permit. Sales tax applies in 45 stat…", "fields": [{"label": "State Sales Tax ID / Seller's Permit Number", "example": "CA 123-456789-0 (NY Certificate of Authority 12-345678-9;…", "type": "text", "required": "conditional", "perState": true}, {"label": "Seller's Permit Issuing State", "example": "CA", "type": "state", "required": "conditional", "perState": true}, {"label": "Certificate of Authority / Seller's Permit Document", "example": "PDF of state-issued seller's permit / Certificate of Auth…", "type": "file", "required": "conditional", "perState": true}, {"label": "NAICS Code", "example": "722511 (Full-Service Restaurants)", "type": "text", "required": "required", "perState": false}, {"label": "Estimated Taxable Sales (Monthly/Annual)", "example": "15000 monthly / 180000 annual", "type": "currency", "required": "conditional", "perState": true}, {"label": "Economic Nexus Confirmation", "example": "Yes — gross sales in state exceeded the state threshold i…", "type": "select", "required": "conditional", "perState": true}, {"label": "Combined Sales Tax Rate at Address", "example": "9.25 (Los Angeles: 7.25% state + local)", "type": "percent", "required": "conditional", "perState": true}, {"label": "Filing Frequency", "example": "Monthly (options: Monthly, Quarterly, Annually)", "type": "select", "required": "conditional", "perState": true}, {"label": "Local Jurisdiction Registration(s) — Home-Rule States", "example": "Colorado: separate registration with self-administering m…", "type": "text", "required": "conditional", "perState": true}, {"label": "Resale / Exemption Certificate", "example": "MTC Uniform Resale Certificate (or CA BOE-230 / TX 01-339…", "type": "file", "required": "conditional", "perState": true}, {"label": "Marketplace Facilitator Declaration", "example": "Yes — sells via DoorDash/Uber Eats (options: Yes, No, Own…", "type": "select", "required": "conditional", "perState": true}, {"label": "Security Deposit / Financial Assurance", "example": "0-25000 (varies by state, business type, and estimated sa…", "type": "currency", "required": "conditional", "perState": true}, {"label": "Acquisition / Prior Owner Permit Info", "example": "Prior owner name + prior permit # + sale date", "type": "text", "required": "conditional", "perState": true}]}, {"key": "licensing", "title": "Licensing", "intro": "State, county, and local operating licenses a restaurant/retail merchant must hold. Issuing authority, naming, and numb…", "fields": [{"label": "Local Business License Number", "example": "BL-2025-001234", "type": "text", "required": "conditional", "perState": true}, {"label": "Business License Issuing Authority", "example": "City of Portland Revenue Division", "type": "text", "required": "conditional", "perState": true}, {"label": "Food Service Establishment Permit Number", "example": "FS-2025-5678", "type": "text", "required": "conditional", "perState": true}, {"label": "Food Service Permit Issuing Authority", "example": "Multnomah County Health Department", "type": "text", "required": "conditional", "perState": true}, {"label": "Liquor License Number", "example": "CA ABC Type 47 (full liquor on-premises); NY Type 2; OLCC…", "type": "text", "required": "conditional", "perState": true}, {"label": "Liquor License Issuing Authority", "example": "California Department of Alcoholic Beverage Control (ABC)", "type": "text", "required": "conditional", "perState": true}, {"label": "Certificate of Occupancy Number", "example": "CoO-2025-4567", "type": "text", "required": "conditional", "perState": true}, {"label": "Certified Food Protection Manager Certificate #", "example": "ServSafe / CFM-2025-1234", "type": "text", "required": "conditional", "perState": true}, {"label": "Workers' Compensation Insurance", "example": "Certificate of Insurance with carrier, policy #, expirati…", "type": "file", "required": "conditional", "perState": true}, {"label": "Disability Insurance Certificate", "example": "Certificate of disability coverage (may bundle with worke…", "type": "file", "required": "conditional", "perState": true}]}, {"key": "documents", "title": "Documents", "intro": "Supporting documents collected for KYC/KYB verification, EIN/bank confirmation, and entity formation. Most are conditio…", "fields": [{"label": "EIN Verification Document (CP575 / 147C / SS-4)", "example": "IRS CP575 EIN assignment letter, 147C confirmation, or SS…", "type": "file", "required": "conditional", "perState": false}, {"label": "Articles of Incorporation / Certificate of Formation", "example": "State-filed Articles of Incorporation (Corp) or Certifica…", "type": "file", "required": "conditional", "perState": true}, {"label": "LLC Operating Agreement", "example": "Operating Agreement showing members, ownership %, managem…", "type": "file", "required": "conditional", "perState": true}, {"label": "DBA / Assumed Name Certificate", "example": "State/county-filed DBA certificate showing legal owner + …", "type": "file", "required": "conditional", "perState": true}, {"label": "Beneficial Ownership Proof (complex structures)", "example": "Cap table / org chart showing all 25%+ owners and interme…", "type": "file", "required": "conditional", "perState": false}, {"label": "Prior Processing Statements (last 3-6 months)", "example": "Monthly statements showing volume, transaction count, cha…", "type": "file", "required": "conditional", "perState": false}, {"label": "Business Bank Statements (last 3-6 months)", "example": "PDF statements showing deposits, revenue, cash flow", "type": "file", "required": "conditional", "perState": false}]}, {"key": "compliance-card-network", "title": "Compliance & Card-Network", "intro": "Card-network (Visa/Mastercard) classification and descriptor data, PCI DSS compliance, and the Terms-of-Service/audit a…", "fields": [{"label": "Merchant Category Code (MCC)", "example": "5812 (options: 5812 full-service restaurant, 5814 fast fo…", "type": "select", "required": "required", "perState": false}, {"label": "Statement Descriptor (Merchant Name)", "example": "ROSEWOOD KITCHEN", "type": "text", "required": "required", "perState": false}, {"label": "Statement Descriptor Prefix", "example": "ROSEWD", "type": "text", "required": "optional", "perState": false}, {"label": "Customer Service Phone (on descriptor)", "example": "555-123-4567", "type": "tel", "required": "conditional", "perState": false}, {"label": "PCI DSS SAQ Type", "example": "SAQ B-IP (options: A, A-EP, B, B-IP, C, C-VT, P2PE, D)", "type": "select", "required": "required", "perState": false}, {"label": "PCI Merchant Level", "example": "Level 4 (options: 1, 2, 3, 4)", "type": "select", "required": "optional", "perState": false}, {"label": "PCI Attestation of Compliance (AOC)", "example": "Signed AOC by an authorized representative (officer/owner…", "type": "file", "required": "required", "perState": false}, {"label": "Terms of Service Acceptance", "example": "Accepted — captures Unix timestamp + IP + user-agent", "type": "select", "required": "required", "perState": false}, {"label": "Personal Guarantee Signature", "example": "Signed by owner(s) on the Merchant Processing Agreement g…", "type": "select", "required": "required", "perState": false}]}]};
+var STATE_TAX={"CA": {"name": "California", "rate": "9.50%", "reg": "Seller's Permit", "regEx": "CA 123-456789-0", "homerule": false, "notax": false}, "NY": {"name": "New York", "rate": "8.875%", "reg": "Certificate of Authority", "regEx": "NY CoA 12-3456789", "homerule": false, "notax": false}, "TX": {"name": "Texas", "rate": "8.25%", "reg": "Sales Tax Permit", "regEx": "TX 1-23456789012-3", "homerule": false, "notax": false}, "FL": {"name": "Florida", "rate": "7.50%", "reg": "Annual Resale Certificate", "regEx": "FL 23-8012345678-9", "homerule": false, "notax": false}, "IL": {"name": "Illinois", "rate": "10.25%", "reg": "Certificate of Registration", "regEx": "IL 1234-5678", "homerule": false, "notax": false}, "GA": {"name": "Georgia", "rate": "8.90%", "reg": "Sales & Use Tax Number", "regEx": "GA 123-456789", "homerule": false, "notax": false}, "WA": {"name": "Washington", "rate": "10.25%", "reg": "UBI / Reseller Permit", "regEx": "WA 601-234-567", "homerule": false, "notax": false}, "PA": {"name": "Pennsylvania", "rate": "8.00%", "reg": "Sales Tax License", "regEx": "PA 12345678", "homerule": false, "notax": false}, "OH": {"name": "Ohio", "rate": "7.50%", "reg": "Vendor’s License", "regEx": "OH 12-345678", "homerule": false, "notax": false}, "MI": {"name": "Michigan", "rate": "6.00%", "reg": "Sales Tax License", "regEx": "MI 12-3456789", "homerule": false, "notax": false}, "NC": {"name": "North Carolina", "rate": "7.25%", "reg": "Certificate of Registration", "regEx": "NC 600123456", "homerule": false, "notax": false}, "NJ": {"name": "New Jersey", "rate": "6.625%", "reg": "Certificate of Authority", "regEx": "NJ 123-456-789/000", "homerule": false, "notax": false}, "MA": {"name": "Massachusetts", "rate": "6.25%", "reg": "Sales & Use Registration", "regEx": "MA SLS-12345678", "homerule": false, "notax": false}, "VA": {"name": "Virginia", "rate": "6.00%", "reg": "Sales Tax Certificate", "regEx": "VA 10-123456789F-001", "homerule": false, "notax": false}, "NV": {"name": "Nevada", "rate": "8.375%", "reg": "Sales/Use Tax Permit", "regEx": "NV 1001234567-001", "homerule": false, "notax": false}, "TN": {"name": "Tennessee", "rate": "9.75%", "reg": "Sales Tax Certificate", "regEx": "TN 1000123456", "homerule": false, "notax": false}, "MO": {"name": "Missouri", "rate": "8.99%", "reg": "Retail Sales License", "regEx": "MO 12345678", "homerule": false, "notax": false}, "MN": {"name": "Minnesota", "rate": "7.875%", "reg": "Sales Tax Account", "regEx": "MN 1234567", "homerule": false, "notax": false}, "WI": {"name": "Wisconsin", "rate": "5.50%", "reg": "Seller’s Permit", "regEx": "WI 456-1234567890-01", "homerule": false, "notax": false}, "IN": {"name": "Indiana", "rate": "7.00%", "reg": "Registered Retail Merchant Cert.", "regEx": "IN 0123456789-001", "homerule": false, "notax": false}, "MD": {"name": "Maryland", "rate": "6.00%", "reg": "Sales & Use Tax License", "regEx": "MD 12345678", "homerule": false, "notax": false}, "CT": {"name": "Connecticut", "rate": "6.35%", "reg": "Sales Tax Permit", "regEx": "CT 12345678-000", "homerule": false, "notax": false}, "AZ": {"name": "Arizona", "rate": "8.60%", "reg": "TPT License", "regEx": "AZ 12-345678", "homerule": true, "notax": false}, "CO": {"name": "Colorado", "rate": "8.81%", "reg": "Sales Tax License", "regEx": "CO 12-34567-0000", "homerule": true, "notax": false}, "LA": {"name": "Louisiana", "rate": "9.55%", "reg": "Sales Tax Account (GeauxBiz)", "regEx": "LA 1234567-001", "homerule": true, "notax": false}, "AL": {"name": "Alabama", "rate": "9.22%", "reg": "Sales Tax Account", "regEx": "AL R012345678", "homerule": true, "notax": false}, "OR": {"name": "Oregon", "rate": "0%", "reg": null, "regEx": null, "homerule": false, "notax": true}, "NH": {"name": "New Hampshire", "rate": "0%", "reg": null, "regEx": null, "homerule": false, "notax": true}, "MT": {"name": "Montana", "rate": "0%", "reg": null, "regEx": null, "homerule": false, "notax": true}, "DE": {"name": "Delaware", "rate": "0%", "reg": null, "regEx": null, "homerule": false, "notax": true}, "AK": {"name": "Alaska", "rate": "0% state (local up to ~7.5%)", "reg": null, "regEx": null, "homerule": false, "notax": true}};
+var SU_SPEED=1.6; /* global pacing for the setup animations — higher = slower */
+function suWait(ms,fn){ms=Math.round(ms*SU_SPEED);if(typeof setTimeout==='function'){setTimeout(fn,ms);}else{fn();}}
+function setupRand(){return Math.random().toString(36).slice(2,8);}
+
+var US_STATES=[['AL','Alabama'],['AK','Alaska'],['AZ','Arizona'],['AR','Arkansas'],['CA','California'],['CO','Colorado'],['CT','Connecticut'],['DE','Delaware'],['DC','District of Columbia'],['FL','Florida'],['GA','Georgia'],['HI','Hawaii'],['ID','Idaho'],['IL','Illinois'],['IN','Indiana'],['IA','Iowa'],['KS','Kansas'],['KY','Kentucky'],['LA','Louisiana'],['ME','Maine'],['MD','Maryland'],['MA','Massachusetts'],['MI','Michigan'],['MN','Minnesota'],['MS','Mississippi'],['MO','Missouri'],['MT','Montana'],['NE','Nebraska'],['NV','Nevada'],['NH','New Hampshire'],['NJ','New Jersey'],['NM','New Mexico'],['NY','New York'],['NC','North Carolina'],['ND','North Dakota'],['OH','Ohio'],['OK','Oklahoma'],['OR','Oregon'],['PA','Pennsylvania'],['RI','Rhode Island'],['SC','South Carolina'],['SD','South Dakota'],['TN','Tennessee'],['TX','Texas'],['UT','Utah'],['VT','Vermont'],['VA','Virginia'],['WA','Washington'],['WV','West Virginia'],['WI','Wisconsin'],['WY','Wyoming']];
+
+var STAGE_ICON={'business-entity':'🏢','beneficial-owners':'👤','bank-settlement':'🏦','processing-underwriting':'📈','tax-state-registration':'🧾','licensing':'📜','compliance-card-network':'🛡','documents':'📎'};
+var STAGE_LABEL={'business-entity':'Fill in','beneficial-owners':'Add owners','bank-settlement':'Connect bank','processing-underwriting':'Profile','tax-state-registration':'Register','licensing':'Add licenses','compliance-card-network':'Attest','documents':'Upload docs','menu':'Upload menu','staff':'Invite team','hardware':'Pair hardware','verify':'Run test charge','golive':'Go live'};
+var STAGE_SKIP={'licensing':true};
+
+var SETUP_STAGES=(function(){
+  var a=BOARDING.sections.map(function(s){return {k:s.key,ic:(STAGE_ICON[s.key]||'•'),t:s.title,d:(s.intro||'').replace(/\s+/g,' ').slice(0,74),skip:!!STAGE_SKIP[s.key],section:s};});
+  a.push({k:'menu',ic:'📖',t:'Menu & catalog',d:'Items, categories & modifiers',skip:true});
+  a.push({k:'staff',ic:'👥',t:'Staff & roles',d:'Invite the team, assign roles',skip:true});
+  a.push({k:'hardware',ic:'🖨',t:'Hardware & terminal',d:'Pair card readers, KDS & printers',skip:true});
+  a.push({k:'verify',ic:'🧪',t:'Verify',d:'Run a $1.00 test charge through the reader'});
+  a.push({k:'golive',ic:'🚀',t:'Go live',d:'Open the store for business'});
+  return a;
+})();
+function setupStageBy(k){for(var i=0;i<SETUP_STAGES.length;i++){if(SETUP_STAGES[i].k===k)return SETUP_STAGES[i];}return null;}
+
+function setupReset(){
+  var stg={}; SETUP_STAGES.forEach(function(s){stg[s.k]='todo';});
+  setupState={boarded:false,store:null,running:false,activeStage:null,usState:'CA',stages:stg};
+}
+setupReset();
+function setupDone(k){var v=setupState.stages[k];return v==='done'||v==='skipped';}
+function setupPct(){var d=0;for(var i=0;i<SETUP_STAGES.length;i++){if(setupDone(SETUP_STAGES[i].k))d++;}return Math.round(d*100/SETUP_STAGES.length);}
+function setupChip(s){
+  if(s==='done')return '<span class="su-chip ok">done</span>';
+  if(s==='skipped')return '<span class="su-chip sk">skipped</span>';
+  if(s==='working')return '<span class="su-chip wk">configuring…</span>';
+  return '<span class="su-chip">to do</span>';
+}
+function setupVal(id){var el=document.getElementById(id);return el&&el.value!=null?el.value:'';}
+function suModalEl(){return document.getElementById('suModal');}
+function suCloseModal(){var m=suModalEl();if(m){m.setAttribute('hidden','');m.innerHTML='';}}
+function suType(el,text,done){
+  if(!el){if(done)done();return;}
+  el.textContent='';el.classList.add('typing');
+  var i=0;(function step(){
+    if(i<=text.length){ el.textContent=String(text).slice(0,i); i++; suWait(28+Math.floor(Math.random()*22),step); }
+    else { el.classList.remove('typing'); if(done)done(); }
+  })();
+}
+function suReqDot(r){return r==='required'?'<i class="su-req" title="required"></i>':(r==='conditional'?'<i class="su-req cond" title="conditional"></i>':'');}
+function cleanEx(s){ if(!s)return ''; s=String(s).split(' (')[0]; if(s.length>52)s=s.slice(0,50)+'…'; return s; }
+function suState(){ return STATE_TAX[setupState.usState]||{name:setupState.usState,rate:'~8.0%',reg:"Seller's Permit",regEx:setupState.usState+' 000-000000-0',homerule:false,notax:false}; }
+function suStateName(ab){ for(var i=0;i<US_STATES.length;i++){ if(US_STATES[i][0]===ab) return US_STATES[i][1]; } return ab; }
+
+function suScene(k){
+  var st=setupStageBy(k);
+  if(k==='tax-state-registration'){
+    var s=suState(),f=[];
+    f.push({label:'Operating state',value:s.name,type:'state'});
+    if(s.notax){
+      f.push({label:'Statewide sales tax',value:'None — '+s.name+' levies no state sales tax',type:'text'});
+      f.push({label:'Seller’s permit',value:'Not required statewide',type:'text'});
+      f.push({label:'NAICS code',value:'722511 · Full-Service Restaurants',type:'text'});
+      return {kind:'form',title:'Tax & state registration',sub:s.name+' · no statewide sales tax',fields:f,hero:1,okText:'No statewide sales-tax registration required in '+s.name};
+    }
+    f.push({label:'Registration type',value:s.reg,type:'text'});
+    f.push({label:s.reg+' number',value:s.regEx,type:'ein'});
+    f.push({label:'Combined sales-tax rate (at address)',value:s.rate,type:'percent'});
+    f.push({label:'NAICS code',value:'722511 · Full-Service Restaurants',type:'text'});
+    f.push({label:'Filing frequency',value:'Monthly',type:'select'});
+    if(s.homerule)f.push({label:'Home-rule local registration',value:'Required — separate local filing ('+s.name+')',type:'text',warn:true});
+    f.push({label:'Economic nexus',value:'Confirmed — over state threshold',type:'select'});
+    return {kind:'form',title:'Tax & state registration',sub:s.name+(s.homerule?' · home-rule: state + local':' · state-administered'),fields:f,hero:2,okText:'Registered to collect sales tax in '+s.name};
+  }
+  if(st&&st.section){
+    var fields=st.section.fields.map(function(x){return {label:x.label,value:cleanEx(x.example),type:x.type,req:x.required};});
+    var heroN = st.section.key==='beneficial-owners'?3:2;
+    return {kind:'form',title:st.section.title,sub:(st.section.intro||'').replace(/\s+/g,' ').slice(0,96),fields:fields,hero:heroN,okText:'Saved & verified'};
+  }
+  switch(k){
+    case 'menu': return {kind:'upload',title:'Upload menu',sub:'Drag a spreadsheet or POS export',file:'ember-room-menu.csv',count:12,rows:[['Greek Salad','$9.50'],['Margherita 16"','$18.00'],['BYO Burger','$19.50'],['Truffle Fries','$8.00'],['Old Fashioned','$19.00'],['Iced Coffee','$4.20']]};
+    case 'staff': return {kind:'list',title:'Invite the team',sub:'Role-scoped invites',pair:false,rows:[['manager@store.com','Manager · invite sent'],['server@store.com','Server · invite sent'],['bartender@store.com','Bartender · invite sent']]};
+    case 'hardware': return {kind:'list',title:'Pair hardware',sub:'Readers, kitchen displays & printers',pair:true,rows:[['Card reader · WisePOS E','online'],['KDS · Grill','online'],['Receipt printer','online']]};
+    case 'verify': return {kind:'charge',title:'Verify',sub:'A $1.00 test charge proves the whole pipeline',amount:'$1.00'};
+    case 'golive': return {kind:'golive',title:'Go live',sub:'Open the store for business'};
+    default: return {kind:'form',title:'Configure',fields:[]};
+  }
+}
+
+function suFinishStage(k,done){
+  setupState.stages[k]='done';setupState.activeStage=null;renderSetup();
+  suWait(820,function(){ suCloseModal(); if(done)done(); });
+}
+function suPlayScene(k,done){
+  if(typeof document==='undefined'||!document.getElementById){ setupState.stages[k]='done'; if(done)done(); return; }
+  var m=suModalEl(),sc=suScene(k);
+  setupState.activeStage=k;setupState.stages[k]='working';renderSetup();
+  if(!m){ suFinishStage(k,done); return; }
+  var head='<div class="su-sheet-h">'+(sc.brand?'<span class="su-brand">'+sc.brand+'</span>':'')+'<div class="su-sheet-t">'+sc.title+'</div>'+(sc.sub?'<div class="su-sheet-s">'+sc.sub+'</div>':'')+'</div>';
+  if(sc.kind==='form'){
+    var rowsHtml=sc.fields.map(function(f,i){
+      if(f.type==='file'){ return '<div class="su-f"><span class="su-fl">📎 '+f.label+' '+suReqDot(f.req)+'</span><span class="su-fv pend" id="suf'+i+'">…</span></div>'; }
+      return '<div class="su-f"><span class="su-fl">'+f.label+' '+suReqDot(f.req)+'</span><span class="su-fv'+(f.warn?' warn':'')+'" id="suf'+i+'"></span></div>';
+    }).join('');
+    m.innerHTML='<div class="su-sheet su-scroll">'+head+'<div class="su-sheet-b">'+rowsHtml+'<div class="su-status" id="suStatus"></div></div></div>';
+    m.removeAttribute('hidden');
+    var hero=sc.hero||2;
+    (function reveal(i){
+      if(i>=sc.fields.length){
+        var st=document.getElementById('suStatus');
+        if(sc.verify){ if(st){st.className='su-status wait';st.innerHTML='<span class="su-spin sm"></span>'+sc.verify;} suWait(1100,function(){ if(st){st.className='su-status ok';st.innerHTML='✓ '+(sc.okText||'Saved');} suFinishStage(k,done); }); }
+        else { if(st){st.className='su-status ok';st.innerHTML='✓ '+(sc.okText||'Saved');} suFinishStage(k,done); }
+        return;
+      }
+      var f=sc.fields[i],el=document.getElementById('suf'+i);
+      if(f.type==='file'){ if(el){el.textContent='attached ✓';el.className='su-fv ok';} suWait(150,function(){reveal(i+1);}); return; }
+      if(i<hero){ suType(el,f.value,function(){ suWait(110,function(){reveal(i+1);}); }); }
+      else { if(el)el.textContent=f.value; suWait(85,function(){reveal(i+1);}); }
+    })(0);
+    return;
+  }
+  if(sc.kind==='upload'){
+    m.innerHTML='<div class="su-sheet">'+head+'<div class="su-sheet-b"><div class="su-drop" id="suDrop"><div class="su-drop-ic">⬆</div><div id="suDropTxt">Drop your menu file…</div></div><div class="su-up" id="suUp" hidden><div class="su-up-row"><span>📄 '+sc.file+'</span><span id="suUpPct">0%</span></div><div class="su-up-bar"><i id="suUpBar"></i></div></div><div class="su-rows" id="suRows"></div><div class="su-status" id="suStatus"></div></div></div>';
+    m.removeAttribute('hidden');
+    var drop=document.getElementById('suDrop'),dt=document.getElementById('suDropTxt');
+    suWait(560,function(){ if(dt)dt.textContent='📄 '+sc.file; if(drop)drop.classList.add('have');
+      suWait(480,function(){ var up=document.getElementById('suUp'); if(up)up.removeAttribute('hidden'); if(drop)drop.setAttribute('hidden','');
+        var pct=0,bar=document.getElementById('suUpBar'),pl=document.getElementById('suUpPct');
+        (function grow(){ pct+=8+Math.floor(Math.random()*16); if(pct>100)pct=100; if(bar)bar.style.width=pct+'%'; if(pl)pl.textContent=pct+'%';
+          if(pct<100){ suWait(95,grow); }
+          else { var rowsEl=document.getElementById('suRows'),j=0;
+            (function rev(){ if(j<sc.rows.length){ var r=document.createElement('div'); r.className='su-row in'; r.innerHTML='<span>'+sc.rows[j][0]+'</span><span class="p">'+sc.rows[j][1]+'</span>'; if(rowsEl)rowsEl.appendChild(r); j++; suWait(120,rev); }
+              else { var st=document.getElementById('suStatus'); if(st){st.className='su-status ok';st.innerHTML='✓ '+sc.count+' items imported';} suFinishStage(k,done); } })();
+          }
+        })();
+      });
+    });
+    return;
+  }
+  if(sc.kind==='list'){
+    m.innerHTML='<div class="su-sheet">'+head+'<div class="su-sheet-b"><div class="su-rows" id="suRows"></div><div class="su-status" id="suStatus"></div></div></div>';
+    m.removeAttribute('hidden');
+    var rowsEl2=document.getElementById('suRows'),j2=0;
+    (function rev(){ if(j2<sc.rows.length){ var r=document.createElement('div'); r.className='su-row in';
+        r.innerHTML='<span>'+sc.rows[j2][0]+'</span><span class="'+(sc.pair?'su-pairing':'p')+'" id="surow'+j2+'">'+(sc.pair?'pairing…':sc.rows[j2][1])+'</span>'; if(rowsEl2)rowsEl2.appendChild(r); var jj=j2;
+        if(sc.pair){ suWait(720,function(){ var c=document.getElementById('surow'+jj); if(c){c.className='su-online';c.textContent=sc.rows[jj][1]+' ✓';} }); }
+        j2++; suWait(sc.pair?440:320,rev); }
+      else { suWait(sc.pair?820:220,function(){ var st=document.getElementById('suStatus'); if(st){st.className='su-status ok';st.innerHTML='✓ '+(sc.pair?'All devices online':'Invites sent');} suFinishStage(k,done); }); } })();
+    return;
+  }
+  if(sc.kind==='charge'){
+    m.innerHTML='<div class="su-sheet">'+head+'<div class="su-sheet-b"><div class="su-reader"><div class="su-reader-top">Card reader · contactless</div><div class="su-amt" id="suAmt">$0.00</div><div class="su-reader-st" id="suStatus">Tap, insert or swipe…</div></div></div></div>';
+    m.removeAttribute('hidden');
+    suType(document.getElementById('suAmt'),sc.amount,function(){
+      var st=document.getElementById('suStatus'); if(st){st.className='su-reader-st wait';st.innerHTML='<span class="su-spin sm"></span>Authorizing…';}
+      suWait(1150,function(){ if(st){st.className='su-reader-st ok';st.innerHTML='✓ Approved · auto-refunded';} suFinishStage(k,done); });
+    });
+    return;
+  }
+  if(sc.kind==='golive'){
+    m.innerHTML='<div class="su-sheet">'+head+'<div class="su-sheet-b"><div class="su-golive"><div class="su-switch" id="suSwitch"><span class="su-knob"></span></div><div class="su-switch-lbl" id="suStatus">Store: <b>OFFLINE</b></div></div></div></div>';
+    m.removeAttribute('hidden');
+    suWait(480,function(){ var sw=document.getElementById('suSwitch'); if(sw)sw.classList.add('on'); var st=document.getElementById('suStatus'); if(st)st.innerHTML='Store: <b class="ok">LIVE</b>'; suWait(720,function(){ suFinishStage(k,done); }); });
+    return;
+  }
+  suFinishStage(k,done);
+}
+
+function setupBoard(){
+  var nm=(setupVal('suName')||'').trim()||'The Ember Room';
+  var stv=setupVal('suState')||'CA';
+  setupReset(); setupState.usState=stv; setupState.boarded=true; setupState.running=true;
+  setupState.store={name:nm,id:'wyp_'+setupRand(),org:'org_'+setupRand()};
+  renderSetup();
+  var m=suModalEl();
+  if(!m){ setupState.running=false; renderSetup(); return; }
+  var steps=['Creating identity org','Provisioning tenant + row-level security','Seeding the 8 roles','Creating the owner account','Seeding defaults · location · station · menu','Health check → LIVE'];
+  m.innerHTML='<div class="su-sheet"><div class="su-sheet-h"><div class="su-sheet-t">Provisioning '+nm+'</div><div class="su-sheet-s">store '+setupState.store.id+' · org '+setupState.store.org+' · '+suStateName(stv)+'</div></div><div class="su-sheet-b"><div class="su-prov-list" id="suProv"></div></div></div>';
+  m.removeAttribute('hidden');
+  var hostEl=document.getElementById('suProv');
+  (function step(idx){
+    if(idx>=steps.length){ suWait(460,function(){ setupState.running=false; suCloseModal(); toast('fire','<b>'+nm+'</b> provisioned — org, tenant, owner & seed created'); renderSetup(); }); return; }
+    var r=document.createElement('div'); r.className='su-prov-line'; r.innerHTML='<span class="su-spin sm"></span><span>'+steps[idx]+'</span>'; if(hostEl)hostEl.appendChild(r);
+    suWait(400,function(){ r.className='su-prov-line ok'; r.innerHTML='<span class="su-lg ok">✓</span><span>'+steps[idx]+'</span>'; });
+    suWait(580,function(){ step(idx+1); });
+  })(0);
+}
+function setupRunAll(){
+  if(setupState.running)return;
+  setupState.running=true;renderSetup();
+  var queue=SETUP_STAGES.filter(function(st){return !setupDone(st.k);});
+  (function next(){
+    if(!queue.length){ setupState.running=false; renderSetup(); toast('pay','<b>'+setupState.store.name+'</b> is fully boarded & live 🎉'); return; }
+    suPlayScene(queue.shift().k, next);
+  })();
+}
+function renderSetup(){
+  if(typeof document==='undefined'||!document.getElementById)return;
+  var host=document.getElementById('setupHost');if(!host)return;
+  if(!setupState.boarded){
+    var opts=US_STATES.map(function(s){return '<option value="'+s[0]+'"'+(s[0]===setupState.usState?' selected':'')+'>'+s[1]+'</option>';}).join('');
+    host.innerHTML=
+      '<div class="su-head"><div class="su-eyebrow">Onboarding</div><h2>Board a new store</h2>'
+      +'<p class="su-lead">Stand up a complete, isolated store — identity org, tenant and owner — then collect every detail a real payments boarding needs (KYB, beneficial owners, bank, underwriting, tax &amp; licensing per state, PCI) and watch each screen fill itself.</p></div>'
+      +'<div class="su-card su-board">'
+      +'<label>Store name<input id="suName" placeholder="The Ember Room"></label>'
+      +'<label>Owner email<input id="suEmail" type="email" placeholder="owner@yourbrand.com"></label>'
+      +'<label>Business state<select id="suState">'+opts+'</select></label>'
+      +'<button class="su-btn primary" data-act="board">Board store →</button>'
+      +'</div>';
+    return;
+  }
+  var s=setupState.store,running=setupState.running,D=running?' disabled':'';
+  var rows=SETUP_STAGES.map(function(st){
+    var status=setupState.stages[st.k],done=setupDone(st.k),active=setupState.activeStage===st.k,lab=STAGE_LABEL[st.k]||'Configure';
+    var variant=(st.k==='golive')?'ai':(done?'ghost':((st.k==='bank-settlement'||st.k==='compliance-card-network'||st.k==='verify'||st.k==='business-entity')?'primary':'sec'));
+    var cfg='<button class="su-btn '+variant+'" data-act="cfg" data-k="'+st.k+'"'+D+'>'+(done?'Edit':lab)+'</button>';
+    var act=(st.skip&&status==='todo'&&!running)?('<button class="su-btn ghost" data-act="skip" data-k="'+st.k+'">Skip</button>'+cfg):cfg;
+    return '<div class="su-stage'+(active?' active':'')+(done?' is-done':'')+'"><div class="su-ic">'+st.ic+'</div>'
+      +'<div class="su-meta"><div class="su-t">'+st.t+' '+setupChip(status)+'</div><div class="su-d">'+st.d+'</div></div>'
+      +'<div class="su-act">'+act+'</div></div>';
+  }).join('');
+  var allDone=setupPct()>=100;
+  var ctl= running?'<span class="su-running"><span class="su-spin"></span>configuring…</span>':(allDone?'':'<button class="su-btn primary sm" data-act="run-all">▶ Run boarding live</button>');
+  host.innerHTML=
+    '<div class="su-head"><div class="su-eyebrow">Setup · '+s.name+'</div><h2>Board &amp; go live · '+s.name+'</h2>'
+    +'<div class="su-prov">store '+s.id+' · org '+s.org+' · '+suStateName(setupState.usState)+' · <span class="ok">provisioned</span></div>'
+    +'<div class="su-prog"><div class="su-prog-row"><span>'+setupPct()+'% complete</span><span class="su-prog-ctl">'+ctl
+    +' <button class="su-btn ghost sm" data-act="reset"'+D+'>Board another</button></span></div>'
+    +'<div class="su-bar"><i style="width:'+setupPct()+'%"></i></div></div></div>'
+    +'<div class="su-list">'+rows+'</div>'
+    +(setupState.stages.golive==='done'
+      ?'<div class="su-card su-live"><div class="su-live-t">🎉 '+s.name+' is live</div><div class="su-d">Boarded, compliant and taking payments — on your brand.</div></div>'
+      :'');
+}
+function setupAction(act,k){
+  if(typeof document==='undefined'||!document.getElementById)return;
+  if(act==='noop')return;
+  if(act==='board'){ setupBoard(); return; }
+  if(act==='run-all'){ setupRunAll(); return; }
+  if(setupState.running)return;
+  if(act==='reset'){ setupReset(); suCloseModal(); renderSetup(); return; }
+  if(act==='skip'){ setupState.stages[k]='skipped'; renderSetup(); return; }
+  if(act==='cfg'){
+    if(k==='golive'){
+      var miss=[];
+      if(!setupDone('business-entity'))miss.push('business entity');
+      if(!setupDone('bank-settlement'))miss.push('bank');
+      if(!setupDone('compliance-card-network'))miss.push('compliance/PCI');
+      if(!setupDone('verify'))miss.push('verify');
+      if(miss.length){ toast('!','Finish first: '+miss.join(', ')); return; }
+    }
+    setupState.running=true;renderSetup();
+    suPlayScene(k,function(){
+      setupState.running=false;
+      var msg={'business-entity':'Business profile saved','beneficial-owners':'Owners verified (KYC)','bank-settlement':'Bank linked &amp; verified','processing-underwriting':'Underwriting profile saved','tax-state-registration':'Tax registration saved','licensing':'Licenses recorded','compliance-card-network':'Descriptor, MCC &amp; PCI attested','documents':'Documents attached','menu':'Menu imported','staff':'Team invited','hardware':'All devices online','verify':'Test charge <b>$1.00</b> approved','golive':'<b>'+setupState.store.name+'</b> is live 🎉'};
+      toast('pay',msg[k]||'Done'); renderSetup();
+    });
+    return;
+  }
+}
+(function(){
+  if(typeof document==='undefined'||typeof document.getElementById!=='function')return;
+  var host=document.getElementById('setupHost');
+  if(!host||typeof host.addEventListener!=='function')return;
+  host.addEventListener('click',function(e){
+    var b=e.target&&e.target.closest?e.target.closest('button'):null;if(!b)return;
+    if(b.disabled)return;
+    var act=b.dataset?b.dataset.act:b.getAttribute('data-act');
+    var k=b.dataset?b.dataset.k:b.getAttribute('data-k');
+    if(act)setupAction(act,k);
+  });
+})();
 
 /* >>> LAUNCHER-JS >>> */
 /* Device + role launcher — mirrors the real app's home.component device family.
@@ -2860,6 +3253,7 @@ seedTickets();renderCheck();updateKdsBadge();setupReportsSidebar();renderReports
       { id:'online', ic:'🌐', label:'Online Ordering',   persona:'Web',             desc:'Dine-in · Takeout · Delivery · Curbside, commission-free.',        mode:'live', surface:'preview', access:'preview', preview:'online' }
     ]},
     { zone:'Back office', items:[
+      { id:'setup', ic:'🏪', label:'Store Setup',        persona:'Owner / Admin',   desc:'Board a new store → configure → go live, end to end.',            mode:'live', surface:'setup',   access:'setup' },
       { id:'admin', ic:'📊', label:'Owner Console',      persona:'Owner / Manager', desc:'Dashboard · 36 live reports · AI advisor · multi-store.',          mode:'live', surface:'reports', access:'full', roles:['owner','manager'] }
     ]}
   ];
@@ -2893,6 +3287,7 @@ seedTickets();renderCheck();updateKdsBadge();setupReportsSidebar();renderReports
     [].slice.call(views).forEach(function(x){ x.classList.toggle('active', x.id===v); });
     if (v==='kds' && typeof renderKDS==='function') renderKDS();
     if (v==='reports' && typeof renderReports==='function') renderReports();
+    if (v==='setup' && typeof renderSetup==='function') renderSetup();
   }
 
   function renderPreview(key){
