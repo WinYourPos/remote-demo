@@ -795,11 +795,9 @@ button{font-family:inherit;cursor:pointer}
 .device-chip .role{color:var(--primary);font-weight:700}
 .app.in-device .stations-back{display:inline-flex}
 .app.in-device .device-chip{display:inline-flex}
-/* role-gated tabs: single-surface roles hide the segmented control */
-.app[data-access="pos"] #seg,
-.app[data-access="kds"] #seg,
-.app[data-access="setup"] #seg,
-.app[data-access="preview"] #seg{display:none}
+/* The top Order/Kitchen/Reports segmented control is retired — every surface is
+   reached from the Stations launcher (device picker), so the bar never shows. */
+#seg{display:none}
 
 /* preview surface (guest-facing devices) */
 #preview{flex-direction:column;overflow-y:auto}
