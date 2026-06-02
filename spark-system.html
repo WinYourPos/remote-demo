@@ -3130,7 +3130,7 @@ function setupBoard(){
   var m=suModalEl();
   if(!m){ setupState.running=false; renderSetup(); return; }
   var steps=['Creating identity org','Provisioning tenant + row-level security','Seeding the 8 roles','Creating the owner account','Seeding defaults · location · station · menu','Health check → LIVE'];
-  m.innerHTML='<div class="su-sheet"><div class="su-sheet-h"><div class="su-sheet-t">Provisioning '+nm+'</div><div class="su-sheet-s">store '+setupState.store.id+' · org '+setupState.store.org+' · '+suStateName(stv)+'</div></div><div class="su-sheet-b"><div class="su-prov-list" id="suProv"></div></div></div>';
+  m.innerHTML='<div class="su-sheet"><div class="su-sheet-h"><div class="su-sheet-t">Provisioning '+nm+'</div><div class="su-sheet-s">Its own identity, data &amp; settings · '+suStateName(stv)+'</div></div><div class="su-sheet-b"><div class="su-prov-list" id="suProv"></div></div></div>';
   m.removeAttribute('hidden');
   var hostEl=document.getElementById('suProv');
   (function step(idx){
@@ -3179,7 +3179,7 @@ function renderSetup(){
   var ctl= running?'<span class="su-running"><span class="su-spin"></span>configuring…</span>':(allDone?'':'<button class="su-btn primary sm" data-act="run-all">▶ Run boarding live</button>');
   host.innerHTML=
     '<div class="su-head"><div class="su-eyebrow">Setup · '+s.name+'</div><h2>Board &amp; go live · '+s.name+'</h2>'
-    +'<div class="su-prov">store '+s.id+' · org '+s.org+' · '+suStateName(setupState.usState)+' · <span class="ok">provisioned</span></div>'
+    +'<div class="su-prov">'+suStateName(setupState.usState)+' · <span class="ok">provisioned &amp; isolated</span></div>'
     +'<div class="su-prog"><div class="su-prog-row"><span>'+setupPct()+'% complete</span><span class="su-prog-ctl">'+ctl
     +' <button class="su-btn ghost sm" data-act="reset"'+D+'>Board another</button></span></div>'
     +'<div class="su-bar"><i style="width:'+setupPct()+'%"></i></div></div></div>'
