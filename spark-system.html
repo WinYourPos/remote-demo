@@ -746,7 +746,7 @@ button{font-family:inherit;cursor:pointer}
 /* <<< NOTES-CSS <<< */
 
 /* >>> LAUNCHER-CSS >>> */
-.lz{position:fixed;inset:0;z-index:300;background:var(--bg);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;animation:spark-view-in .3s cubic-bezier(.2,.8,.2,1)}
+.lz{position:fixed;inset:0;z-index:300;background:var(--bg);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable;animation:spark-view-in .3s cubic-bezier(.2,.8,.2,1)}
 .lz[hidden]{display:none}
 .lz::before{content:'';position:absolute;top:-22%;left:50%;transform:translateX(-50%);width:120vw;height:62vh;background:radial-gradient(ellipse 50% 50% at 50% 50%,rgba(27,111,243,.12),transparent 70%);pointer-events:none}
 .lz-inner{position:relative;z-index:1;max-width:1100px;margin:0 auto;width:100%;padding:clamp(26px,5vw,54px) 24px 60px}
@@ -853,7 +853,8 @@ button{font-family:inherit;cursor:pointer}
 .lz-tnav:active{transform:scale(.93)}
 .lz-tnav svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .lz-panel{display:none}
-.lz-panel.on{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;animation:spark-view-in .3s cubic-bezier(.2,.8,.2,1)}
+.lz-panel.on{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;animation:lz-fade .22s ease}
+@keyframes lz-fade{from{opacity:0}to{opacity:1}}
 .lz-panel .lz-card{flex:0 0 232px;width:232px;max-width:100%}
 @media (max-width:560px){ .lz-panel .lz-card{flex:1 1 100%;width:auto;max-width:360px} }
 /* center the Choose-your-station hero */
@@ -5718,7 +5719,7 @@ function setupAction(act,k){
       idx = ((i % n) + n) % n;
       [].slice.call(host.querySelectorAll('.lz-tab')).forEach(function(t){ t.classList.toggle('on', (+t.getAttribute('data-zi'))===idx); });
       [].slice.call(host.querySelectorAll('.lz-panel')).forEach(function(p){ p.classList.toggle('on', (+p.getAttribute('data-zi'))===idx); });
-      var act = host.querySelector('.lz-tab.on'); if (act && act.scrollIntoView){ try{ act.scrollIntoView({inline:'center',block:'nearest'}); }catch(e){} }
+      var act = host.querySelector('.lz-tab.on'); var strip = document.getElementById('lzTabStrip'); if (act && strip && strip.scrollWidth > strip.clientWidth + 2){ var sl = act.offsetLeft - (strip.clientWidth - act.offsetWidth)/2; try{ strip.scrollTo({left:sl,behavior:'smooth'}); }catch(e){ strip.scrollLeft = sl; } }
     }
     [].slice.call(host.querySelectorAll('.lz-tab')).forEach(function(t){ if(typeof t.addEventListener==='function') t.addEventListener('click', function(){ showZone(+t.getAttribute('data-zi')); }); });
     var pvb=document.getElementById('lzTabPrev'); if(pvb&&typeof pvb.addEventListener==='function') pvb.addEventListener('click', function(){ showZone(idx-1); });
