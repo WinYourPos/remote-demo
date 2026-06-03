@@ -249,12 +249,11 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
 .cloud-ic svg{width:16px;height:16px;stroke:var(--primary);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block}
 .cloud:hover{transform:translateY(-3px) scale(1.05);border-color:rgba(27,111,243,.55);background:#fff;box-shadow:0 10px 26px rgba(27,111,243,.22),0 0 0 4px rgba(47,134,255,.12)}
 .cloud:active{transform:scale(.97)}
-.cloud.c1{top:6%;left:13%;animation-delay:-.2s}
-.cloud.c2{top:1%;right:14%;animation-delay:-1.4s}
-.cloud.c3{top:44%;left:-2%;animation-delay:-2.6s}
-.cloud.c4{top:44%;right:-2%;animation-delay:-.8s}
-.cloud.c5{bottom:7%;left:15%;animation-delay:-3.4s}
-.cloud.c6{bottom:2%;right:15%;animation-delay:-2s}
+.cloud.c1{top:2%;left:calc(50% - 78px);animation-delay:-.2s}
+.cloud.c2{top:40%;left:-1%;animation-delay:-2.6s}
+.cloud.c3{top:40%;right:-1%;animation-delay:-.8s}
+.cloud.c4{bottom:6%;left:14%;animation-delay:-3.4s}
+.cloud.c5{bottom:6%;right:14%;animation-delay:-2s}
 @keyframes sc-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
 /* tagline */
 .sc-title{margin-top:6px;z-index:3;text-align:center}
@@ -383,19 +382,17 @@ body.chatting #greeting,body.chatting .starters{animation:gru-in .5s cubic-bezie
     <div class="sc-ring r1" aria-hidden="true"></div>
     <div class="sc-ring r2" aria-hidden="true"></div>
     <svg class="sc-links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-      <line x1="50" y1="50" x2="20" y2="14"/>
-      <line x1="50" y1="50" x2="80" y2="9"/>
-      <line x1="50" y1="50" x2="6" y2="50"/>
-      <line x1="50" y1="50" x2="94" y2="50"/>
-      <line x1="50" y1="50" x2="22" y2="88"/>
-      <line x1="50" y1="50" x2="80" y2="92"/>
+      <line x1="50" y1="50" x2="50" y2="9"/>
+      <line x1="50" y1="50" x2="6" y2="46"/>
+      <line x1="50" y1="50" x2="94" y2="46"/>
+      <line x1="50" y1="50" x2="24" y2="90"/>
+      <line x1="50" y1="50" x2="76" y2="90"/>
     </svg>
     <button class="cloud c1" data-q="forecast"><span class="cloud-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span> Forecast demand</button>
-    <button class="cloud c2" data-q="smart86"><span class="cloud-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg></span> Smart 86</button>
-    <button class="cloud c3" data-q="upsell"><span class="cloud-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .962 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.962 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg></span> Upsell ideas</button>
-    <button class="cloud c4" data-q="anomaly"><span class="cloud-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span> Spot anomalies</button>
-    <button class="cloud c5" data-q="dish"><span class="cloud-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 2v7c0 1.1.9 2 2 2a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg></span> New dish</button>
-    <button class="cloud c6" data-q="campaign"><span class="cloud-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg></span> Campaigns</button>
+    <button class="cloud c2" data-q="upsell"><span class="cloud-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .962 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.962 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg></span> Upsell ideas</button>
+    <button class="cloud c3" data-q="anomaly"><span class="cloud-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span> Spot anomalies</button>
+    <button class="cloud c4" data-q="dish"><span class="cloud-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 2v7c0 1.1.9 2 2 2a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg></span> New dish</button>
+    <button class="cloud c5" data-q="campaign"><span class="cloud-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg></span> Campaigns</button>
     <div class="sc-orbwrap">
       <svg viewBox="0 0 24 24" class="sc-orb" aria-hidden="true"><use href="#guru-orb"/></svg>
     </div>
@@ -411,7 +408,7 @@ body.chatting #greeting,body.chatting .starters{animation:gru-in .5s cubic-bezie
         <svg class="guru-orb" viewBox="0 0 24 24"><use href="#guru-orb"/></svg>
       </div>
       <div class="body">
-        Hi — I'm <b style="color:var(--primary)">Restaurant Guru</b>, one AI service reading your store's live data (read-only, tenant-scoped): demand forecasting, smart 86 / out-of-stock, upsell, anomaly detection, plus new-dish and campaign ideas.
+        Hi — I'm <b style="color:var(--primary)">Restaurant Guru</b>, one AI service reading your store's live data (read-only, tenant-scoped): demand forecasting, upsell, anomaly detection, plus new-dish and campaign ideas.
         <br><br>
         Try one of these 👇
       </div>
@@ -425,8 +422,7 @@ body.chatting #greeting,body.chatting .starters{animation:gru-in .5s cubic-bezie
       <button class="starter" data-q="dish">Suggest a new dish from guest preferences</button>
       <button class="starter" data-q="anomaly">Anything unusual in my numbers?</button>
       <button class="starter" data-q="upsell">What should my staff upsell?</button>
-      <button class="starter" data-q="smart86">What am I about to 86?</button>
-      <button class="starter" data-q="forecast">What should I forecast for this weekend?</button>
+        <button class="starter" data-q="forecast">What should I forecast for this weekend?</button>
     </div>
     <button class="st-nav" id="stNext" type="button" aria-label="Next suggestions"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button>
   </div>
@@ -453,25 +449,6 @@ const GURU = {
         <p class="g-meta">Confidence: medium-high · driven by weather + the Saturday event</p>
       </div>
       <div class="g-disc"><b>Starting point only.</b> Check this against your reservation book and staffing before locking the schedule.</div>`
-  },
-  smart86: {
-    q: "What am I about to 86?",
-    body: `
-      <div class="g-block"><div class="g-l">Read of your data</div><ul class="g-ul">
-        <li><b>Ribeye:</b> 22 portions on hand, weekend forecast burns ~30 → short by Saturday dinner</li>
-        <li><b>Burrata:</b> 9 on hand at a 7/day pace → tight for Sunday brunch</li>
-        <li><b>Soft-shell crab special:</b> only 3 sold in 2 days — slow mover, not at risk</li>
-      </ul></div>
-      <div class="g-block"><div class="g-l">Recommendation</div><p class="g-lead">Pre-empt two likely 86s <b>now</b>, before they hit the floor.</p></div>
-      <div class="g-block"><div class="g-l">Moves</div><ul class="g-ul">
-        <li>Reorder ribeye today (1-day lead time) — bump the order to 36</li>
-        <li>Flag burrata to the host stand as "limited" after 1pm Sunday</li>
-        <li>Re-feature the crab as tonight's staff pick to clear it</li>
-      </ul></div>
-      <div class="g-block"><div class="g-l">Expected outcome</div>
-        <p class="g-lead">Zero surprise 86s this weekend · ~$640 of slow crab inventory cleared</p>
-      </div>
-      <div class="g-disc"><b>Starting point only.</b> Confirm on-hand counts with your kitchen before reordering.</div>`
   },
   upsell: {
     q: "What should my staff upsell?",
@@ -590,7 +567,6 @@ const GURU = {
       <p class="g-lead">I haven't trained on that exact question yet, but here's where I'd start looking in your data.</p>
       <div class="g-block" style="margin-top:14px"><div class="g-l">Try one of these instead</div><ul class="g-ul">
         <li>"What should I forecast for this weekend?"</li>
-        <li>"What am I about to 86?"</li>
         <li>"Suggest a new dish from guest preferences"</li>
         <li>"What campaign should I run this week?"</li>
       </ul></div>
@@ -640,7 +616,6 @@ function pickKey(txt){
   if (/margin|cogs|cost|profit|p&l|expense/.test(t)) return 'margin';
   if (/opp|grow|focus|priorit|next/.test(t)) return 'opportunity';
   if (/forecast|weekend|predict|demand|how busy|covers/.test(t)) return 'forecast';
-  if (/\b86\b|out.?of.?stock|run out|stock out|going to run/.test(t)) return 'smart86';
   if (/upsell|attach|add.?on|sell more|pair/.test(t)) return 'upsell';
   if (/anomal|unusual|weird|spike|wrong|off\b/.test(t)) return 'anomaly';
   return null;
