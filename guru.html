@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <meta name="theme-color" content="#1B6FF3"/>
-<title>Ask Guru — Win your POS</title>
+<title>Restaurant Guru — Win your POS</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA4MCA4MCc+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSdwJyB4MT0nNDAnIHkxPSc0MCcgeDI9JzQwJyB5Mj0nNzInIGdyYWRpZW50VW5pdHM9J3VzZXJTcGFjZU9uVXNlJz48c3RvcCBvZmZzZXQ9JzAnIHN0b3AtY29sb3I9JyMyRjg2RkYnLz48c3RvcCBvZmZzZXQ9JzEnIHN0b3AtY29sb3I9JyMxMzY2RUMnLz48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0ncycgeDE9JzQwJyB5MT0nNDYnIHgyPSc0MCcgeTI9JzYwJyBncmFkaWVudFVuaXRzPSd1c2VyU3BhY2VPblVzZSc+PHN0b3Agb2Zmc2V0PScwJyBzdG9wLWNvbG9yPScjRkZGRkZGJyBzdG9wLW9wYWNpdHk9Jy4yMicvPjxzdG9wIG9mZnNldD0nMScgc3RvcC1jb2xvcj0nI0ZGRkZGRicgc3RvcC1vcGFjaXR5PScuMDQnLz48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0nYicgeDE9JzQwJyB5MT0nNicgeDI9JzQwJyB5Mj0nNTYnIGdyYWRpZW50VW5pdHM9J3VzZXJTcGFjZU9uVXNlJz48c3RvcCBvZmZzZXQ9JzAnIHN0b3AtY29sb3I9JyNFQUYyRkYnLz48c3RvcCBvZmZzZXQ9Jy41JyBzdG9wLWNvbG9yPScjOUNDNEZGJy8+PHN0b3Agb2Zmc2V0PScxJyBzdG9wLWNvbG9yPScjMUI2RkYzJy8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0nMTInIHk9JzQwJyB3aWR0aD0nNTYnIGhlaWdodD0nMzInIHJ4PSc3JyBmaWxsPSd1cmwoI3ApJy8+PHJlY3QgeD0nMTgnIHk9JzQ2JyB3aWR0aD0nNDQnIGhlaWdodD0nMTQnIHJ4PScyJyBmaWxsPSd1cmwoI3MpJy8+PHJlY3QgeD0nMjAnIHk9JzY1JyB3aWR0aD0nNDAnIGhlaWdodD0nMS40JyByeD0nLjcnIGZpbGw9JyNGRkZGRkYnIGZpbGwtb3BhY2l0eT0nLjMwJy8+PHBhdGggZD0nTTQ0IDYgTDI0IDQwIEwzNiA0MCBMMzAgNTYgTDUyIDI4IEw0MCAyOCBMNDggNiBaJyBmaWxsPSd1cmwoI2IpJy8+PC9zdmc+">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -78,6 +78,8 @@ body{
   color:var(--primary);
 }
 .msg.guru .av svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.msg.guru .av svg.guru-orb{width:25px;height:25px;stroke:none;overflow:visible}
+.brand .brand-logo.guru-orb{width:32px;height:32px}
 .msg .body{
   background:var(--surface-2);border:1px solid var(--border);
   border-radius:14px;padding:14px 16px;
@@ -221,6 +223,36 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
       <rect x="20" y="65" width="40" height="1.4" rx=".7" fill="#FFFFFF" fill-opacity=".30"/>
       <path d="M44 6 L24 40 L36 40 L30 56 L52 28 L40 28 L48 6 Z" fill="url(#brand-bolt-grad)"/>
     </symbol>
+    <radialGradient id="goOrb" cx="38%" cy="32%" r="78%">
+      <stop offset="0" stop-color="#CFE0FF"/>
+      <stop offset=".42" stop-color="#4F8DF6"/>
+      <stop offset="1" stop-color="#123E9E"/>
+    </radialGradient>
+    <clipPath id="goClip"><circle cx="12" cy="14.5" r="6.5"/></clipPath>
+    <symbol id="guru-orb" viewBox="0 0 24 24">
+      <path d="M8.6 20.4 h6.8 l-1 1.7 h-4.8 z" fill="#0A5FE0" fill-opacity=".55" stroke="none"/>
+      <circle cx="12" cy="14.5" r="6.5" fill="url(#goOrb)" stroke="none"/>
+      <g clip-path="url(#goClip)">
+        <path d="M6.4 15 q3 -4.6 5.6 -1.4 q3 3.4 5.6 -1" fill="none" stroke="#EAF2FF" stroke-opacity=".55" stroke-width="1.1" stroke-linecap="round">
+          <animateTransform attributeName="transform" type="rotate" from="0 12 14.5" to="360 12 14.5" dur="7s" repeatCount="indefinite"/>
+        </path>
+        <circle r="1" fill="#FFFFFF" stroke="none">
+          <animateMotion dur="3.4s" repeatCount="indefinite" path="M12 10.6 a3.9 3.9 0 1 0 0.01 0"/>
+          <animate attributeName="opacity" values=".25;1;.25" dur="1.7s" repeatCount="indefinite"/>
+        </circle>
+        <circle r=".75" fill="#BFD7FF" stroke="none">
+          <animateMotion dur="5s" repeatCount="indefinite" path="M12 17.4 a2.9 2.9 0 1 1 0.01 0"/>
+          <animate attributeName="opacity" values="1;.3;1" dur="2.3s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+      <ellipse cx="9.7" cy="11.9" rx="2.1" ry="1.3" fill="#FFFFFF" fill-opacity=".55" stroke="none"/>
+      <g fill="#FFFFFF" stroke="#C9D2DE" stroke-width=".5" stroke-linejoin="round">
+        <circle cx="8.7" cy="5.5" r="2.2"/>
+        <circle cx="15.3" cy="5.5" r="2.2"/>
+        <circle cx="12" cy="4.1" r="2.7"/>
+        <rect x="7.6" y="6.1" width="8.8" height="2.7" rx="1.1"/>
+      </g>
+    </symbol>
   </defs>
 </svg>
 
@@ -230,8 +262,8 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
       <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
     </a>
     <div class="brand">
-      <svg class="brand-logo" viewBox="0 0 80 80" aria-hidden="true"><use href="#brand-spark-pos"/></svg>
-      Ask Guru <small>· your AI advisor</small>
+      <svg class="brand-logo guru-orb" viewBox="0 0 24 24" aria-hidden="true"><use href="#guru-orb"/></svg>
+      Restaurant Guru <small>· your AI advisor</small>
     </div>
     <div class="live-dot">LIVE</div>
   </div>
@@ -239,28 +271,28 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
   <div class="chat" id="chat">
     <div class="msg guru">
       <div class="av">
-        <svg viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+        <svg class="guru-orb" viewBox="0 0 24 24"><use href="#guru-orb"/></svg>
       </div>
       <div class="body">
-        Hi — I'm Guru, one AI service reading your store's live data (read-only, tenant-scoped): demand forecasting, smart 86 / out-of-stock, upsell, anomaly detection, plus new-dish and campaign ideas.
+        Hi — I'm <b style="color:var(--primary)">Restaurant Guru</b>, one AI service reading your store's live data (read-only, tenant-scoped): demand forecasting, smart 86 / out-of-stock, upsell, anomaly detection, plus new-dish and campaign ideas.
         <br><br>
-        Try one of these, or type your own question 👇
+        Try one of these 👇
       </div>
     </div>
   </div>
 
   <div class="starters" id="starters">
-    <button class="starter" data-q="forecast">What should I forecast for this weekend?</button>
-    <button class="starter" data-q="smart86">What am I about to 86?</button>
-    <button class="starter" data-q="upsell">What should my staff upsell?</button>
-    <button class="starter" data-q="anomaly">Anything unusual in my numbers?</button>
-    <button class="starter" data-q="dish">Suggest a new dish from guest preferences</button>
     <button class="starter" data-q="campaign">What campaign should I run this week?</button>
+    <button class="starter" data-q="dish">Suggest a new dish from guest preferences</button>
+    <button class="starter" data-q="anomaly">Anything unusual in my numbers?</button>
+    <button class="starter" data-q="upsell">What should my staff upsell?</button>
+    <button class="starter" data-q="smart86">What am I about to 86?</button>
+    <button class="starter" data-q="forecast">What should I forecast for this weekend?</button>
   </div>
 
   <div class="composer">
     <div class="composer-row">
-      <input type="text" id="composerInput" placeholder="Ask Guru — forecast, 86, upsell, anomalies…" autocomplete="off" lang="en-US">
+      <input type="text" id="composerInput" placeholder="Ask Restaurant Guru — forecast, 86, upsell, anomalies…" autocomplete="off" lang="en-US">
     </div>
     <button class="send" id="composerSend" aria-label="Send" type="button">
       <svg viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></svg>
@@ -439,7 +471,7 @@ const starters = document.getElementById('starters');
 const input = document.getElementById('composerInput');
 const send = document.getElementById('composerSend');
 
-const GURU_AV = '<svg viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>';
+const GURU_AV = '<svg class="guru-orb" viewBox="0 0 24 24"><use href="#guru-orb"/></svg>';
 
 function scrollToBottom(){ requestAnimationFrame(() => { chat.scrollTop = chat.scrollHeight; }); }
 
