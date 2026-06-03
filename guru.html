@@ -241,7 +241,8 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
   box-shadow:0 6px 18px rgba(17,24,39,.1),0 0 0 4px rgba(255,255,255,.4);
   transition:transform .18s,box-shadow .18s,border-color .18s,background .18s;
   animation:sc-bob 6s ease-in-out infinite}
-.cloud-ic{font-size:15px;line-height:1;filter:saturate(1.05)}
+.cloud-ic{display:inline-flex;align-items:center;justify-content:center;line-height:0}
+.cloud-ic svg{width:16px;height:16px;stroke:var(--primary);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block}
 .cloud:hover{transform:translateY(-3px) scale(1.05);border-color:rgba(27,111,243,.55);background:#fff;box-shadow:0 10px 26px rgba(27,111,243,.22),0 0 0 4px rgba(47,134,255,.12)}
 .cloud:active{transform:scale(.97)}
 .cloud.c1{top:6%;left:13%;animation-delay:-.2s}
@@ -364,12 +365,12 @@ body.chatting #greeting,body.chatting .starters,body.chatting .composer{animatio
       <line x1="50" y1="50" x2="22" y2="88"/>
       <line x1="50" y1="50" x2="80" y2="92"/>
     </svg>
-    <button class="cloud c1" data-q="forecast"><span class="cloud-ic">📈</span> Forecast demand</button>
-    <button class="cloud c2" data-q="smart86"><span class="cloud-ic">⛔️</span> Smart 86</button>
-    <button class="cloud c3" data-q="upsell"><span class="cloud-ic">✨</span> Upsell ideas</button>
-    <button class="cloud c4" data-q="anomaly"><span class="cloud-ic">🔎</span> Spot anomalies</button>
-    <button class="cloud c5" data-q="dish"><span class="cloud-ic">🍽️</span> New dish</button>
-    <button class="cloud c6" data-q="campaign"><span class="cloud-ic">📣</span> Campaigns</button>
+    <button class="cloud c1" data-q="forecast"><span class="cloud-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span> Forecast demand</button>
+    <button class="cloud c2" data-q="smart86"><span class="cloud-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg></span> Smart 86</button>
+    <button class="cloud c3" data-q="upsell"><span class="cloud-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .962 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.962 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg></span> Upsell ideas</button>
+    <button class="cloud c4" data-q="anomaly"><span class="cloud-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span> Spot anomalies</button>
+    <button class="cloud c5" data-q="dish"><span class="cloud-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 2v7c0 1.1.9 2 2 2a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg></span> New dish</button>
+    <button class="cloud c6" data-q="campaign"><span class="cloud-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg></span> Campaigns</button>
     <div class="sc-orbwrap">
       <svg viewBox="0 0 24 24" class="sc-orb" aria-hidden="true"><use href="#guru-orb"/></svg>
     </div>
