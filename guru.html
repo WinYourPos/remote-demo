@@ -280,6 +280,27 @@ body.chatting #showcase{display:none}
 body.chatting #greeting,body.chatting .starters,body.chatting .composer{animation:gru-in .5s cubic-bezier(.2,.8,.2,1) both}
 @keyframes gru-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 /* <<< SHOWCASE-STATE-CSS <<< */
+/* >>> MOBILE-GURU-FIXES >>> */
+.st-nav{display:none}
+@media (max-width:560px){
+  .showcase{justify-content:flex-start;min-height:auto;padding:18px 14px 6px;overflow:visible}
+  .sc-stars,.sc-ring,.sc-links{display:none}
+  .sc-stage{width:100%;height:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start}
+  .sc-orbwrap{grid-column:1 / -1;justify-self:center;margin-bottom:2px;order:-1}
+  .sc-orbwrap::before{width:186px;height:186px}
+  .sc-orbwrap::after{width:130px;height:130px}
+  .sc-orb{width:116px;height:116px}
+  .cloud{position:static;animation:none;width:100%;min-width:0;justify-content:center;font-size:12px;padding:8px 10px;box-shadow:0 4px 12px rgba(17,24,39,.08),0 0 0 3px rgba(255,255,255,.5)}
+  .sc-title{margin-top:8px}
+  .ask-cta{margin-top:12px}
+  .starters{flex-wrap:nowrap;justify-content:center;align-items:center;gap:6px;padding:0 12px 12px}
+  .st-nav{display:inline-grid;place-items:center;flex:0 0 auto;width:32px;height:32px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);color:var(--primary);cursor:pointer}
+  .st-nav svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+  .st-nav:active{transform:scale(.92)}
+  .starter{flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+  .starter[hidden]{display:none}
+}
+/* <<< MOBILE-GURU-FIXES >>> */
 </style>
 </head>
 <body>
@@ -394,12 +415,14 @@ body.chatting #greeting,body.chatting .starters,body.chatting .composer{animatio
   </div>
 
   <div class="starters" id="starters">
+    <button class="st-nav" id="stPrev" type="button" aria-label="Previous suggestions"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
     <button class="starter" data-q="campaign">What campaign should I run this week?</button>
     <button class="starter" data-q="dish">Suggest a new dish from guest preferences</button>
     <button class="starter" data-q="anomaly">Anything unusual in my numbers?</button>
     <button class="starter" data-q="upsell">What should my staff upsell?</button>
     <button class="starter" data-q="smart86">What am I about to 86?</button>
     <button class="starter" data-q="forecast">What should I forecast for this weekend?</button>
+    <button class="st-nav" id="stNext" type="button" aria-label="Next suggestions"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button>
   </div>
 
   <div class="composer">
@@ -687,6 +710,26 @@ if (matchMedia('(hover: hover)').matches) input.focus();
   });
 })();
 /* <<< SHOWCASE-ENTER-JS <<< */
+/* >>> STARTERS-PAGER-JS >>> */
+(function(){
+  var wrap = document.getElementById('starters');
+  var prev = document.getElementById('stPrev');
+  var next = document.getElementById('stNext');
+  if(!wrap||!prev||!next) return;
+  var chips = Array.prototype.slice.call(wrap.querySelectorAll('.starter'));
+  var per = 2, page = 0, pages = Math.ceil(chips.length/per);
+  function mobile(){ return window.matchMedia('(max-width:560px)').matches; }
+  function render(){
+    if(!mobile()){ chips.forEach(function(c){ c.hidden=false; }); return; }
+    if(page>=pages) page=0;
+    chips.forEach(function(c,i){ c.hidden = !(i>=page*per && i<page*per+per); });
+  }
+  prev.addEventListener('click', function(){ page=(page-1+pages)%pages; render(); });
+  next.addEventListener('click', function(){ page=(page+1)%pages; render(); });
+  window.addEventListener('resize', render);
+  render();
+})();
+/* <<< STARTERS-PAGER-JS <<< */
 /* >>> PAGE-NAV-FADE-JS >>> */
 (function(){
   if (typeof document === 'undefined') return;
