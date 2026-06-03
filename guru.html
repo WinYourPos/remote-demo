@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA4MCA4MCc+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSdwJyB4MT0nNDAnIHkxPSc0MCcgeDI9JzQwJyB5Mj0nNzInIGdyYWRpZW50VW5pdHM9J3VzZXJTcGFjZU9uVXNlJz48c3RvcCBvZmZzZXQ9JzAnIHN0b3AtY29sb3I9JyMyRjg2RkYnLz48c3RvcCBvZmZzZXQ9JzEnIHN0b3AtY29sb3I9JyMxMzY2RUMnLz48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0ncycgeDE9JzQwJyB5MT0nNDYnIHgyPSc0MCcgeTI9JzYwJyBncmFkaWVudFVuaXRzPSd1c2VyU3BhY2VPblVzZSc+PHN0b3Agb2Zmc2V0PScwJyBzdG9wLWNvbG9yPScjRkZGRkZGJyBzdG9wLW9wYWNpdHk9Jy4yMicvPjxzdG9wIG9mZnNldD0nMScgc3RvcC1jb2xvcj0nI0ZGRkZGRicgc3RvcC1vcGFjaXR5PScuMDQnLz48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0nYicgeDE9JzQwJyB5MT0nNicgeDI9JzQwJyB5Mj0nNTYnIGdyYWRpZW50VW5pdHM9J3VzZXJTcGFjZU9uVXNlJz48c3RvcCBvZmZzZXQ9JzAnIHN0b3AtY29sb3I9JyNFQUYyRkYnLz48c3RvcCBvZmZzZXQ9Jy41JyBzdG9wLWNvbG9yPScjOUNDNEZGJy8+PHN0b3Agb2Zmc2V0PScxJyBzdG9wLWNvbG9yPScjMUI2RkYzJy8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0nMTInIHk9JzQwJyB3aWR0aD0nNTYnIGhlaWdodD0nMzInIHJ4PSc3JyBmaWxsPSd1cmwoI3ApJy8+PHJlY3QgeD0nMTgnIHk9JzQ2JyB3aWR0aD0nNDQnIGhlaWdodD0nMTQnIHJ4PScyJyBmaWxsPSd1cmwoI3MpJy8+PHJlY3QgeD0nMjAnIHk9JzY1JyB3aWR0aD0nNDAnIGhlaWdodD0nMS40JyByeD0nLjcnIGZpbGw9JyNGRkZGRkYnIGZpbGwtb3BhY2l0eT0nLjMwJy8+PHBhdGggZD0nTTQ0IDYgTDI0IDQwIEwzNiA0MCBMMzAgNTYgTDUyIDI4IEw0MCAyOCBMNDggNiBaJyBmaWxsPSd1cmwoI2IpJy8+PC9zdmc+">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#FFFFFF;--surface:#FFFFFF;--surface-2:#F4F6F8;--surface-3:#E8EBEF;
@@ -50,7 +50,7 @@ body{
 .brand small{font-weight:400;color:var(--dim);font-size:13px;margin-left:4px}
 .topbar .live-dot{
   margin-left:auto;display:flex;align-items:center;gap:7px;
-  font-family:'JetBrains Mono';font-size:11px;color:var(--dim);
+  font-family:'Sora';font-size:11px;color:var(--dim);
   letter-spacing:.08em;text-transform:uppercase;
 }
 .topbar .live-dot::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 10px var(--success);animation:pulse 2s infinite}
@@ -88,7 +88,7 @@ body{
 .msg.user{justify-content:flex-end}
 .msg.user .av{
   background:var(--surface-3);border:1px solid var(--border-2);
-  color:var(--dim);font-family:'JetBrains Mono';font-size:13px;font-weight:700;
+  color:var(--dim);font-family:'Sora';font-size:13px;font-weight:700;
   order:2;
 }
 .msg.user .body{
@@ -97,7 +97,7 @@ body{
 }
 .msg.thinking .body{
   display:flex;gap:5px;align-items:center;color:var(--dim);
-  font-family:'JetBrains Mono';font-size:13px;
+  font-family:'Sora';font-size:13px;
 }
 .msg.thinking .dot{
   width:6px;height:6px;border-radius:50%;background:var(--primary);
@@ -115,13 +115,13 @@ body{
 .g-block:nth-of-type(4){animation-delay:1140ms}
 .g-disc{opacity:0;transform:translateY(6px);animation:g-rise .5s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:1520ms}
 @keyframes g-rise{to{opacity:1;transform:translateY(0)}}
-.g-l{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.12em;font-weight:700;color:var(--primary);text-transform:uppercase;margin-bottom:6px}
+.g-l{font-family:'Sora';font-size:10.5px;letter-spacing:.12em;font-weight:700;color:var(--primary);text-transform:uppercase;margin-bottom:6px}
 .g-lead{font-size:14.5px;line-height:1.55;color:var(--text)}
 .g-lead b{color:var(--primary)}
 .g-ul{padding-left:18px;display:flex;flex-direction:column;gap:5px;font-size:13.5px;color:var(--dim);line-height:1.55;margin:0}
 .g-ul li::marker{color:var(--primary)}
 .g-ul b{color:var(--text)}
-.g-meta{font-size:11.5px;color:var(--dim-2);margin-top:6px;font-family:'JetBrains Mono'}
+.g-meta{font-size:11.5px;color:var(--dim-2);margin-top:6px;font-family:'Sora'}
 .g-disc{
   margin-top:14px;padding:10px 14px;
   background:rgba(27,111,243,.05);border:1px solid rgba(27,111,243,.18);
@@ -242,7 +242,7 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
         <svg viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
       </div>
       <div class="body">
-        Hi — I'm Guru, one AI service reading your store's live data (read-only, tenant-scoped): demand forecasting, smart 86 / out-of-stock, upsell suggestions and anomaly detection.
+        Hi — I'm Guru, one AI service reading your store's live data (read-only, tenant-scoped): demand forecasting, smart 86 / out-of-stock, upsell, anomaly detection, plus new-dish and campaign ideas.
         <br><br>
         Try one of these, or type your own question 👇
       </div>
@@ -254,6 +254,8 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
     <button class="starter" data-q="smart86">What am I about to 86?</button>
     <button class="starter" data-q="upsell">What should my staff upsell?</button>
     <button class="starter" data-q="anomaly">Anything unusual in my numbers?</button>
+    <button class="starter" data-q="dish">Suggest a new dish from guest preferences</button>
+    <button class="starter" data-q="campaign">What campaign should I run this week?</button>
   </div>
 
   <div class="composer">
@@ -268,6 +270,82 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
 
 <script>
 const GURU = {
+  forecast: {
+    q: "What should I forecast for this weekend?",
+    body: `
+      <div class="g-block"><div class="g-l">Read of your data</div><ul class="g-ul">
+        <li>Trailing 4 weekends: <b>Fri ~42</b> covers, <b>Sat ~51</b> — both up ~6% month over month</li>
+        <li>This weekend is clear and warm (patio adds an est. 8–10 covers) with a concert 3 blocks away Saturday</li>
+        <li>Loyalty pre-bookings are already <b>22% ahead</b> of last Saturday at this hour</li>
+      </ul></div>
+      <div class="g-block"><div class="g-l">Recommendation</div><p class="g-lead">Plan for <b>Fri ~48 / Sat ~60</b> covers — about <b>+15%</b> over your trailing average.</p></div>
+      <div class="g-block"><div class="g-l">Prep guidance</div><ul class="g-ul">
+        <li>Scale ribeye + pasta mise to the higher count; pull an extra case of the house red</li>
+        <li>Add one server and one Sauté hand to the Saturday 6–9pm block</li>
+        <li>Pre-batch your two top pasta sauces before the rush</li>
+      </ul></div>
+      <div class="g-block"><div class="g-l">Expected outcome</div>
+        <p class="g-lead">~108 weekend covers handled with no 86 and ticket times held under target</p>
+        <p class="g-meta">Confidence: medium-high · driven by weather + the Saturday event</p>
+      </div>
+      <div class="g-disc"><b>Starting point only.</b> Check this against your reservation book and staffing before locking the schedule.</div>`
+  },
+  smart86: {
+    q: "What am I about to 86?",
+    body: `
+      <div class="g-block"><div class="g-l">Read of your data</div><ul class="g-ul">
+        <li><b>Ribeye:</b> 22 portions on hand, weekend forecast burns ~30 → short by Saturday dinner</li>
+        <li><b>Burrata:</b> 9 on hand at a 7/day pace → tight for Sunday brunch</li>
+        <li><b>Soft-shell crab special:</b> only 3 sold in 2 days — slow mover, not at risk</li>
+      </ul></div>
+      <div class="g-block"><div class="g-l">Recommendation</div><p class="g-lead">Pre-empt two likely 86s <b>now</b>, before they hit the floor.</p></div>
+      <div class="g-block"><div class="g-l">Moves</div><ul class="g-ul">
+        <li>Reorder ribeye today (1-day lead time) — bump the order to 36</li>
+        <li>Flag burrata to the host stand as "limited" after 1pm Sunday</li>
+        <li>Re-feature the crab as tonight's staff pick to clear it</li>
+      </ul></div>
+      <div class="g-block"><div class="g-l">Expected outcome</div>
+        <p class="g-lead">Zero surprise 86s this weekend · ~$640 of slow crab inventory cleared</p>
+      </div>
+      <div class="g-disc"><b>Starting point only.</b> Confirm on-hand counts with your kitchen before reordering.</div>`
+  },
+  upsell: {
+    q: "What should my staff upsell?",
+    body: `
+      <div class="g-block"><div class="g-l">Read of your data</div><ul class="g-ul">
+        <li>Wine attach is <b>78%</b> on pasta tables vs 52% house-wide — the biggest gap to close</li>
+        <li>Dessert attach is only <b>19%</b> on 2-tops, despite a 71% dessert margin</li>
+        <li>"Avocado +$2" and "Truffle fries +$3" convert at ~1 in 4 whenever they're offered</li>
+      </ul></div>
+      <div class="g-block"><div class="g-l">Recommendation</div><p class="g-lead">Three scripted, low-friction prompts for tonight's service.</p></div>
+      <div class="g-block"><div class="g-l">Prompts</div><ul class="g-ul">
+        <li>On every pasta order: suggest the <b>$12 house red</b> pairing</li>
+        <li>At entrée clear on 2-tops: offer a <b>shared dessert + two spoons</b></li>
+        <li>At the register: the premium add-ons as a one-line "make it…"</li>
+      </ul></div>
+      <div class="g-block"><div class="g-l">Expected outcome</div>
+        <p class="g-lead">+$4–6 average check on pasta tables · +6–8 desserts a night</p>
+      </div>
+      <div class="g-disc"><b>Starting point only.</b> Brief the team at pre-shift and track attach for a week before you judge it.</div>`
+  },
+  anomaly: {
+    q: "Anything unusual in my numbers?",
+    body: `
+      <div class="g-block"><div class="g-l">Read of your data</div><ul class="g-ul">
+        <li>Void rate hit <b>4.1%</b> Tuesday vs a 1.3% baseline — concentrated on one server's tickets</li>
+        <li>Sauté ticket time crept to <b>11.1 min</b> (target 10) over the last 5 services</li>
+        <li>Cash drawer swung <b>−$38</b> Wednesday — first variance in 3 weeks</li>
+      </ul></div>
+      <div class="g-block"><div class="g-l">Recommendation</div><p class="g-lead">Two to check today, one to watch.</p></div>
+      <div class="g-block"><div class="g-l">Checks</div><ul class="g-ul">
+        <li>Pull Tuesday's voids by reason — likely a training or comp-button issue</li>
+        <li>Shadow the Sauté pass at the next rush; the carbonara / scampi pair is the bottleneck</li>
+      </ul></div>
+      <div class="g-block"><div class="g-l">Watch</div>
+        <p class="g-lead">The cash variance — re-count the Wednesday close and confirm the float</p>
+      </div>
+      <div class="g-disc"><b>Starting point only.</b> Anomalies flag where to look, not a conclusion — confirm before acting on staff.</div>`
+  },
   campaign: {
     q: "What campaign should I run this week?",
     body: `
@@ -289,7 +367,7 @@ const GURU = {
       <div class="g-disc"><b>Starting point only.</b> Guru reads what's in your data — for pricing or supplier calls, consult an industry specialist before acting.</div>`
   },
   dish: {
-    q: "What new dish should I add to the menu?",
+    q: "What new dish should I add, based on guest preferences?",
     body: `
       <div class="g-block"><div class="g-l">Read of your data</div><ul class="g-ul">
         <li>"Avocado +$2" sells <b>19 units/day</b> at near-100% margin</li>
@@ -347,10 +425,10 @@ const GURU = {
     body: `
       <p class="g-lead">I haven't trained on that exact question yet, but here's where I'd start looking in your data.</p>
       <div class="g-block" style="margin-top:14px"><div class="g-l">Try one of these instead</div><ul class="g-ul">
+        <li>"What should I forecast for this weekend?"</li>
+        <li>"What am I about to 86?"</li>
+        <li>"Suggest a new dish from guest preferences"</li>
         <li>"What campaign should I run this week?"</li>
-        <li>"What new dish should I add?"</li>
-        <li>"What's my biggest opportunity right now?"</li>
-        <li>"How's my margin trending?"</li>
       </ul></div>
       <div class="g-disc"><b>Starting point only.</b> For anything that affects pricing, supplier or staffing, talk to a restaurant industry specialist.</div>`
   }
@@ -397,6 +475,10 @@ function pickKey(txt){
   if (/dish|menu|add|item|food|plate/.test(t)) return 'dish';
   if (/margin|cogs|cost|profit|p&l|expense/.test(t)) return 'margin';
   if (/opp|grow|focus|priorit|next/.test(t)) return 'opportunity';
+  if (/forecast|weekend|predict|demand|how busy|covers/.test(t)) return 'forecast';
+  if (/\b86\b|out.?of.?stock|run out|stock out|going to run/.test(t)) return 'smart86';
+  if (/upsell|attach|add.?on|sell more|pair/.test(t)) return 'upsell';
+  if (/anomal|unusual|weird|spike|wrong|off\b/.test(t)) return 'anomaly';
   return null;
 }
 
