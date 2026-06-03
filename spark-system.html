@@ -842,6 +842,24 @@ button{font-family:inherit;cursor:pointer}
 .lz-qr-sub{font-size:12.5px;color:var(--dim);margin-top:6px;line-height:1.45;max-width:32ch}
 @media(max-width:560px){.lz-grid{grid-template-columns:1fr 1fr}.rp-roles{grid-template-columns:1fr}.lz-qr{width:100%}}
 @media(max-width:400px){.lz-grid{grid-template-columns:1fr}}
+.lz-tabs{display:flex;align-items:center;gap:8px;margin:6px 0 18px}
+.lz-tabstrip{flex:1;min-width:0;display:flex;gap:8px;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none;padding:2px}
+.lz-tabstrip::-webkit-scrollbar{display:none}
+.lz-tab{flex:0 0 auto;padding:10px 18px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border);color:var(--dim);font-family:'Sora';font-size:13px;font-weight:600;letter-spacing:-.01em;cursor:pointer;white-space:nowrap;transition:.15s}
+.lz-tab:hover{border-color:rgba(27,111,243,.4);color:var(--text)}
+.lz-tab.on{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 6px 16px rgba(27,111,243,.3)}
+.lz-tnav{flex:0 0 auto;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--surface);border:1px solid var(--border);color:var(--primary);cursor:pointer;transition:.15s}
+.lz-tnav:hover{border-color:var(--primary);background:rgba(27,111,243,.06)}
+.lz-tnav:active{transform:scale(.93)}
+.lz-tnav svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.lz-panel{display:none}
+.lz-panel.on{display:grid;grid-template-columns:repeat(auto-fit,minmax(236px,280px));justify-content:center;gap:14px;animation:spark-view-in .3s cubic-bezier(.2,.8,.2,1)}
+/* center the Choose-your-station hero */
+.lz-inner{text-align:center}
+.lz-brand,.lz-eyebrow{justify-content:center}
+.lz-card{text-align:left}
+.lz-qr-meta{text-align:left}
+@media (min-width:561px){ .lz-tabstrip{justify-content:center} }
 /* <<< LAUNCHER-CSS <<< */
 
 /* >>> PREVIEW-APPS-CSS >>> */
@@ -1321,6 +1339,7 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
     <div class="lz-eyebrow"><span class="live"></span> Live demo · The Ember Room</div>
     <h1>Choose your station</h1>
     <p class="sub">One platform, every surface. Tap a device to launch it full-screen — exactly what your staff and guests would touch. Switch role or station anytime.</p>
+    <div id="lzZones"></div>
     <div class="lz-qr" id="lzQr">
       <div class="lz-qr-code" id="lzQrCode"></div>
       <div class="lz-qr-meta">
@@ -1329,7 +1348,6 @@ body.spark-leaving{animation:spark-page-out .22s cubic-bezier(.55,.05,.7,.18) fo
         <div class="lz-qr-sub">Point your phone camera at the code — this live demo opens right on your device.</div>
       </div>
     </div>
-    <div id="lzZones"></div>
     <div class="lz-foot">Every surface here is a <b>live, interactive</b> demo — grounded 1:1 in the real Win your POS app. Order, fire to the line, take payment, tip, redeem loyalty — it all works.</div>
   </div>
 </div>
@@ -5555,10 +5573,6 @@ function setupAction(act,k){
   var histOk = (function(){ try{ return (typeof history!=='undefined' && history.pushState && typeof window!=='undefined' && window.addEventListener) ? true : false; }catch(e){ return false; } })();
 
   var DEVICES = [
-    { zone:'Back office', items:[
-      { id:'setup', ic:'🏪', label:'Store Setup',        persona:'Owner / Admin',   desc:'Board a new store → configure → go live, end to end.',            mode:'live', surface:'setup',   access:'setup' },
-      { id:'admin', ic:'📊', label:'Owner Console',      persona:'Owner / Manager', desc:'Dashboard · 36 live reports · AI advisor · multi-store.',          mode:'live', surface:'reports', access:'full', roles:['owner','manager'] }
-    ]},
     { zone:'Front of house', items:[
       { id:'pos-server', ic:'🧾', label:'Server POS',    persona:'Server',          desc:'Floor → ticket → fire → checkout. Split, coursing, manager PIN.', mode:'live', surface:'order',   access:'pos',  roles:['server','bartender','manager','owner'] },
       { id:'pos-mobile', ic:'📱', label:'Mobile POS',    persona:'Handheld',        desc:'Pocket twin of the server POS — order & pay tableside.',          mode:'live', surface:'order',   access:'pos',  roles:['server','bartender','manager','owner'] }
@@ -5567,6 +5581,10 @@ function setupAction(act,k){
       { id:'kds-grill', ic:'🔥', label:'KDS · Grill',    persona:'Line cook',       desc:'Tickets age white → gold → red. Bump & recall, station routing.', mode:'live', surface:'kds', access:'kds', station:'grill' },
       { id:'kds-saute', ic:'🍳', label:'KDS · Sauté',    persona:'Line cook',       desc:'Per-station queue with predictive prep timing.',                  mode:'live', surface:'kds', access:'kds', station:'saute' },
       { id:'kds-expo',  ic:'🛎', label:'KDS · Expo',     persona:'Expediter',       desc:'All-day item counts across every open ticket.',                   mode:'live', surface:'kds', access:'kds', expo:true }
+    ]},
+    { zone:'Back office', items:[
+      { id:'setup', ic:'🏪', label:'Store Setup',        persona:'Owner / Admin',   desc:'Board a new store → configure → go live, end to end.',            mode:'live', surface:'setup',   access:'setup' },
+      { id:'admin', ic:'📊', label:'Owner Console',      persona:'Owner / Manager', desc:'Dashboard · 36 live reports · AI advisor · multi-store.',          mode:'live', surface:'reports', access:'full', roles:['owner','manager'] }
     ]},
     { zone:'Guest-facing', items:[
       { id:'kiosk',  ic:'🖥', label:'Self-order Kiosk',  persona:'Guest',           desc:'Walk-in browse → build → Apple Pay. Bigger checks, less labour.',  mode:'live', surface:'preview', access:'preview', preview:'kiosk' },
@@ -5669,26 +5687,44 @@ function setupAction(act,k){
 
   function renderLauncher(){
     var host = document.getElementById('lzZones'); if (!host) return;
-    host.innerHTML = DEVICES.map(function(z){
-      return '<div class="lz-zone">'+z.zone+'</div><div class="lz-grid">'+
-        z.items.map(function(d){
-          return '<button class="lz-card" data-id="'+d.id+'">'+
-            '<span class="lz-badge '+d.mode+'">'+(d.mode==='live'?'Live':'Preview')+'</span>'+
-            '<div class="lz-bezel">'+d.ic+'</div>'+
-            '<h3>'+d.label+'</h3>'+
-            '<div class="lz-persona">'+d.persona+'</div>'+
-            '<p>'+d.desc+'</p>'+
-          '</button>';
-        }).join('')+'</div>';
-    }).join('');
+    function cardHtml(d){
+      return '<button class="lz-card" data-id="'+d.id+'">'+
+        '<span class="lz-badge '+d.mode+'">'+(d.mode==='live'?'Live':'Preview')+'</span>'+
+        '<div class="lz-bezel">'+d.ic+'</div>'+
+        '<h3>'+d.label+'</h3>'+
+        '<div class="lz-persona">'+d.persona+'</div>'+
+        '<p>'+d.desc+'</p>'+
+      '</button>';
+    }
+    var chevL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>';
+    var chevR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>';
+    var tabs = DEVICES.map(function(z,i){ return '<button class="lz-tab'+(i===0?' on':'')+'" type="button" data-zi="'+i+'">'+z.zone+'</button>'; }).join('');
+    var panels = DEVICES.map(function(z,i){ return '<div class="lz-grid lz-panel'+(i===0?' on':'')+'" data-zi="'+i+'">'+z.items.map(cardHtml).join('')+'</div>'; }).join('');
+    host.innerHTML =
+      '<div class="lz-tabs">'+
+        '<button class="lz-tnav" id="lzTabPrev" type="button" aria-label="Previous zone">'+chevL+'</button>'+
+        '<div class="lz-tabstrip" id="lzTabStrip">'+tabs+'</div>'+
+        '<button class="lz-tnav" id="lzTabNext" type="button" aria-label="Next zone">'+chevR+'</button>'+
+      '</div>'+
+      '<div class="lz-panels">'+panels+'</div>';
     [].slice.call(host.querySelectorAll('.lz-card')).forEach(function(btn){
       if (typeof btn.addEventListener!=='function') return;
       btn.addEventListener('click', function(){ var d = findDevice(btn.dataset.id); if (d) pickDevice(d); });
     });
-    // Real, scannable "try here" QR -> opens this live demo on the partner's own phone.
+    var idx = 0, n = DEVICES.length;
+    function showZone(i){
+      idx = ((i % n) + n) % n;
+      [].slice.call(host.querySelectorAll('.lz-tab')).forEach(function(t){ t.classList.toggle('on', (+t.getAttribute('data-zi'))===idx); });
+      [].slice.call(host.querySelectorAll('.lz-panel')).forEach(function(p){ p.classList.toggle('on', (+p.getAttribute('data-zi'))===idx); });
+      var act = host.querySelector('.lz-tab.on'); if (act && act.scrollIntoView){ try{ act.scrollIntoView({inline:'center',block:'nearest'}); }catch(e){} }
+    }
+    [].slice.call(host.querySelectorAll('.lz-tab')).forEach(function(t){ if(typeof t.addEventListener==='function') t.addEventListener('click', function(){ showZone(+t.getAttribute('data-zi')); }); });
+    var pvb=document.getElementById('lzTabPrev'); if(pvb&&typeof pvb.addEventListener==='function') pvb.addEventListener('click', function(){ showZone(idx-1); });
+    var nxb=document.getElementById('lzTabNext'); if(nxb&&typeof nxb.addEventListener==='function') nxb.addEventListener('click', function(){ showZone(idx+1); });
+    // Real, scannable QR -> opens this live demo straight on the Stations launcher (skips onboarding).
     var qbox = document.getElementById('lzQrCode');
     if (qbox && !qbox.firstChild && typeof qrcode !== 'undefined'){
-      try { var q = qrcode(0,'M'); q.addData('https://winyourpos.github.io/remote-demo/try.html'); q.make(); qbox.innerHTML = q.createSvgTag({ scalable:true, margin:0 }); } catch(e){}
+      try { var q = qrcode(0,'M'); q.addData('https://winyourpos.github.io/remote-demo/spark-system.html#stations'); q.make(); qbox.innerHTML = q.createSvgTag({ scalable:true, margin:0 }); } catch(e){}
     }
   }
 
@@ -6438,7 +6474,10 @@ function wypEnterSetupGate(){
 }
 (function(){
   if(typeof document==='undefined'||typeof document.getElementById!=='function')return;
-  if(typeof window!=='undefined'&&window.addEventListener){ window.addEventListener('load',wypEnterSetupGate); }
+  if(typeof window==='undefined'||!window.addEventListener)return;
+  // QR / deep-link (#stations) skips the onboarding gate and lands straight on the Stations launcher.
+  var direct=false; try{ direct=/stations|launch/i.test((location.hash||'')+(location.search||'')); }catch(e){}
+  window.addEventListener('load', direct ? wypShowStations : wypEnterSetupGate);
 })();
 /* <<< SETUP-GATE <<< */
 </script>
